@@ -1,0 +1,3 @@
+Player;1000;. . .
+Player;50;Damn those adventurers
+Player;40;Who would've thought they have a banishing spell?

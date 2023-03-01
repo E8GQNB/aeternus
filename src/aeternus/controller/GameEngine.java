@@ -5,10 +5,8 @@
  */
 package aeternus.controller;
 
-/**
- *
- * @author User
- */
 public class GameEngine {
-    
+    public enum characters {
+    PLAYER, SERVANT, WEAPONSMERCHANT, MAGICMERCHANT
+}
 }
