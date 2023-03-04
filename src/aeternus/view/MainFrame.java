@@ -48,10 +48,12 @@ public class MainFrame extends javax.swing.JFrame {
         background = new javax.swing.JLabel();
         Main = new javax.swing.JPanel();
         Main1 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Aeternus");
@@ -125,9 +127,16 @@ public class MainFrame extends javax.swing.JFrame {
         Main1.setMinimumSize(new java.awt.Dimension(1920, 1080));
         Main1.setLayout(null);
 
+        jLabel6.setFont(new java.awt.Font("Agency FB", 0, 60)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel6.setText(">");
+        Main1.add(jLabel6);
+        jLabel6.setBounds(1830, 990, 70, 70);
+
         jLabel2.setOpaque(true);
         Main1.add(jLabel2);
-        jLabel2.setBounds(20, 720, 350, 340);
+        jLabel2.setBounds(20, 720, 340, 340);
 
         jLabel3.setFont(new java.awt.Font("Agency FB", 0, 36)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(204, 204, 204));
@@ -140,6 +149,8 @@ public class MainFrame extends javax.swing.JFrame {
         Main1.add(jLabel3);
         jLabel3.setBounds(390, 800, 1510, 260);
 
+        jLabel4.setFont(new java.awt.Font("Agency FB", 1, 36)); // NOI18N
+        jLabel4.setText("asd");
         jLabel4.setOpaque(true);
         Main1.add(jLabel4);
         jLabel4.setBounds(390, 720, 1510, 60);
@@ -149,6 +160,14 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel1.setOpaque(true);
         Main1.add(jLabel1);
         jLabel1.setBounds(0, 700, 1920, 380);
+
+        jLabel7.setBackground(new java.awt.Color(102, 102, 102));
+        jLabel7.setFont(new java.awt.Font("Agency FB", 0, 48)); // NOI18N
+        jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel7.setText("InfoText");
+        jLabel7.setOpaque(true);
+        Main1.add(jLabel7);
+        jLabel7.setBounds(610, 460, 700, 150);
 
         getContentPane().add(Main1);
         Main1.setBounds(0, 0, 1920, 1080);
@@ -207,6 +226,8 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel logo;
     private javax.swing.JButton startButton;
     private javax.swing.JLabel transitionOut;
