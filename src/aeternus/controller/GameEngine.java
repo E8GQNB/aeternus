@@ -7,6 +7,6 @@ package aeternus.controller;
 
 public class GameEngine {
     public enum characters {
-    PLAYER, SERVANT, WEAPONSMERCHANT, MAGICMERCHANT
+    PLAYER, SERVANT, WEAPONMERCHANT, MAGICMERCHANT
 }
 }

@@ -9,6 +9,7 @@ import java.awt.Component;
 import javax.swing.JPanel;
 import aeternus.controller.DialougeSystem;
 import aeternus.controller.GameEngine;
+import aeternus.model.InfoText;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,8 +19,9 @@ import java.util.logging.Logger;
  */
 public class AeternusGUI {
     
-    MainFrame s = new MainFrame(this);
-    Component[] clist = s.getRootPane().getContentPane().getComponents();
+    private MainFrame s = new MainFrame(this);
+    private Component[] clist = s.getRootPane().getContentPane().getComponents();
+    private volatile boolean dialougeState = false;
     public AeternusGUI(){ 
         s.setVisible(true);
         new java.util.Timer().schedule( 
@@ -49,20 +51,33 @@ public class AeternusGUI {
         
     }
     
+    public void CreateInfo(JPanel p, String text, int length) throws InterruptedException{
+        InfoText inf = new InfoText(p, text, length);
+    }
+    
+    public void setDialougeState(boolean b){
+        dialougeState = b;
+    }
     
     public void newGame(){
+        dialougeState = true;
+        
+        DialougeSystem d = new DialougeSystem(GameEngine.characters.PLAYER, GameEngine.characters.SERVANT, (JPanel)clist[2], this);
         new java.util.Timer().schedule( 
         new java.util.TimerTask() {
             @Override
             public void run() {
-                DialougeSystem d = new DialougeSystem(GameEngine.characters.PLAYER, GameEngine.characters.SERVANT, (JPanel)clist[2]);
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(1000);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(AeternusGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 try {
                     d.play("Open");
+                    while(dialougeState){}
+                    Thread.sleep(2000);
+                    CreateInfo((JPanel)clist[2], "An hour later...", 3000);
+                    
                 } catch (Exception ex) {
                     Logger.getLogger(AeternusGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
