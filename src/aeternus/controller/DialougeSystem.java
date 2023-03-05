@@ -7,7 +7,6 @@ package aeternus.controller;
 
 import java.awt.Color;
 import javax.swing.JLabel;
-import aeternus.controller.GameEngine;
 import aeternus.model.InfoText;
 import aeternus.view.AeternusGUI;
 import java.awt.Component;
@@ -49,6 +48,7 @@ public class DialougeSystem {
         destination.add(dialougeTextBox);
         dialougeTextBox.setBounds(390, 800, 1510, 260);
         dialougeTextBox.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 SkipButtonMouseClicked(evt);
             }
@@ -92,51 +92,44 @@ public class DialougeSystem {
     }  
     
     private void createBackground(){
-        fadeIn(dialougeBackground, 5);
+        dialougeBackground.setBackground(new Color(30, 30, 30, 0));
         dialougeBackground.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         dialougeBackground.setOpaque(true);
+        dialougeBackground.setVisible(false);
         destination.add(dialougeBackground);
         dialougeBackground.setBounds(0, 700, 1920, 380);
     }
     
-    private void fadeIn(JLabel l, int length){
-        Thread one = new Thread() {
-        public void run() {
+    public void fadeIn(JLabel l, int length){
             try {
-                for(int i = 0; i < 255; i++){
+                for(int i = 0; i < 200; i++){
                     l.setBackground(new Color(30, 30, 30, i));
+                    l.getParent().validate();
+                    l.getParent().repaint();
                     Thread.sleep(length);
                 }
             } catch(InterruptedException v) {
                 System.out.println(v);
             }
-        }  
-    };
-
-    one.start();
     }
     
-    private void fadeOut(JLabel l, int length){
-        Thread one = new Thread() {
-        public void run() {
+    public void fadeOut(JLabel l, int length){
             try {
-                for(int i = 0; i < 255; i++){
-                    l.setBackground(new Color(30, 30, 30, 255-i));
+                for(int i = 0; i < 200; i++){
+                    l.setBackground(new Color(30, 30, 30, 200-i));
+                    l.getParent().validate();
+                    l.getParent().repaint();
                     Thread.sleep(length);
                 }
-                l.getParent().validate();
-                l.getParent().repaint();
                 ae.setDialougeState(false);
             } catch(InterruptedException v) {
                 System.out.println(v);
             }
-        }  
-    };
-
-    one.start();
     }
     
     public void play(String id) throws Exception{
+        dialougeBackground.setVisible(true);
+        fadeIn(dialougeBackground, 5);
         ArrayList<String[]> dialouge = readIn(id);
         dialougeTextBox.setVisible(true);
         speakerName.setVisible(true);
@@ -166,7 +159,7 @@ public class DialougeSystem {
                                 if(ch != '€'){
                                     text += ch;
                                     dialougeTextBox.setText(text);
-                                }else{
+                                }else if(flag){
                                     Thread.sleep(Integer.parseInt(s[1])*8);
                                 }
                                 Thread.sleep(Integer.parseInt(s[1]));
@@ -180,6 +173,10 @@ public class DialougeSystem {
                         dialougeTextBox.setVisible(false);
                         speakerName.setVisible(false);
                         speakerImage.setVisible(false);
+                        
+                        dialougeTextBox.setText("");
+                        speakerName.setText("");
+                        speakerImage.setIcon(null);
                         fadeOut(dialougeBackground, 5);
                     } catch(InterruptedException v) {
                         System.out.println(v);
