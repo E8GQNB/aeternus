@@ -16,10 +16,7 @@ import javax.swing.SwingUtilities;
  * @author User
  */
 public class MainFrame extends javax.swing.JFrame {
-
-    /**
-     * Creates new form titleScreen
-     */
+    
     private AeternusGUI ae;
     public MainFrame(AeternusGUI ae) {
         initComponents();
@@ -47,7 +44,7 @@ public class MainFrame extends javax.swing.JFrame {
         logo = new javax.swing.JLabel();
         background = new javax.swing.JLabel();
         Main = new javax.swing.JPanel();
-        Main1 = new javax.swing.JPanel();
+        Prototype = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -123,19 +120,19 @@ public class MainFrame extends javax.swing.JFrame {
         getContentPane().add(Main);
         Main.setBounds(0, 0, 1920, 1080);
 
-        Main1.setBackground(new java.awt.Color(0, 0, 0));
-        Main1.setMinimumSize(new java.awt.Dimension(1920, 1080));
-        Main1.setLayout(null);
+        Prototype.setBackground(new java.awt.Color(0, 0, 0));
+        Prototype.setMinimumSize(new java.awt.Dimension(1920, 1080));
+        Prototype.setLayout(null);
 
         jLabel6.setFont(new java.awt.Font("Agency FB", 0, 60)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel6.setText(">");
-        Main1.add(jLabel6);
+        Prototype.add(jLabel6);
         jLabel6.setBounds(1830, 990, 70, 70);
 
         jLabel2.setOpaque(true);
-        Main1.add(jLabel2);
+        Prototype.add(jLabel2);
         jLabel2.setBounds(20, 720, 340, 340);
 
         jLabel3.setFont(new java.awt.Font("Agency FB", 0, 36)); // NOI18N
@@ -146,19 +143,19 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel3.setOpaque(true);
         jLabel3.setVerifyInputWhenFocusTarget(false);
         jLabel3.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
-        Main1.add(jLabel3);
+        Prototype.add(jLabel3);
         jLabel3.setBounds(390, 800, 1510, 260);
 
         jLabel4.setFont(new java.awt.Font("Agency FB", 1, 36)); // NOI18N
         jLabel4.setText("asd");
         jLabel4.setOpaque(true);
-        Main1.add(jLabel4);
+        Prototype.add(jLabel4);
         jLabel4.setBounds(390, 720, 1510, 60);
 
         logo.setBackground(new Color(0, 0, 0, 120));
         jLabel1.setBackground(new java.awt.Color(51, 51, 51));
         jLabel1.setOpaque(true);
-        Main1.add(jLabel1);
+        Prototype.add(jLabel1);
         jLabel1.setBounds(0, 700, 1920, 380);
 
         jLabel7.setBackground(new java.awt.Color(102, 102, 102));
@@ -166,11 +163,11 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel7.setText("InfoText");
         jLabel7.setOpaque(true);
-        Main1.add(jLabel7);
+        Prototype.add(jLabel7);
         jLabel7.setBounds(610, 460, 700, 150);
 
-        getContentPane().add(Main1);
-        Main1.setBounds(0, 0, 1920, 1080);
+        getContentPane().add(Prototype);
+        Prototype.setBounds(0, 0, 1920, 1080);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -217,8 +214,8 @@ public class MainFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Main;
-    private javax.swing.JPanel Main1;
     private javax.swing.JPanel MainMenu;
+    private javax.swing.JPanel Prototype;
     private javax.swing.JPanel SplashScreen;
     private javax.swing.JLabel background;
     private javax.swing.JLabel jLabel1;
