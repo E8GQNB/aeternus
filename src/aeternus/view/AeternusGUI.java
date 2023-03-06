@@ -120,6 +120,7 @@ public class AeternusGUI {
         transitionCover.setOpaque(true);
         transitionCover.setVisible(true);
         dest.add(transitionCover);
+        dest.setComponentZOrder(transitionCover, 0);
         transitionCover.setBounds(0, 0, 1920, 1080);
     }
     
@@ -129,13 +130,15 @@ public class AeternusGUI {
         backgroundImage.setVisible(true);
         backgroundImage.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         dest.add(backgroundImage);
+        dest.setComponentZOrder(backgroundImage, 6);
         backgroundImage.setBounds(0, 0, 1920, 1080);
     }
     
     private void loadLocale(GameEngine.locations x, JPanel destination, boolean transition){
-        loadPointsOfInterest(x, destination);
-        createBackground(destination);
         setBackground(x.getPath(), 5, transition);
+        loadPointsOfInterest(x, destination);
+        destination.getParent().validate();
+        destination.getParent().repaint();
     }
     
     private void loadPointsOfInterest(GameEngine.locations x, JPanel destination){
@@ -151,6 +154,7 @@ public class AeternusGUI {
             newLabel.setVerticalAlignment(javax.swing.SwingConstants.CENTER);
             newLabel.setFont(new java.awt.Font("Agency FB", 0, 30));
             destination.add(newLabel);
+            destination.setComponentZOrder(newLabel, 1);
             newLabel.setBounds(Integer.parseInt(point[1]), Integer.parseInt(point[2]), Integer.parseInt(point[3]), Integer.parseInt(point[4]));
             newLabel.addMouseListener(new java.awt.event.MouseAdapter() {
                 public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -161,9 +165,22 @@ public class AeternusGUI {
         }
     }
     
+    private void removePointsOfInterest(){
+        for(JLabel l : scenePoints){
+            l.getParent().remove(l);
+        }
+        backgroundImage.getParent().revalidate();
+        backgroundImage.getParent().repaint();
+    }
+    
     private void loadPOI(java.awt.event.MouseEvent evt){
-        System.out.println(evt.getComponent());
-        setBackground("/images/beta" + evt.getComponent().getName() + ".png", 5, true);
+        Thread one = new Thread() {
+            public void run() {
+                removePointsOfInterest();
+                setBackground("/images/beta" + evt.getComponent().getName() + ".png", 2, true);
+            }
+        };
+        one.start();
     }
     
     public void newGame(){
@@ -182,14 +199,14 @@ public class AeternusGUI {
                     createTransition((JPanel)clist[2]);
                     createBackground((JPanel)clist[2]);
                     setBackground("/images/betaCaveBackground.png", 5, true);
-                    d.play("Open");
+                    /*d.play("Open");
                     while(dialougeState){}
                     Thread.sleep(1000);
                     CreateInfo((JPanel)clist[2], "An hour later...", 3000);
                     dialougeState = true;
                     d.play("Open2");
                     while(dialougeState){}
-                    Thread.sleep(1000);
+                    Thread.sleep(1000);*/
                     CreateInfo((JPanel)clist[2], "At the surface", 2500, "/images/betaMenuBackground.png", 5);
                     dialougeState = true;
                     d.play("Open3");

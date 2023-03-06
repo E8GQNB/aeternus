@@ -1,4 +1,4 @@
-Servant;50;Here we are
+Servant;50;Here we are.
 Player;50;How quaint.€ What were you so worried about?
 Servant;50;Take a look at the sky.
 Player;60;.€.€.€ You have got to be kidding me.
