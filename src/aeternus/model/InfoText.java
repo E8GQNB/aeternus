@@ -32,6 +32,7 @@ public class InfoText {
         infoText.setFont(new java.awt.Font("Agency FB", 0, 48));
         infoText.setBackground(new Color(30, 30, 30));
         destination.add(infoText);
+        destination.setComponentZOrder(infoText, 0);
         infoText.setBounds(610, 465, 700, 150);
         Thread.sleep(length);
         destination.remove(infoText);
