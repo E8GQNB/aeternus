@@ -29,6 +29,7 @@ public class AeternusGUI {
     private JLabel backgroundImage = new JLabel();
     private JLabel transitionCover = new JLabel();
     private ArrayList<JLabel> scenePoints = new ArrayList<JLabel>();
+    private ArrayList<JLabel> locationOptions = new ArrayList<JLabel>();
     
     public AeternusGUI(){ 
         s.setVisible(true);
@@ -36,7 +37,7 @@ public class AeternusGUI {
         new java.util.TimerTask() {
             @Override
             public void run() {
-                clist[0].setVisible(false);
+                findPanel("SplashScreen").setVisible(false);
             }
         }, 
         100
@@ -49,14 +50,24 @@ public class AeternusGUI {
         new java.util.TimerTask() {
             @Override
             public void run() {
-                clist[1].setVisible(false);
-                clist[2].setVisible(true);
+                findPanel("MainMenu").setVisible(false);
+                findPanel("Main").setVisible(true);
+                //clist[2].setVisible(true);
                 newGame();
             }
         }, 
         570
 );
         
+    }
+    
+    public JPanel findPanel(String name){
+        for(Component c : clist){
+            if(c.getName().equals(name)){
+                return (JPanel)c;
+            }
+        }
+        return null;
     }
     
     public void CreateInfo(JPanel p, String text, int length) throws InterruptedException{
@@ -174,18 +185,67 @@ public class AeternusGUI {
     }
     
     private void loadPOI(java.awt.event.MouseEvent evt){
+        DialougeSystem event = new DialougeSystem(GameEngine.characters.PLAYER, GameEngine.characters.MAGICMERCHANT, findPanel("Main"), this);
+        String flag = GameEngine.interactables.valueOf(evt.getComponent().getName()).getFlag();
+        ArrayList<String[]> options = GameEngine.interactables.valueOf(evt.getComponent().getName()).getOptions();
         Thread one = new Thread() {
             public void run() {
                 removePointsOfInterest();
                 setBackground("/images/beta" + evt.getComponent().getName() + ".png", 2, true);
+                if(flag != ""){
+                    dialougeState = true;
+                    try {
+                        event.play(flag);
+                        while(dialougeState){}
+                    } catch (Exception ex) {
+                        Logger.getLogger(AeternusGUI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    while(dialougeState){}
+                }
+                int cnt = 0;
+                for(String[] row : options){
+                    if(row[0].equals("option")){
+                        addOption(row[1], GameEngine.interactables.valueOf(evt.getComponent().getName()).toString(), cnt, GameEngine.interactables.valueOf(evt.getComponent().getName()).getParentLocation());
+                        cnt++;
+                    }
+                }
             }
         };
         one.start();
     }
     
+    private void addOption(String name, String id, int place, String parentLocation){
+        JLabel newL = new JLabel();
+        newL.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        newL.setForeground(new java.awt.Color(204, 204, 204));
+        newL.setOpaque(true);
+        newL.setVisible(true);
+        newL.setText(name);
+        newL.setVerticalAlignment(javax.swing.SwingConstants.CENTER);
+        newL.setFont(new java.awt.Font("Agency FB", 0, 36));
+        newL.setBackground(new Color(40, 40, 40));
+        findPanel("Main").add(newL);
+        findPanel("Main").setComponentZOrder(newL, 0);
+        newL.setBounds(610, 300 + (place*100), 700, 50);
+        locationOptions.add(newL);
+        newL.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                loadShop(evt, id, name, parentLocation);
+            }
+        });
+    }
+    
+    private void loadShop(java.awt.event.MouseEvent evt, String id, String name, String parent){
+        if(name.equals("Leave")){
+            loadLocale(GameEngine.locations.valueOf(parent), findPanel("Main"), true);
+        }
+        System.out.println("click!");
+    }
+    
     public void newGame(){
         dialougeState = true;
-        DialougeSystem d = new DialougeSystem(GameEngine.characters.PLAYER, GameEngine.characters.SERVANT, (JPanel)clist[2], this);
+        DialougeSystem d = new DialougeSystem(GameEngine.characters.PLAYER, GameEngine.characters.SERVANT, findPanel("Main"), this);
         new java.util.Timer().schedule( 
         new java.util.TimerTask() {
             @Override
@@ -196,23 +256,24 @@ public class AeternusGUI {
                     Logger.getLogger(AeternusGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 try {
-                    createTransition((JPanel)clist[2]);
-                    createBackground((JPanel)clist[2]);
+                    createTransition(findPanel("Main"));
+                    createBackground(findPanel("Main"));
                     setBackground("/images/betaCaveBackground.png", 5, true);
                     /*d.play("Open");
                     while(dialougeState){}
                     Thread.sleep(1000);
-                    CreateInfo((JPanel)clist[2], "An hour later...", 3000);
+                    CreateInfo(findPanel("Main"), "An hour later...", 3000);
                     dialougeState = true;
                     d.play("Open2");
                     while(dialougeState){}
                     Thread.sleep(1000);*/
-                    CreateInfo((JPanel)clist[2], "At the surface", 2500, "/images/betaMenuBackground.png", 5);
+                    CreateInfo(findPanel("Main"), "At the surface", 2500, "/images/betaMenuBackground.png", 5);
                     dialougeState = true;
                     d.play("Open3");
                     while(dialougeState){}
                     Thread.sleep(1000);
-                    loadLocale(GameEngine.locations.SQUARE, (JPanel)clist[2], false);
+                    d.removeAllStuff();
+                    loadLocale(GameEngine.locations.SQUARE, findPanel("Main"), false);
                 } catch (Exception ex) {
                     Logger.getLogger(AeternusGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }

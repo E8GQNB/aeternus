@@ -19,7 +19,7 @@ public class GameEngine {
 }
     public enum locations{
         SQUARE("/images/betaMenuBackground.png", readIn("Square")); 
-        //LAB("/images/betaLab.png", readIn("Lab"));
+        //BASE("/images/betaLab.png", readIn("Lab"));
         
         private final String path;
         private ArrayList<String[]> POI = new ArrayList<String[]>();
@@ -39,19 +39,63 @@ public class GameEngine {
         
         static private ArrayList<String[]> readIn(String name){
         File file = new File("src/locations/" + name + ".txt");
-        ArrayList<String[]> dialouge = new ArrayList<String[]>();
+        ArrayList<String[]> data = new ArrayList<String[]>();
         BufferedReader br;
             try {
                 br = new BufferedReader(new FileReader(file));
                 String st;
                 while ((st = br.readLine()) != null){
                     String[] line = st.split(";");
-                    dialouge.add(line);
+                    data.add(line);
                 }
             } catch (Exception ex) {
                 Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
             }
-        return dialouge;
+        return data;
+    }
+    }
+    
+    public enum interactables{
+        MAGICSHOP(readIn("MagicShop"), "SQUARE"),
+        /*WEAPONSHOP(readIn("WeaponShop")),
+        BLACKSMITH(readIn("Blacksmith")),
+        GENERATOR(readIn("Generator"))*/;
+        
+        private ArrayList<String[]> data = new ArrayList<String[]>();
+        private String l;
+        
+        interactables(ArrayList<String[]> data, String l){
+            this.data = data;
+            this.l = l;
+        }
+        
+        public ArrayList<String[]> getOptions(){
+            return data;
+        }
+        
+        public String getParentLocation(){
+            return l;
+        }
+        
+        public String getFlag(){
+            return data.get(data.size()-1)[1];
+        }
+        
+        static private ArrayList<String[]> readIn(String name){
+        File file = new File("src/locations/" + name + ".txt");
+        ArrayList<String[]> data = new ArrayList<String[]>();
+        BufferedReader br;
+            try {
+                br = new BufferedReader(new FileReader(file));
+                String st;
+                while ((st = br.readLine()) != null){
+                    String[] line = st.split(";");
+                    data.add(line);
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        return data;
     }
     }
     
