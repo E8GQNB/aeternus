@@ -17,9 +17,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 
 public class DialougeSystem {
-    private JLabel dialougeTextBox = new javax.swing.JLabel();
+    private JTextArea dialougeTextBox = new javax.swing.JTextArea();
     private JLabel speakerName = new javax.swing.JLabel();
     private JLabel speakerImage = new javax.swing.JLabel();
     private JLabel dialougeBackground = new javax.swing.JLabel();
@@ -31,21 +32,36 @@ public class DialougeSystem {
     public DialougeSystem(GameEngine.characters c1, GameEngine.characters c2, JPanel destination, AeternusGUI ae){
         this.destination = destination;
         this.ae = ae;
+        
         nextArrow();
         createSpeakerName();
         createSpeakerImage();
         createTextBox();
         createBackground();
     }
+
+    public void removeAllStuff(){
+        destination.remove(dialougeTextBox);
+        destination.remove(speakerName);
+        destination.remove(speakerImage);
+        destination.remove(nextArrow);
+        destination.remove(dialougeBackground);
+        destination.revalidate();
+        destination.repaint();
+        System.out.println(destination.getComponents());
+    }
     
     private void createTextBox(){
-        dialougeTextBox.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         dialougeTextBox.setForeground(new java.awt.Color(204, 204, 204));
+        dialougeTextBox.setColumns(20);
+        dialougeTextBox.setLineWrap(true);
+        dialougeTextBox.setRows(5);
+        dialougeTextBox.setDisabledTextColor(new java.awt.Color(204, 204, 204));
+        dialougeTextBox.setEnabled(false);
         dialougeTextBox.setOpaque(false);
         dialougeTextBox.setVisible(false);
-        dialougeTextBox.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         dialougeTextBox.setFont(new java.awt.Font("Agency FB", 0, 36));
-        destination.add(dialougeTextBox);
+        destination.add(dialougeTextBox, 0);
         dialougeTextBox.setBounds(390, 800, 1510, 260);
         dialougeTextBox.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
@@ -62,7 +78,7 @@ public class DialougeSystem {
         speakerName.setVisible(false);
         speakerName.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         speakerName.setFont(new java.awt.Font("Agency FB", 1, 36));
-        destination.add(speakerName);
+        destination.add(speakerName, 0);
         speakerName.setBounds(390, 720, 1510, 60);
     }
     
@@ -71,7 +87,7 @@ public class DialougeSystem {
         speakerImage.setOpaque(false);
         speakerImage.setVisible(false);
         speakerImage.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-        destination.add(speakerImage);
+        destination.add(speakerImage,0 );
         speakerImage.setBounds(20, 720, 340, 340);
     }
     
@@ -83,7 +99,7 @@ public class DialougeSystem {
         nextArrow.setText(">");
         nextArrow.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         nextArrow.setFont(new java.awt.Font("Agency FB", 0, 60));
-        destination.add(nextArrow);
+        destination.add(nextArrow, 0);
         nextArrow.setBounds(1830, 990, 70, 70);
     }
     
@@ -96,7 +112,7 @@ public class DialougeSystem {
         dialougeBackground.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         dialougeBackground.setOpaque(true);
         dialougeBackground.setVisible(false);
-        destination.add(dialougeBackground);
+        destination.add(dialougeBackground, 4);
         dialougeBackground.setBounds(0, 700, 1920, 380);
     }
     
@@ -137,6 +153,7 @@ public class DialougeSystem {
             Thread one = new Thread() {
                 public void run() {
                     try {
+                        //setZorders();
                         for(String[] s : dialouge){
                             //Speaker image
                             if(s[0].length() > 0){
@@ -144,8 +161,6 @@ public class DialougeSystem {
                                         new javax.swing.ImageIcon(getClass().getResource(
                                                 "/images/beta" + s[0].toUpperCase() + "icon.png")).getImage().getScaledInstance(340, 340, Image.SCALE_DEFAULT)));
                             }
-                            
-                            //speakerImage.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon("icon.png").getImage().getScaledInstance(20, 20, Image.SCALE_DEFAULT)));
                             //speaker name
                             speakerName.setText(s[0]);
                             //Dialouge

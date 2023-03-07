@@ -63,6 +63,7 @@ public class MainFrame extends javax.swing.JFrame {
         getContentPane().setLayout(null);
 
         SplashScreen.setBackground(new java.awt.Color(102, 102, 102));
+        SplashScreen.setName("SplashScreen"); // NOI18N
         SplashScreen.setPreferredSize(new java.awt.Dimension(1920, 1080));
         SplashScreen.setLayout(null);
 
@@ -76,6 +77,7 @@ public class MainFrame extends javax.swing.JFrame {
         SplashScreen.setBounds(0, 0, 1920, 1080);
 
         MainMenu.setBackground(new java.awt.Color(102, 102, 102));
+        MainMenu.setName("MainMenu"); // NOI18N
         MainMenu.setPreferredSize(new java.awt.Dimension(1920, 1080));
         MainMenu.setLayout(null);
 
@@ -115,6 +117,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         Main.setBackground(new java.awt.Color(0, 0, 0));
         Main.setMinimumSize(new java.awt.Dimension(1920, 1080));
+        Main.setName("Main"); // NOI18N
         Main.setPreferredSize(new java.awt.Dimension(1920, 1080));
         Main.setLayout(null);
         getContentPane().add(Main);

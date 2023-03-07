@@ -19,7 +19,6 @@ public class InfoText {
         this.destination = destination;
         this.length = length;
         createText(x, length);
-        //createBackground(destination);
     }
     
     private void createText(String x, int length) throws InterruptedException{
@@ -38,15 +37,6 @@ public class InfoText {
         destination.remove(infoText);
         destination.revalidate();
         destination.repaint();
-    }
-    
-    private void createBackground(){
-        //fadeIn(dialougeBackground, 5);
-        infoBackground.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        infoBackground.setOpaque(true);
-        destination.add(infoBackground);
-        infoBackground.setBounds(610, 465, 700, 150);
-    }
-    
+    }    
     
 }

@@ -1,0 +1,4 @@
+option;Shop
+option;Talk
+option;Leave
+flag;FirstMeetMagic
