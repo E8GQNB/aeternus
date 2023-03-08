@@ -27,12 +27,17 @@ public class AeternusGUI {
     private Component[] clist = s.getRootPane().getContentPane().getComponents();
     private volatile boolean dialougeState = false;
     private JLabel backgroundImage = new JLabel();
+    private JLabel subBackground = new JLabel();
     private JLabel transitionCover = new JLabel();
+    private JLabel subTransition = new JLabel();
     private ArrayList<JLabel> scenePoints = new ArrayList<JLabel>();
     private ArrayList<JLabel> locationOptions = new ArrayList<JLabel>();
+    private GameEngine game;
+    private GameEngine.locations currentLocale;
     
     public AeternusGUI(){ 
         s.setVisible(true);
+        this.game = new GameEngine();
         new java.util.Timer().schedule( 
         new java.util.TimerTask() {
             @Override
@@ -100,6 +105,33 @@ public class AeternusGUI {
         }
     }
     
+    private void setBackground(String path, int speed, boolean transition, JLabel bg){
+        if(transition){
+            fadeIn(transitionCover, speed);
+        }
+        bg.setIcon(new javax.swing.ImageIcon(
+                                        new javax.swing.ImageIcon(getClass().getResource(path)).getImage().getScaledInstance(1920, 1080, Image.SCALE_DEFAULT)));
+        if(transition){
+            fadeOut(transitionCover, speed);
+        }
+    }
+    
+    private void setBackground(String path, int speed, boolean transition, JLabel bg, JPanel to){
+        if(transition){
+            fadeIn(transitionCover, speed);
+        }
+        bg.setIcon(new javax.swing.ImageIcon(
+                                        new javax.swing.ImageIcon(getClass().getResource(path)).getImage().getScaledInstance(1920, 1080, Image.SCALE_DEFAULT)));
+        
+        to.setVisible(true);
+        to.getParent().revalidate();
+        to.getParent().repaint();
+        transitionCover.setBackground(new Color(0,0,0,0));
+        if(transition){
+            fadeOut(subTransition, speed);
+        }
+    }
+    
     public void fadeIn(JLabel l, int length){
             try {
                 for(int i = 0; i < 255; i++){
@@ -126,23 +158,23 @@ public class AeternusGUI {
             }
     }
     
-    private void createTransition(JPanel dest){
-        transitionCover.setForeground(new java.awt.Color(0, 0, 0, 0));
-        transitionCover.setOpaque(true);
-        transitionCover.setVisible(true);
-        dest.add(transitionCover);
-        dest.setComponentZOrder(transitionCover, 0);
-        transitionCover.setBounds(0, 0, 1920, 1080);
+    private void createTransition(JPanel dest, JLabel tr){
+        tr.setForeground(new java.awt.Color(0, 0, 0, 0));
+        tr.setOpaque(true);
+        tr.setVisible(true);
+        dest.add(tr);
+        dest.setComponentZOrder(tr, 0);
+        tr.setBounds(0, 0, 1920, 1080);
     }
     
-    private void createBackground(JPanel dest){
-        backgroundImage.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        backgroundImage.setOpaque(false);
-        backgroundImage.setVisible(true);
-        backgroundImage.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-        dest.add(backgroundImage);
-        dest.setComponentZOrder(backgroundImage, 6);
-        backgroundImage.setBounds(0, 0, 1920, 1080);
+    private void createBackground(JPanel dest, JLabel bg, int z){
+        bg.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        bg.setOpaque(false);
+        bg.setVisible(true);
+        bg.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        dest.add(bg);
+        dest.setComponentZOrder(bg, z);
+        bg.setBounds(0, 0, 1920, 1080);
     }
     
     private void loadLocale(GameEngine.locations x, JPanel destination, boolean transition){
@@ -154,6 +186,7 @@ public class AeternusGUI {
     
     private void loadPointsOfInterest(GameEngine.locations x, JPanel destination){
         ArrayList<String[]> POI = x.getPOI();
+        currentLocale = x;
         for(String[] point : POI){
             JLabel newLabel = new javax.swing.JLabel();
             newLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -161,7 +194,7 @@ public class AeternusGUI {
             newLabel.setOpaque(false);
             newLabel.setText(point[0]);
             newLabel.setName(point[5]);
-            newLabel.setVisible(true);
+            newLabel.setVisible(game.getLockState(point[5]));
             newLabel.setVerticalAlignment(javax.swing.SwingConstants.CENTER);
             newLabel.setFont(new java.awt.Font("Agency FB", 0, 30));
             destination.add(newLabel);
@@ -169,7 +202,7 @@ public class AeternusGUI {
             newLabel.setBounds(Integer.parseInt(point[1]), Integer.parseInt(point[2]), Integer.parseInt(point[3]), Integer.parseInt(point[4]));
             newLabel.addMouseListener(new java.awt.event.MouseAdapter() {
                 public void mouseClicked(java.awt.event.MouseEvent evt) {
-                    loadPOI(evt);
+                    loadLocation(evt);
                 }
             });
             scenePoints.add(newLabel);
@@ -184,14 +217,33 @@ public class AeternusGUI {
         backgroundImage.getParent().repaint();
     }
     
-    private void loadPOI(java.awt.event.MouseEvent evt){
-        DialougeSystem event = new DialougeSystem(GameEngine.characters.PLAYER, GameEngine.characters.MAGICMERCHANT, findPanel("Main"), this);
-        String flag = GameEngine.interactables.valueOf(evt.getComponent().getName()).getFlag();
+    private void createNewPanel(String name, int z){
+        JPanel newP = new JPanel();
+        newP.setBackground(new java.awt.Color(0, 0, 0));
+        newP.setMinimumSize(new java.awt.Dimension(1920, 1080));
+        createBackground(newP, subBackground, 0);
+        createTransition(newP, subTransition);
+        newP.setName(name);
+        newP.setPreferredSize(new java.awt.Dimension(1920, 1080));
+        newP.setLayout(null);
+        s.getRootPane().getContentPane().add(newP);
+        newP.setBounds(0, 0, 1920, 1080);
+        s.getRootPane().getContentPane().setComponentZOrder(newP, z);
+        clist = s.getRootPane().getContentPane().getComponents();
+        findPanel(name).setVisible(false);
+        newP.getParent().revalidate();
+        newP.getParent().repaint();
+    }
+    
+    private void loadLocation(java.awt.event.MouseEvent evt){
+        createNewPanel("subMenu", 0);
+        DialougeSystem event = new DialougeSystem(GameEngine.characters.PLAYER, GameEngine.characters.MAGICMERCHANT, findPanel("subMenu"), this);
+        String flag = game.getFlag(GameEngine.interactables.valueOf(evt.getComponent().getName()));
+        System.out.println(flag);
         ArrayList<String[]> options = GameEngine.interactables.valueOf(evt.getComponent().getName()).getOptions();
         Thread one = new Thread() {
             public void run() {
-                removePointsOfInterest();
-                setBackground("/images/beta" + evt.getComponent().getName() + ".png", 2, true);
+                setBackground("/images/beta" + evt.getComponent().getName() + ".png", 2, true, subBackground, findPanel("subMenu"));
                 if(flag != ""){
                     dialougeState = true;
                     try {
@@ -201,11 +253,13 @@ public class AeternusGUI {
                         Logger.getLogger(AeternusGUI.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     while(dialougeState){}
+                    game.checkConnections(flag);
+                    game.removeFlag(flag);
                 }
                 int cnt = 0;
                 for(String[] row : options){
                     if(row[0].equals("option")){
-                        addOption(row[1], GameEngine.interactables.valueOf(evt.getComponent().getName()).toString(), cnt, GameEngine.interactables.valueOf(evt.getComponent().getName()).getParentLocation());
+                        addOption(row[1], GameEngine.interactables.valueOf(evt.getComponent().getName()).toString(), cnt);
                         cnt++;
                     }
                 }
@@ -214,7 +268,7 @@ public class AeternusGUI {
         one.start();
     }
     
-    private void addOption(String name, String id, int place, String parentLocation){
+    private void addOption(String name, String id, int place){
         JLabel newL = new JLabel();
         newL.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         newL.setForeground(new java.awt.Color(204, 204, 204));
@@ -224,23 +278,26 @@ public class AeternusGUI {
         newL.setVerticalAlignment(javax.swing.SwingConstants.CENTER);
         newL.setFont(new java.awt.Font("Agency FB", 0, 36));
         newL.setBackground(new Color(40, 40, 40));
-        findPanel("Main").add(newL);
-        findPanel("Main").setComponentZOrder(newL, 0);
+        findPanel("subMenu").add(newL);
+        findPanel("subMenu").setComponentZOrder(newL, 0);
         newL.setBounds(610, 300 + (place*100), 700, 50);
         locationOptions.add(newL);
         newL.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                loadShop(evt, id, name, parentLocation);
+                loadShop(evt, id, name);
             }
         });
     }
     
-    private void loadShop(java.awt.event.MouseEvent evt, String id, String name, String parent){
+    private void loadShop(java.awt.event.MouseEvent evt, String id, String name){
         if(name.equals("Leave")){
-            loadLocale(GameEngine.locations.valueOf(parent), findPanel("Main"), true);
+            findPanel("subMenu").getParent().remove(findPanel("subMenu"));
+            //reload poi
+            
+            s.getRootPane().getContentPane().revalidate();
+            s.getRootPane().getContentPane().repaint();
         }
-        System.out.println("click!");
     }
     
     public void newGame(){
@@ -256,8 +313,8 @@ public class AeternusGUI {
                     Logger.getLogger(AeternusGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 try {
-                    createTransition(findPanel("Main"));
-                    createBackground(findPanel("Main"));
+                    createTransition(findPanel("Main"), transitionCover);
+                    createBackground(findPanel("Main"), backgroundImage, 6);
                     setBackground("/images/betaCaveBackground.png", 5, true);
                     /*d.play("Open");
                     while(dialougeState){}
