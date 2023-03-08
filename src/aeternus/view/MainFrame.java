@@ -125,6 +125,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         Prototype.setBackground(new java.awt.Color(0, 0, 0));
         Prototype.setMinimumSize(new java.awt.Dimension(1920, 1080));
+        Prototype.setName("Prototype"); // NOI18N
         Prototype.setLayout(null);
 
         jLabel6.setFont(new java.awt.Font("Agency FB", 0, 60)); // NOI18N
