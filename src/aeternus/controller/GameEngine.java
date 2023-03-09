@@ -20,7 +20,7 @@ public class GameEngine {
     PLAYER, SERVANT, WEAPONMERCHANT, MAGICMERCHANT
 }
     public enum locations{
-        SQUARE("/images/betaMenuBackground.png", readIn("Square")); 
+        SQUARE("/images/betaMenuBackground.png", readIn("locations/Square")); 
         //BASE("/images/betaLab.png", readIn("Lab"));
         
         private final String path;
@@ -78,11 +78,14 @@ public class GameEngine {
     private ArrayList<String[]> flags;
     private ArrayList<String[]> unlocks;
     private ArrayList<String[]> lookupTable;
+    private ArrayList<String[]> engineUpgrades;
+    private int souls = 0;
     
     public GameEngine(){
-       this.flags = readIn("eventflags");
-       this.unlocks = readIn("Unlocks");
-       this.lookupTable = readIn("connections");
+       this.flags = readIn("locations/eventflags");
+       this.unlocks = readIn("locations/Unlocks");
+       this.lookupTable = readIn("locations/connections");
+       this.engineUpgrades = readIn("upgrades/engine");
     }
     
     public String getFlag(interactables i){
@@ -92,6 +95,18 @@ public class GameEngine {
             }
         }
         return null;
+    }
+    
+    public void alterSouls(int x){
+        souls += x;
+    }
+    
+    public int getSouls(){
+        return souls;
+    }
+    
+    public ArrayList<String[]> getEngineUpgrades(){
+        return engineUpgrades;
     }
     
     public void removeFlag(String name){
@@ -134,7 +149,7 @@ public class GameEngine {
     }
     
     static private ArrayList<String[]> readIn(String name){
-        File file = new File("src/locations/" + name + ".txt");
+        File file = new File("src/" + name + ".txt");
         ArrayList<String[]> data = new ArrayList<String[]>();
         BufferedReader br;
             try {
@@ -160,7 +175,7 @@ public class GameEngine {
                     }
                 }
                 fw.close();
-                readIn(name);
+                readIn("locations/" + name);
               } catch (IOException e) {
                 e.printStackTrace();
               }

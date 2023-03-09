@@ -1,0 +1,4 @@
+Reaper Assistant;0;15;true;Little helpers operating the Engine. SpS 0.1
+Soul Vent;0;100;true;Designed to increase the maximum intake of souls. SpS 1
+Shrine;0;500;false;Active time: 10s. Cooldown: 1 minute. Increases soul output two-fold
+Spirit Combustion;0;10000;false;

@@ -1,1 +1,2 @@
 FirstMeetMagic;unlock;BASE
+FirstEnterBase;unlock;SOULSMITH
