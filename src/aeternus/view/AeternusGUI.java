@@ -32,6 +32,7 @@ public class AeternusGUI {
     private JLabel subTransition = new JLabel();
     private ArrayList<JLabel> scenePoints = new ArrayList<JLabel>();
     private ArrayList<JLabel> locationOptions = new ArrayList<JLabel>();
+    private JLabel soulCount = new JLabel();
     private GameEngine game;
     private GameEngine.locations currentLocale;
     
@@ -177,16 +178,18 @@ public class AeternusGUI {
         bg.setBounds(0, 0, 1920, 1080);
     }
     
-    private void loadLocale(GameEngine.locations x, JPanel destination, boolean transition){
+    private void loadLocale(GameEngine.locations x, boolean transition){
+        currentLocale = x;
         setBackground(x.getPath(), 5, transition);
-        loadPointsOfInterest(x, destination);
-        destination.getParent().validate();
-        destination.getParent().repaint();
+        loadPointsOfInterest(x);
+        findPanel("Main").getParent().validate();
+        findPanel("Main").getParent().repaint();
     }
     
-    private void loadPointsOfInterest(GameEngine.locations x, JPanel destination){
+    private void loadPointsOfInterest(GameEngine.locations x){
         ArrayList<String[]> POI = x.getPOI();
         currentLocale = x;
+        setSoulCount(findPanel("Main"));
         for(String[] point : POI){
             JLabel newLabel = new javax.swing.JLabel();
             newLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -197,8 +200,8 @@ public class AeternusGUI {
             newLabel.setVisible(game.getLockState(point[5]));
             newLabel.setVerticalAlignment(javax.swing.SwingConstants.CENTER);
             newLabel.setFont(new java.awt.Font("Agency FB", 0, 30));
-            destination.add(newLabel);
-            destination.setComponentZOrder(newLabel, 1);
+            findPanel("Main").add(newLabel);
+            findPanel("Main").setComponentZOrder(newLabel, 1);
             newLabel.setBounds(Integer.parseInt(point[1]), Integer.parseInt(point[2]), Integer.parseInt(point[3]), Integer.parseInt(point[4]));
             newLabel.addMouseListener(new java.awt.event.MouseAdapter() {
                 public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -213,6 +216,7 @@ public class AeternusGUI {
         for(JLabel l : scenePoints){
             l.getParent().remove(l);
         }
+        scenePoints.clear();
         backgroundImage.getParent().revalidate();
         backgroundImage.getParent().repaint();
     }
@@ -237,6 +241,7 @@ public class AeternusGUI {
     
     private void loadLocation(java.awt.event.MouseEvent evt){
         createNewPanel("subMenu", 0);
+        setSoulCount(findPanel("subMenu"));
         DialougeSystem event = new DialougeSystem(GameEngine.characters.PLAYER, GameEngine.characters.MAGICMERCHANT, findPanel("subMenu"), this);
         String flag = game.getFlag(GameEngine.interactables.valueOf(evt.getComponent().getName()));
         System.out.println(flag);
@@ -280,24 +285,133 @@ public class AeternusGUI {
         newL.setBackground(new Color(40, 40, 40));
         findPanel("subMenu").add(newL);
         findPanel("subMenu").setComponentZOrder(newL, 0);
-        newL.setBounds(610, 300 + (place*100), 700, 50);
+        newL.setBounds(610, 400 + (place*100), 700, 50);
         locationOptions.add(newL);
         newL.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                loadShop(evt, id, name);
+                if(newL.isEnabled()){
+                    loadShop(evt, id, name);
+                }
             }
         });
     }
     
+    private void setOptions(boolean b){
+        for(JLabel l : locationOptions){
+            l.setEnabled(b);
+        }
+    }
+    
+    private void setOptionsVisibility(boolean b){
+        for(JLabel l : locationOptions){
+            l.setVisible(b);
+        }
+    }
+    
+    private void setSoulCount(JPanel destination){
+        soulCount.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        soulCount.setForeground(new java.awt.Color(204, 204, 204));
+        soulCount.setBackground(new java.awt.Color(0, 0, 0, 50));
+        soulCount.setOpaque(true);
+        soulCount.setVisible(true);
+        soulCount.setText(String.valueOf(game.getSouls()));
+        soulCount.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        soulCount.setFont(new java.awt.Font("Agency FB", 1, 36));
+        destination.add(soulCount, 0);
+        soulCount.setBounds(10, 10, 100, 50);
+    }
+    
+    private void refreshSouls(){
+        soulCount.setText(String.valueOf(game.getSouls()));
+        soulCount.getParent().revalidate();
+        soulCount.getParent().repaint();
+    }
+    
     private void loadShop(java.awt.event.MouseEvent evt, String id, String name){
+        setOptions(false);
         if(name.equals("Leave")){
             findPanel("subMenu").getParent().remove(findPanel("subMenu"));
-            //reload poi
-            
+            removePointsOfInterest();
+            loadPointsOfInterest(currentLocale);
             s.getRootPane().getContentPane().revalidate();
             s.getRootPane().getContentPane().repaint();
+        }else if(name.equals("Shop")){
+            if(game.getSouls() == 0){
+                dialougeState = true;
+                DialougeSystem d = new DialougeSystem(GameEngine.characters.PLAYER, GameEngine.characters.MAGICMERCHANT, findPanel("subMenu"), this);
+                Thread one = new Thread() {
+                    public void run() {
+                        try {
+                            d.play("NoSoulsMagic");
+                            while(dialougeState){}
+                            setOptions(true);
+                        } catch (Exception ex) {
+                            Logger.getLogger(AeternusGUI.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                };
+                one.start();
+            }
+        }else if(name.equals("Engine")){
+            setOptionsVisibility(false);
+            showEngineMenu();
         }
+    }
+    
+    private void showEngineMenu(){
+        JLabel engine = new JLabel();
+        engine.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        engine.setOpaque(false);
+        engine.setVisible(true);
+        engine.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        findPanel("subMenu").add(engine,0 );
+        engine.setBounds(200, 320, 500, 500);
+        engine.setIcon(new javax.swing.ImageIcon(
+                                        new javax.swing.ImageIcon(getClass().getResource(
+                                                "/images/betaENGINE.png")).getImage().getScaledInstance(500, 500, Image.SCALE_DEFAULT)));
+        engine.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                game.alterSouls(1);
+                refreshSouls();
+            }
+        });
+        ArrayList<String[]> upgrades = game.getEngineUpgrades();
+        int cnt = 0;
+        for(String[] row : upgrades){
+            addUpgrade(row[0], cnt, row[3]);
+            cnt++;
+        }
+    }
+    
+    private void addUpgrade(String name, int place, String state){
+        JLabel newL = new JLabel();
+        newL.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        newL.setForeground(new java.awt.Color(204, 204, 204));
+        newL.setOpaque(true);
+        newL.setVisible(true);
+        newL.setText(name);
+        newL.setEnabled(Boolean.parseBoolean(state));
+        newL.setVerticalAlignment(javax.swing.SwingConstants.CENTER);
+        newL.setFont(new java.awt.Font("Agency FB", 0, 28));
+        newL.setBackground(new Color(40, 40, 40));
+        findPanel("subMenu").add(newL);
+        findPanel("subMenu").setComponentZOrder(newL, 0);
+        newL.setBounds(800, 300 + (place*50), 1000, 40);
+        //locationOptions.add(newL);
+        newL.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                if(newL.isEnabled()){
+                    buyUpgrade(name);
+                }
+            }
+        });
+    }
+    
+    private void buyUpgrade(String name){
+        
     }
     
     public void newGame(){
@@ -330,7 +444,7 @@ public class AeternusGUI {
                     while(dialougeState){}
                     Thread.sleep(1000);
                     d.removeAllStuff();
-                    loadLocale(GameEngine.locations.SQUARE, findPanel("Main"), false);
+                    loadLocale(GameEngine.locations.SQUARE, false);
                 } catch (Exception ex) {
                     Logger.getLogger(AeternusGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
