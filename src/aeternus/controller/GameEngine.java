@@ -5,6 +5,7 @@
  */
 package aeternus.controller;
 
+import aeternus.view.AeternusGUI;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,6 +13,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -79,13 +83,16 @@ public class GameEngine {
     private ArrayList<String[]> unlocks;
     private ArrayList<String[]> lookupTable;
     private ArrayList<String[]> engineUpgrades;
-    private int souls = 0;
+    private AeternusGUI aeg;
+    private double soulPower = 1.0;
+    private double souls = 0;
     
-    public GameEngine(){
+    public GameEngine(AeternusGUI aeg){
        this.flags = readIn("locations/eventflags");
        this.unlocks = readIn("locations/Unlocks");
        this.lookupTable = readIn("locations/connections");
        this.engineUpgrades = readIn("upgrades/engine");
+       this.aeg = aeg;
     }
     
     public String getFlag(interactables i){
@@ -97,12 +104,40 @@ public class GameEngine {
         return null;
     }
     
-    public void alterSouls(int x){
+    public void soulCountThread(){
+        int x = 0;
+        Runnable newThread = new Runnable() {
+            @Override
+            public void run() {
+                addSouls();
+                aeg.refreshSouls();
+            }
+        };
+
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        executor.scheduleAtFixedRate(newThread, 0, 100, TimeUnit.MILLISECONDS);
+    }
+    
+    public void alterSouls(double x){
         souls += x;
     }
     
-    public int getSouls(){
+    public double getSoulPower(){
+        return soulPower;
+    }
+    
+    public double getSouls(){
         return souls;
+    }
+    
+    public void addSouls(){
+        double total = 0;
+        for(String[] row : engineUpgrades){
+            if(Double.parseDouble(row[1]) > 0){
+                total += (Double.parseDouble(row[3])/10) * Double.parseDouble(row[1]);
+            }
+        }
+        alterSouls(total);
     }
     
     public ArrayList<String[]> getEngineUpgrades(){

@@ -7,11 +7,8 @@ package aeternus.controller;
 
 import java.awt.Color;
 import javax.swing.JLabel;
-import aeternus.model.InfoText;
 import aeternus.view.AeternusGUI;
-import java.awt.Component;
 import java.awt.Image;
-import java.awt.event.MouseListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
