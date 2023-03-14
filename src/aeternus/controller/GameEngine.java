@@ -8,7 +8,6 @@ package aeternus.controller;
 import aeternus.view.AeternusGUI;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -48,7 +47,8 @@ public class GameEngine {
         MAGICSHOP(readIn("MagicShop")),
         WEAPONSHOP(readIn("WeaponShop")),
         SOULSMITH(readIn("Soulsmith")),
-        BASE(readIn("Base"));
+        BASE(readIn("Base")),
+        PORTAL(readIn("Portal"));
         
         private ArrayList<String[]> data = new ArrayList<String[]>();
         

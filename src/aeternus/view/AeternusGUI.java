@@ -117,17 +117,6 @@ public class AeternusGUI {
         }
     }
     
-    private void setBackground(String path, int speed, boolean transition, JLabel bg){
-        if(transition){
-            fadeIn(transitionCover, speed);
-        }
-        bg.setIcon(new javax.swing.ImageIcon(
-                                        new javax.swing.ImageIcon(getClass().getResource(path)).getImage().getScaledInstance(1920, 1080, Image.SCALE_DEFAULT)));
-        if(transition){
-            fadeOut(transitionCover, speed);
-        }
-    }
-    
     private void setBackground(String path, int speed, boolean transition, JLabel bg, JPanel to){
         if(transition){
             fadeIn(transitionCover, speed);
@@ -370,62 +359,61 @@ public class AeternusGUI {
         s.getRootPane().getContentPane().repaint();
     }
     
-    private void option(java.awt.event.MouseEvent evt, String id, String name){
-        setOptions(false);
-        if(name.equals("Leave")){
-            leaveSubMenu();
-        }else if(name.equals("Shop")){
+    private void startDialouge(String name){
+        dialougeState = true;
+        DialougeSystem d = new DialougeSystem(GameEngine.characters.PLAYER, GameEngine.characters.MAGICMERCHANT, findPanel("subMenu"), this);
+        Thread one = new Thread() {
+            public void run() {
+                try {
+                    d.play(name);
+                    while(dialougeState){}
+                    setOptions(true);
+                } catch (Exception ex) {
+                    Logger.getLogger(AeternusGUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                game.checkConnections(name);
+                game.removeFlag(name);
+            }
+        };
+        one.start();
+    }
+    
+    private void loadShop(String id){
+        if(id.equals("MAGICSHOP")){
             if(game.getSouls() == 0){
-                dialougeState = true;
-                DialougeSystem d = new DialougeSystem(GameEngine.characters.PLAYER, GameEngine.characters.MAGICMERCHANT, findPanel("subMenu"), this);
-                Thread one = new Thread() {
-                    public void run() {
-                        try {
-                            d.play("NoSoulsMagic");
-                            while(dialougeState){}
-                            setOptions(true);
-                        } catch (Exception ex) {
-                            Logger.getLogger(AeternusGUI.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
-                };
-                one.start();
-            }else if(game.getSouls() < 10000){
-                dialougeState = true;
-                DialougeSystem d = new DialougeSystem(GameEngine.characters.PLAYER, GameEngine.characters.MAGICMERCHANT, findPanel("subMenu"), this);
-                Thread one = new Thread() {
-                    public void run() {
-                        try {
-                            d.play("BeforePortalsMagic");
-                            while(dialougeState){}
-                            setOptions(true);
-                        } catch (Exception ex) {
-                            Logger.getLogger(AeternusGUI.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
-                };
-                one.start();
+                startDialouge("NoSoulsMagic");
+            }else if(game.getSouls() < 10000 && !game.getLockState("PORTAL")){
+                startDialouge("BeforePortalsMagic");
+            }else if(game.getSouls() >= 10000 && !game.getLockState("PORTAL")){
+                startDialouge("UnlockPortalsMagic");
             }else{
                 openShop();
             }
-        }else if(name.equals("Engine")){
-            setOptionsVisibility(false);
-            showEngineMenu();
-        }else if(name.equals("Talk")){
-            dialougeState = true;
-            DialougeSystem d = new DialougeSystem(GameEngine.characters.PLAYER, GameEngine.characters.MAGICMERCHANT, findPanel("subMenu"), this);
-            Thread one = new Thread() {
-                public void run() {
-                    try {
-                        d.play(id + (int)(Math.random()*5));
-                        while(dialougeState){}
-                        setOptions(true);
-                    } catch (Exception ex) {
-                        Logger.getLogger(AeternusGUI.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            };
-            one.start();
+        }else if(id.equals("SOULSMITH")){
+            if(!game.getLockState("PORTAL")){
+                startDialouge("lockedSmith");
+            }else{
+                openShop();
+            }
+        }
+    }
+    
+    private void option(java.awt.event.MouseEvent evt, String id, String name){
+        setOptions(false);
+        switch(name){
+            case "Leave":
+                leaveSubMenu();
+            break;
+            case "Shop":
+                loadShop(id);
+            break;
+            case "Engine":
+                setOptionsVisibility(false);
+                showEngineMenu();
+            break;
+            case "Talk":
+                startDialouge(id + (int)(Math.random()*5));
+            break;
         }
     }
     
