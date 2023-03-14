@@ -2,3 +2,4 @@ MAGICSHOP;FirstMeetMagic
 WEAPONSHOP;FirstMeetWeapon
 SOULSMITH;FirstMeetSmith
 BASE;FirstEnterBase
+PORTAL;FirstVisitPortal
