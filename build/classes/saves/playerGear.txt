@@ -1,0 +1,5 @@
+head;
+chest;
+weapon;
+magic1;
+magic2;

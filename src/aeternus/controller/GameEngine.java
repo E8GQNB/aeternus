@@ -83,15 +83,19 @@ public class GameEngine {
     private ArrayList<String[]> unlocks;
     private ArrayList<String[]> lookupTable;
     private ArrayList<String[]> engineUpgrades;
+    private ArrayList<String[]> idList;
+    private ArrayList<String[]> magicStock;
     private AeternusGUI aeg;
     private double soulPower = 1.0;
-    private double souls = 0;
+    private double souls = 10000;
     
     public GameEngine(AeternusGUI aeg){
        this.flags = readIn("locations/eventflags");
        this.unlocks = readIn("locations/Unlocks");
        this.lookupTable = readIn("locations/connections");
        this.engineUpgrades = readIn("upgrades/engine");
+       this.magicStock = readIn("items/MAGICSHOPstock");
+       this.idList = readIn("items/idlist");
        this.aeg = aeg;
     }
     
@@ -142,6 +146,14 @@ public class GameEngine {
     
     public ArrayList<String[]> getEngineUpgrades(){
         return engineUpgrades;
+    }
+    
+    public ArrayList<String[]> getMagicStock(){
+        return magicStock;
+    }
+    
+    public ArrayList<String[]> getIds(){
+        return idList;
     }
     
     public void removeFlag(String name){

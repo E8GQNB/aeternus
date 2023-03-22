@@ -44,6 +44,16 @@ public class MainFrame extends javax.swing.JFrame {
         logo = new javax.swing.JLabel();
         background = new javax.swing.JLabel();
         Main = new javax.swing.JPanel();
+        Prototype1 = new javax.swing.JPanel();
+        jLabel9 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
+        jLabel16 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
         Prototype = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -122,6 +132,67 @@ public class MainFrame extends javax.swing.JFrame {
         Main.setLayout(null);
         getContentPane().add(Main);
         Main.setBounds(0, 0, 1920, 1080);
+
+        Prototype1.setBackground(new java.awt.Color(0, 0, 0));
+        Prototype1.setMinimumSize(new java.awt.Dimension(1920, 1080));
+        Prototype1.setName("Prototype"); // NOI18N
+        Prototype1.setLayout(null);
+
+        jLabel9.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel9.setText("weapon");
+        jLabel9.setOpaque(true);
+        Prototype1.add(jLabel9);
+        jLabel9.setBounds(460, 460, 140, 140);
+
+        jLabel11.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel11.setText("xp bar");
+        jLabel11.setOpaque(true);
+        Prototype1.add(jLabel11);
+        jLabel11.setBounds(140, 620, 460, 60);
+
+        jLabel12.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel12.setText("stats");
+        jLabel12.setOpaque(true);
+        Prototype1.add(jLabel12);
+        jLabel12.setBounds(140, 700, 460, 240);
+
+        jLabel13.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel13.setText("helmet");
+        jLabel13.setOpaque(true);
+        Prototype1.add(jLabel13);
+        jLabel13.setBounds(460, 140, 140, 140);
+
+        jLabel10.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel10.setText("img");
+        jLabel10.setOpaque(true);
+        Prototype1.add(jLabel10);
+        jLabel10.setBounds(140, 140, 300, 300);
+
+        jLabel14.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel14.setText("magic item 2");
+        jLabel14.setOpaque(true);
+        Prototype1.add(jLabel14);
+        jLabel14.setBounds(300, 460, 140, 140);
+
+        jLabel15.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel15.setText("magic item 1");
+        jLabel15.setOpaque(true);
+        Prototype1.add(jLabel15);
+        jLabel15.setBounds(140, 460, 140, 140);
+
+        jLabel16.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel16.setText("chestplate");
+        jLabel16.setOpaque(true);
+        Prototype1.add(jLabel16);
+        jLabel16.setBounds(460, 300, 140, 140);
+
+        jLabel8.setBackground(new java.awt.Color(102, 102, 102));
+        jLabel8.setOpaque(true);
+        Prototype1.add(jLabel8);
+        jLabel8.setBounds(100, 100, 1720, 880);
+
+        getContentPane().add(Prototype1);
+        Prototype1.setBounds(0, 0, 1920, 1080);
 
         Prototype.setBackground(new java.awt.Color(0, 0, 0));
         Prototype.setMinimumSize(new java.awt.Dimension(1920, 1080));
@@ -220,15 +291,25 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel Main;
     private javax.swing.JPanel MainMenu;
     private javax.swing.JPanel Prototype;
+    private javax.swing.JPanel Prototype1;
     private javax.swing.JPanel SplashScreen;
     private javax.swing.JLabel background;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JLabel logo;
     private javax.swing.JButton startButton;
     private javax.swing.JLabel transitionOut;
