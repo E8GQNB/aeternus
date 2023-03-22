@@ -2,3 +2,4 @@ FirstMeetMagic;unlock;BASE
 FirstEnterBase;unlock;SOULSMITH
 UnlockPortalsMagic;unlock;PORTAL
 FirstVisitPortal;setflag;SOULSMITH;unlockSmith
+FirstVisitPortal;unlock;WEAPONSHOP

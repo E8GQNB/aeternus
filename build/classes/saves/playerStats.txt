@@ -1,0 +1,5 @@
+str;10
+con;10
+dex;10
+int;10
+lck;10

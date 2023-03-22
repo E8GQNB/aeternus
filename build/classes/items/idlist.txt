@@ -1,0 +1,20 @@
+001;Rusty Blade;weapon;5
+002;Chipped Shortsword;weapon;10
+003;Weathered Sword;weapon;12
+004;Iron Sword;weapon;15
+005;Coldiron Sword;weapon;20
+006;Tattered Helmet;helmet;1
+007;Leather Helmet;helmet;3
+008;Studded Leather Helmet;helmet;5
+009;Iron Helmet;helmet;8
+010;Coldiron Helmet;helmet;10
+011;Leather Armor;chestpiece;5
+012;Studded Leather Armor;chestpiece;8
+013;Hide Armor;chestpiece;10
+014;Chainmail Armor;chestpiece;12
+015;Plate Armor;chestpiece;15
+016;Rabbits Foot;charm;lck
+017;Phoenix Feather;charm;int
+018;Health Amulet;charm;con
+019;Ring of Strength;charm;str
+020;Strange Pocketwatch;charm;dex

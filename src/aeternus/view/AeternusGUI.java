@@ -11,7 +11,10 @@ import aeternus.controller.DialougeSystem;
 import aeternus.controller.GameEngine;
 import aeternus.model.InfoText;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Image;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -37,9 +40,11 @@ public class AeternusGUI {
     private JLabel subBackground = new JLabel();
     private JLabel transitionCover = new JLabel();
     private JLabel subTransition = new JLabel();
-    private ArrayList<JLabel> scenePoints = new ArrayList<JLabel>();
+    private ArrayList<JLabel> mapLocations = new ArrayList<JLabel>();
     private ArrayList<JLabel> locationOptions = new ArrayList<JLabel>();
     private ArrayList<JLabel> upgradeOptions = new ArrayList<JLabel>();
+    private ArrayList<JLabel> shopMenu = new ArrayList<JLabel>();
+    private ArrayList<JLabel> inventoryMenu = new ArrayList<JLabel>();
     private JLabel soulCount = new JLabel();
     private JLabel engine = new JLabel();
     private GameEngine game;
@@ -192,12 +197,12 @@ public class AeternusGUI {
         setSoulCount(findPanel("Main"));
         for(String[] point : POI){
             JLabel newLabel = new javax.swing.JLabel();
-            labelFactory(newLabel, false, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER});
-            newLabel.setForeground(new java.awt.Color(255, 255, 255));
-            newLabel.setText(point[0]);
+            labelFactory(newLabel, false, game.getLockState(point[5]), new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
+                new Color(255, 255, 255), 
+                new Color(0, 0, 0, 0), 
+                String.valueOf(point[0]), 
+                new Font("Agency FB", 0, 30));
             newLabel.setName(point[5]);
-            newLabel.setVisible(game.getLockState(point[5]));
-            newLabel.setFont(new java.awt.Font("Agency FB", 0, 30));
             findPanel("Main").add(newLabel);
             findPanel("Main").setComponentZOrder(newLabel, 1);
             newLabel.setBounds(Integer.parseInt(point[1]), Integer.parseInt(point[2]), Integer.parseInt(point[3]), Integer.parseInt(point[4]));
@@ -208,22 +213,22 @@ public class AeternusGUI {
                     }
                 }
             });
-            scenePoints.add(newLabel);
+            mapLocations.add(newLabel);
         }
         transitionCover.getParent().setComponentZOrder(transitionCover, 0);
     }
     
     private void removePointsOfInterest(){
-        for(JLabel l : scenePoints){
+        for(JLabel l : mapLocations){
             l.getParent().remove(l);
         }
-        scenePoints.clear();
+        mapLocations.clear();
         backgroundImage.getParent().revalidate();
         backgroundImage.getParent().repaint();
     }
     
     private void setPOI(boolean b){
-        for(JLabel l : scenePoints){
+        for(JLabel l : mapLocations){
             l.setEnabled(b);
         }
     }
@@ -283,11 +288,11 @@ public class AeternusGUI {
     
     private void addOption(String name, String id, int place){
         JLabel newL = new JLabel();
-        labelFactory(newL, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER});
-        newL.setForeground(new java.awt.Color(204, 204, 204));
-        newL.setText(name);
-        newL.setFont(new java.awt.Font("Agency FB", 0, 36));
-        newL.setBackground(new Color(40, 40, 40));
+        labelFactory(newL, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
+                new Color(204, 204, 204), 
+                new Color(40, 40, 40), 
+                name, 
+                new Font("Agency FB", 0, 36));
         findPanel("subMenu").add(newL);
         findPanel("subMenu").setComponentZOrder(newL, 0);
         newL.setBounds(610, 400 + (place*100), 700, 50);
@@ -314,21 +319,120 @@ public class AeternusGUI {
         }
     }
     
-    private void labelFactory(JLabel j, boolean opacity, boolean vis, int[] alignment){
+    private void labelFactory(JLabel j, boolean opacity, boolean vis, int[] alignment, Color fG, Color bG, String text, Font f){
         j.setOpaque(opacity);
         j.setVisible(vis);
         j.setHorizontalAlignment(alignment[0]);
         j.setVerticalAlignment(alignment[1]);
+        j.setForeground(fG);
+        j.setBackground(bG);
+        j.setText(text);
+        j.setFont(f);
     }
     
     private void setSoulCount(JPanel destination){
-        labelFactory(soulCount, true, true, new int[]{SwingConstants.LEFT, SwingConstants.TOP});
-        soulCount.setForeground(new java.awt.Color(204, 204, 204));
-        soulCount.setBackground(new java.awt.Color(0, 0, 0, 50));
-        soulCount.setText(String.valueOf(game.getSouls()));
-        soulCount.setFont(new java.awt.Font("Agency FB", 1, 36));
+        labelFactory(soulCount, true, true, new int[]{SwingConstants.LEFT, SwingConstants.TOP}, 
+                new Color(204, 204, 204), 
+                new Color(0, 0, 0, 50), 
+                String.valueOf(game.getSouls()), 
+                new Font("Agency FB", 1, 36));
         destination.add(soulCount, 0);
         soulCount.setBounds(10, 10, 100, 50);
+        createInvButton(destination);
+    }
+    
+    private void createInvButton(JPanel destination){
+        JLabel inv = new JLabel();
+        labelFactory(inv, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
+                new Color(204, 204, 204), 
+                new Color(0, 0, 0, 50), 
+                "Inv", 
+                new Font("Agency FB", 1, 28));
+        destination.add(inv, 0);
+        inv.setBounds(1860, 0, 60, 60);
+        inv.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                if(inventoryMenu.size()>0){
+                    hideInventory(destination);
+                }else{
+                    showInventory(destination);
+                }
+                
+            }
+        });
+    }
+    
+    public void showInventory(JPanel dest){
+        JLabel invBg = new JLabel();
+        JLabel invAvatar = new JLabel();
+        JLabel invHelmet = new JLabel();
+        JLabel invChestplate = new JLabel();
+        JLabel invWeapon = new JLabel();
+        JLabel invMagicItem1 = new JLabel();
+        JLabel invMagicItem2 = new JLabel();
+        JLabel invXp = new JLabel();
+        JLabel invStatBox = new JLabel();
+        inventoryMenu.add(invBg);
+        inventoryMenu.add(invAvatar);
+        inventoryMenu.add(invHelmet);
+        inventoryMenu.add(invChestplate);
+        inventoryMenu.add(invWeapon);
+        inventoryMenu.add(invMagicItem1);
+        inventoryMenu.add(invMagicItem2);
+        inventoryMenu.add(invXp);
+        inventoryMenu.add(invStatBox);
+        
+        for(JLabel j : inventoryMenu){
+            labelFactory(j, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
+                new Color(204, 204, 204), 
+                new Color(0, 0, 0, 150), 
+                null, 
+                new Font("Agency FB", 0, 36));
+            dest.add(j, 0);
+        }
+        
+        //background
+        invBg.setBounds(100, 100, 1720, 880);
+        dest.add(invBg, 0);
+        
+        //player img
+        invAvatar.setBounds(140, 140, 300, 300);
+        
+        //equipment
+        invHelmet.setBounds(460, 140, 140, 140);
+        invChestplate.setBounds(460, 300, 140, 140);
+        invWeapon.setBounds(460, 460, 140, 140);
+        invMagicItem1.setBounds(140, 460, 140, 140);
+        invMagicItem2.setBounds(300, 460, 140, 140);
+        
+        //xp bar
+        invXp.setBounds(140, 620, 460, 60);
+        
+        //stats
+        invStatBox.setBounds(140, 700, 460, 240);
+        
+        if(locationOptions.size()>0){
+            setOptions(false);
+        }else{
+            setPOI(false);
+        }
+        dest.revalidate();
+        dest.repaint();
+    }
+    
+    public void hideInventory(JPanel origin){
+        for(JLabel j : inventoryMenu){
+            j.getParent().remove(j);
+        }
+        if(locationOptions.size()>0){
+            setOptions(true);
+        }else{
+            setPOI(true);
+        }
+        inventoryMenu.clear();
+        origin.revalidate();
+        origin.repaint();
     }
     
     public void refreshSouls(){
@@ -418,14 +522,98 @@ public class AeternusGUI {
     }
     
     private void openShop(){
+        JLabel shopBg = new JLabel();
+        labelFactory(shopBg, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
+                new Color(204, 204, 204), 
+                new Color(0, 0, 0, 150), 
+                null, 
+                new Font("Agency FB", 0, 36));
+        findPanel("subMenu").add(shopBg, 0);
+        shopBg.setBounds(100, 100, 1720, 880);
+        setOptions(false);
+        setOptionsVisibility(false);
+        shopMenu.add(shopBg);
+        ArrayList<String[]> stock = game.getMagicStock();
+        ArrayList<String[]> idList = game.getIds();
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 8; j++) {
+                CustomLabel shopSlot = new CustomLabel();
+                labelFactory(shopSlot, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
+                new Color(204, 204, 204), 
+                new Color(0, 0, 0, 150), 
+                null, 
+                new Font("Agency FB", 0, 36));
+                if(stock.size() >= i*8 + j + 1){
+                    shopSlot.setIcon(new javax.swing.ImageIcon(
+                                    new javax.swing.ImageIcon(getClass().getResource(
+                                    "/items/itemImages/tempImage.png")).getImage().getScaledInstance(200, 200, Image.SCALE_DEFAULT)));
+                    String id = stock.get(i*8 + j)[0];
+                    for(String[] s : idList){
+                        if(s[0].equals(id)){
+                            String color = "";
+                            switch(stock.get(i*8 + j)[1]){
+                                case "common":
+                                    color = "ffffff";
+                                break;
+                                case "uncommon":
+                                    color = "0000ff";
+                                break;
+                                case "rare":
+                                    color = "00ff00";
+                                break;
+                                case "epic":
+                                    color = "ff00ff";
+                                break;
+                                case "legendary":
+                                    color = "ffff00";
+                                break;
+                            }
+                            shopSlot.setToolTipText("<html>" + s[1] + "<br><b><em style='color: #" + color + "'>" +  stock.get(i*8 + j)[1] + "</em></b><br>" + "<html>");
+                        }
+                    }
+                }
+                
+                findPanel("subMenu").add(shopSlot, 0);
+                shopSlot.setName("slot" + j*8 + i);
+                shopSlot.setBounds(190 + j*200, 150 + i*200, 150, 150);
+                setOptionsVisibility(false);
+                shopMenu.add(shopSlot);
+            }
+        }
+        JLabel exit = new JLabel();
+        labelFactory(exit, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
+                Color.white, 
+                new Color(0, 0, 0, 150), 
+                null, 
+                new Font("Agency FB", 0, 26));
+        exit.setText("Leave");
+        findPanel("subMenu").add(exit, 0);
+        exit.setBounds(760, 915, 400, 50);
+        shopMenu.add(exit);
+        exit.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                for(JLabel j : shopMenu){
+                    j.getParent().remove(j);
+                }
+                shopMenu.clear();
+                setOptions(true);
+                setOptionsVisibility(true);
+                findPanel("subMenu").revalidate();
+                findPanel("subMenu").repaint();
+            }
+        });
         
+        findPanel("subMenu").revalidate();
+        findPanel("subMenu").repaint();
     }
     
     private void showEngineMenu(){
-        engine.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        engine.setOpaque(false);
-        engine.setVisible(true);
-        engine.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        labelFactory(engine, false, true, new int[]{SwingConstants.LEFT, SwingConstants.TOP}, 
+                new Color(204, 204, 204), 
+                new Color(0, 0, 0, 150), 
+                null, 
+                new Font("Agency FB", 0, 36));
         findPanel("subMenu").add(engine,0 );
         engine.setBounds(200, 320, 500, 500);
         engine.setIcon(new javax.swing.ImageIcon(
@@ -449,8 +637,11 @@ public class AeternusGUI {
     
     private void addUpgradeOption(String name, int place, double price, String desc, double power){
         CustomLabel newL = new CustomLabel();
-        labelFactory(newL, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER});
-        newL.setForeground(Color.lightGray);
+        labelFactory(newL, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
+                Color.lightGray, 
+                new Color(40, 40, 40), 
+                null, 
+                new Font("Agency FB", 0, 28));
         if(name.equals("Leave")){
             newL.setText(name);
         }else{
@@ -459,8 +650,6 @@ public class AeternusGUI {
         newL.setName(String.valueOf(price));
         newL.setToolTipText("<html>" + power + " Souls per Second<br>" + desc + "<html>");
         newL.setEnabled((game.getSouls()- price) >= 0);
-        newL.setFont(new java.awt.Font("Agency FB", 0, 28));
-        newL.setBackground(new Color(40, 40, 40));
         findPanel("subMenu").add(newL);
         findPanel("subMenu").setComponentZOrder(newL, 0);
         newL.setBounds(800, 300 + (place*120), 1000, 90);
@@ -590,6 +779,7 @@ class MyCustomToolTip extends JToolTip {
       setComponent(component);
       setBackground(Color.darkGray);
       setForeground(Color.lightGray);
+      setFont(new java.awt.Font("Agency FB", 0, 20));
       setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
    }
 }
