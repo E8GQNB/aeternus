@@ -9,7 +9,12 @@ import java.awt.Component;
 import javax.swing.JPanel;
 import aeternus.controller.DialougeSystem;
 import aeternus.controller.GameEngine;
+import aeternus.model.Charm;
+import aeternus.model.Chestpiece;
+import aeternus.model.Helmet;
 import aeternus.model.InfoText;
+import aeternus.model.Item;
+import aeternus.model.Weapon;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Image;
@@ -337,7 +342,7 @@ public class AeternusGUI {
                 String.valueOf(game.getSouls()), 
                 new Font("Agency FB", 1, 36));
         destination.add(soulCount, 0);
-        soulCount.setBounds(10, 10, 100, 50);
+        soulCount.setBounds(10, 10, 120, 50);
         createInvButton(destination);
     }
     
@@ -366,13 +371,18 @@ public class AeternusGUI {
     public void showInventory(JPanel dest){
         JLabel invBg = new JLabel();
         JLabel invAvatar = new JLabel();
-        JLabel invHelmet = new JLabel();
-        JLabel invChestplate = new JLabel();
-        JLabel invWeapon = new JLabel();
-        JLabel invMagicItem1 = new JLabel();
-        JLabel invMagicItem2 = new JLabel();
+        CustomLabel invHelmet = new CustomLabel();
+        CustomLabel invChestplate = new CustomLabel();
+        CustomLabel invWeapon = new CustomLabel();
+        CustomLabel invMagicItem1 = new CustomLabel();
+        CustomLabel invMagicItem2 = new CustomLabel();
         JLabel invXp = new JLabel();
         JLabel invStatBox = new JLabel();
+        JLabel strLabel = new JLabel();
+        JLabel conLabel = new JLabel();
+        JLabel dexLabel = new JLabel();
+        JLabel intLabel = new JLabel();
+        JLabel lckLabel = new JLabel();
         inventoryMenu.add(invBg);
         inventoryMenu.add(invAvatar);
         inventoryMenu.add(invHelmet);
@@ -382,6 +392,11 @@ public class AeternusGUI {
         inventoryMenu.add(invMagicItem2);
         inventoryMenu.add(invXp);
         inventoryMenu.add(invStatBox);
+        inventoryMenu.add(strLabel);
+        inventoryMenu.add(conLabel);
+        inventoryMenu.add(dexLabel);
+        inventoryMenu.add(intLabel);
+        inventoryMenu.add(lckLabel);
         
         for(JLabel j : inventoryMenu){
             labelFactory(j, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
@@ -398,6 +413,10 @@ public class AeternusGUI {
         
         //player img
         invAvatar.setBounds(140, 140, 300, 300);
+        invAvatar.setIcon(new javax.swing.ImageIcon(
+                                    new javax.swing.ImageIcon(getClass().getResource(
+                                    "/images/betaPLAYERIcon.png")).getImage().getScaledInstance(300, 300, Image.SCALE_DEFAULT)));
+        invAvatar.getParent().setComponentZOrder(invAvatar, 0);
         
         //equipment
         invHelmet.setBounds(460, 140, 140, 140);
@@ -405,12 +424,110 @@ public class AeternusGUI {
         invWeapon.setBounds(460, 460, 140, 140);
         invMagicItem1.setBounds(140, 460, 140, 140);
         invMagicItem2.setBounds(300, 460, 140, 140);
+        ArrayList<CustomLabel> gear = new ArrayList<CustomLabel>();
+        gear.add(invHelmet);
+        gear.add(invChestplate);
+        gear.add(invWeapon);
+        gear.add(invMagicItem1);
+        gear.add(invMagicItem2);
+        int cnt = 0;
+        for(CustomLabel custom : gear){
+            custom.getParent().setComponentZOrder(custom, 0);
+            if(game.getEquipped()[cnt] != null){
+                Item x = game.getEquipped()[cnt];
+                custom.setIcon(new javax.swing.ImageIcon(
+                                    new javax.swing.ImageIcon(getClass().getResource(
+                                    "/items/itemImages/tempImage.png")).getImage().getScaledInstance(200, 200, Image.SCALE_DEFAULT)));
+                for(String[] s : game.getIds()){
+                        if(s[0].equals(game.getEquipped()[cnt].getId())){
+                            custom.setToolTipText("<html>" + s[1] + "<br><b><em style='color: #" 
+                                    + getColor(game.getEquipped()[cnt].getRarity()) + "'>" 
+                                    +  game.getEquipped()[cnt].getRarity() 
+                                    + "</em></b><br>" + "<html>");
+                        }
+                }
+                custom.addMouseListener(new java.awt.event.MouseAdapter() {
+                    @Override
+                    public void mouseClicked(java.awt.event.MouseEvent evt) {
+                        removeItem(x, dest);
+                    }
+                });
+            }else{
+                custom.setIcon(new javax.swing.ImageIcon(
+                                    new javax.swing.ImageIcon(getClass().getResource(
+                                    "/items/itemImages/emptyGear.png")).getImage().getScaledInstance(200, 200, Image.SCALE_DEFAULT)));
+            }
+            cnt++;
+        }
         
         //xp bar
         invXp.setBounds(140, 620, 460, 60);
+        invXp.setText("Level: " + game.getStat("lvl"));
+        invXp.getParent().setComponentZOrder(invXp, 0);
         
         //stats
         invStatBox.setBounds(140, 700, 460, 240);
+        invStatBox.getParent().setComponentZOrder(invStatBox, 0);
+        
+        strLabel.setBounds(140, 700, 460, 40);
+        conLabel.setBounds(140, 750, 460, 40);
+        dexLabel.setBounds(140, 800, 460, 40);
+        intLabel.setBounds(140, 850, 460, 40);
+        lckLabel.setBounds(140, 900, 460, 40);
+        
+        strLabel.setText("Strength: " + game.getStat("str"));
+        conLabel.setText("Constitution: " + game.getStat("con"));
+        dexLabel.setText("Dexterity: " + game.getStat("dex"));
+        intLabel.setText("Intelligence: " + game.getStat("int"));
+        lckLabel.setText("Luck: " + game.getStat("lck"));
+        
+        invStatBox.getParent().setComponentZOrder(strLabel, 0);
+        invStatBox.getParent().setComponentZOrder(conLabel, 0);
+        invStatBox.getParent().setComponentZOrder(dexLabel, 0);
+        invStatBox.getParent().setComponentZOrder(intLabel, 0);
+        invStatBox.getParent().setComponentZOrder(lckLabel, 0);
+        
+        //inventory
+        ArrayList<String[]> idList = game.getIds();
+        ArrayList<Item> inv = game.getInv();
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 6; j++) {
+                CustomLabel invSlot = new CustomLabel();
+                labelFactory(invSlot, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
+                new Color(204, 204, 204), 
+                new Color(0, 0, 0, 150), 
+                null, 
+                new Font("Agency FB", 0, 36));
+                if(inv.size() >= i*6 + j + 1){
+                    invSlot.setIcon(new javax.swing.ImageIcon(
+                                    new javax.swing.ImageIcon(getClass().getResource(
+                                    "/items/itemImages/tempImage.png")).getImage().getScaledInstance(200, 200, Image.SCALE_DEFAULT)));
+                    String id = inv.get(i*6 + j).getId();
+                    for(String[] s : idList){
+                        if(s[0].equals(id)){
+                            invSlot.setToolTipText("<html>" + s[1] + "<br><b><em style='color: #" 
+                                    + getColor(inv.get(i*6 + j).getRarity()) 
+                                    + "'>" +  inv.get(i*6 + j).getRarity() 
+                                    + "</em></b><br>" + "<html>");
+                        }
+                    }
+                }
+                invSlot.setName(String.valueOf(i*6 + j));
+                invSlot.addMouseListener(new java.awt.event.MouseAdapter() {
+                    @Override
+                    public void mouseClicked(java.awt.event.MouseEvent evt) {
+                        if(invSlot.getIcon() != null){
+                            equipItem(Integer.parseInt(invSlot.getName()), dest);
+                        }
+                    }
+                });
+                
+                dest.add(invSlot, 0);
+                invSlot.setBounds(620 + j*200, 160 + i*200, 150, 150);
+                setOptionsVisibility(false);
+                inventoryMenu.add(invSlot);
+            }
+        }
         
         if(locationOptions.size()>0){
             setOptions(false);
@@ -419,6 +536,27 @@ public class AeternusGUI {
         }
         dest.revalidate();
         dest.repaint();
+    }
+    
+    public void equipItem(int slot, JPanel destination){
+        Item x = game.getInv().get(slot);
+        x.equip(slot);
+        hideInventory(destination);
+        showInventory(destination);
+    }
+    
+    public void removeItem(Item gear, JPanel destination){
+        ArrayList<Item> inv = game.getInv();
+        inv.add(gear);
+        Item[] gearSetup = game.getEquipped();
+        for(int i = 0; i < gearSetup.length; i++){
+            if(gearSetup[i] != null && gearSetup[i].equals(gear)){
+                gearSetup[i] = null;
+            }
+        }
+        game.setEquipped(gearSetup);
+        hideInventory(destination);
+        showInventory(destination);
     }
     
     public void hideInventory(JPanel origin){
@@ -433,6 +571,28 @@ public class AeternusGUI {
         inventoryMenu.clear();
         origin.revalidate();
         origin.repaint();
+    }
+    
+    private String getColor(String input){
+        String out = "";
+        switch(input){
+            case "common":
+                out = "ffffff";
+            break;
+            case "uncommon":
+                out = "0000ff";
+            break;
+            case "rare":
+                out = "00ff00";
+            break;
+            case "epic":
+                out = "ff00ff";
+            break;
+            case "legendary":
+                out = "ffff00";
+            break;
+        }
+        return out;
     }
     
     public void refreshSouls(){
@@ -491,13 +651,13 @@ public class AeternusGUI {
             }else if(game.getSouls() >= 10000 && !game.getLockState("PORTAL")){
                 startDialouge("UnlockPortalsMagic");
             }else{
-                openShop();
+                openShop("MAGICSHOP");
             }
         }else if(id.equals("SOULSMITH")){
             if(!game.getLockState("PORTAL")){
                 startDialouge("lockedSmith");
             }else{
-                openShop();
+                openShop("SOULSMITH");
             }
         }
     }
@@ -521,7 +681,7 @@ public class AeternusGUI {
         }
     }
     
-    private void openShop(){
+    private void openShop(String shop){
         JLabel shopBg = new JLabel();
         labelFactory(shopBg, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
                 new Color(204, 204, 204), 
@@ -533,7 +693,7 @@ public class AeternusGUI {
         setOptions(false);
         setOptionsVisibility(false);
         shopMenu.add(shopBg);
-        ArrayList<String[]> stock = game.getMagicStock();
+        ArrayList<String[]> stock = game.getStock(shop);
         ArrayList<String[]> idList = game.getIds();
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 8; j++) {
@@ -550,27 +710,19 @@ public class AeternusGUI {
                     String id = stock.get(i*8 + j)[0];
                     for(String[] s : idList){
                         if(s[0].equals(id)){
-                            String color = "";
-                            switch(stock.get(i*8 + j)[1]){
-                                case "common":
-                                    color = "ffffff";
-                                break;
-                                case "uncommon":
-                                    color = "0000ff";
-                                break;
-                                case "rare":
-                                    color = "00ff00";
-                                break;
-                                case "epic":
-                                    color = "ff00ff";
-                                break;
-                                case "legendary":
-                                    color = "ffff00";
-                                break;
-                            }
-                            shopSlot.setToolTipText("<html>" + s[1] + "<br><b><em style='color: #" + color + "'>" +  stock.get(i*8 + j)[1] + "</em></b><br>" + "<html>");
+                            shopSlot.setToolTipText("<html>" + s[1] + "<br><b><em style='color: #" 
+                                    + getColor(stock.get(i*6 + j)[1]) + "'>" 
+                                    +  stock.get(i*8 + j)[1] 
+                                    + "</em></b><br>§" + stock.get(i*6 + j)[2] + "<br><html>");
                         }
                     }
+                    int slotnum = i*8 + j;
+                    shopSlot.addMouseListener(new java.awt.event.MouseAdapter() {
+                        @Override
+                        public void mouseClicked(java.awt.event.MouseEvent evt) {
+                            purchaseItem(slotnum, shop);
+                        }
+                    });
                 }
                 
                 findPanel("subMenu").add(shopSlot, 0);
@@ -606,6 +758,28 @@ public class AeternusGUI {
         
         findPanel("subMenu").revalidate();
         findPanel("subMenu").repaint();
+    }
+    
+    private void purchaseItem(int slot, String shop){
+        ArrayList<String[]> stock = game.getStock(shop);
+        ArrayList<Item> inv = game.getInv();
+        if(game.getSouls() >= Integer.parseInt(stock.get(slot)[2])){
+            Item x = game.createItem(new String[]{stock.get(slot)[0], stock.get(slot)[1]});
+            game.alterSouls(-Integer.parseInt(stock.get(slot)[2]));
+            stock.remove(slot);
+            inv.add(x);
+            game.setInventory(inv);
+            
+            for(JLabel j : shopMenu){
+                    j.getParent().remove(j);
+                }
+                shopMenu.clear();
+                setOptions(true);
+                setOptionsVisibility(true);
+                findPanel("subMenu").revalidate();
+                findPanel("subMenu").repaint();
+            openShop(shop);
+        }
     }
     
     private void showEngineMenu(){

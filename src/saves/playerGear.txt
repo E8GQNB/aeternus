@@ -1,5 +1,5 @@
-head;
-chest;
+helmet;006;common
+chestpiece;
 weapon;
 magic1;
 magic2;

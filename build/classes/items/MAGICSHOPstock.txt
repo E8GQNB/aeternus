@@ -1,2 +1,2 @@
-016;common
-019;uncommon
+016;common;12653
+019;uncommon;19466

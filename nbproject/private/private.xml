@@ -5,10 +5,15 @@
         <group>
             <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/controller/GameEngine.java</file>
             <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/model/FullPageInfo.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/model/Weapon.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/model/Chestpiece.java</file>
             <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/view/MainFrame.java</file>
             <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/view/AeternusGUI.java</file>
             <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/controller/DialougeSystem.java</file>
             <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/model/InfoText.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/model/Item.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/model/Charm.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/model/Helmet.java</file>
         </group>
     </open-files>
 </project-private>
