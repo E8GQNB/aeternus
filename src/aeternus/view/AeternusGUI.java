@@ -20,6 +20,7 @@ import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -28,6 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JToolTip;
 import javax.swing.SwingConstants;
@@ -41,6 +43,7 @@ public class AeternusGUI {
     private MainFrame s = new MainFrame(this);
     private Component[] clist = s.getRootPane().getContentPane().getComponents();
     private volatile boolean dialougeState = false;
+    private boolean activeLabyrinth = false;
     private JLabel backgroundImage = new JLabel();
     private JLabel subBackground = new JLabel();
     private JLabel transitionCover = new JLabel();
@@ -86,6 +89,10 @@ public class AeternusGUI {
         570
 );
         
+    }
+    
+    public JFrame getFrame(){
+        return s;
     }
     
     public JPanel findPanel(String name){
@@ -596,7 +603,8 @@ public class AeternusGUI {
     }
     
     public void refreshSouls(){
-        if(game.getSouls() > 1000000){
+        if(!activeLabyrinth){
+            if(game.getSouls() > 1000000){
             soulCount.setText(String.format("%.1f", game.getSouls()/1000000) + "M");
         }else{
             soulCount.setText(String.format("%.1f", game.getSouls()));
@@ -612,6 +620,7 @@ public class AeternusGUI {
             }else{
                 j.setBackground(new Color(40,40,40));
             }
+        }
         }
     }
     
@@ -678,6 +687,19 @@ public class AeternusGUI {
             case "Talk":
                 startDialouge(id + (int)(Math.random()*5));
             break;
+            case "Initiate Portal":
+            {
+                try {
+                    setOptions(false);
+                    setOptionsVisibility(false);
+                    activeLabyrinth = true;
+                    game.enterPortal();
+                } catch (IOException ex) {
+                    Logger.getLogger(AeternusGUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            break;
+
         }
     }
     

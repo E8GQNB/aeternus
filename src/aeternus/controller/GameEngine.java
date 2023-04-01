@@ -9,6 +9,7 @@ import aeternus.model.Charm;
 import aeternus.model.Chestpiece;
 import aeternus.model.Helmet;
 import aeternus.model.Item;
+import aeternus.model.Labyrinth;
 import aeternus.model.Weapon;
 import aeternus.view.AeternusGUI;
 import java.io.BufferedReader;
@@ -24,6 +25,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
 
 public class GameEngine {
     public enum characters {
@@ -261,6 +263,13 @@ public class GameEngine {
             }
         }
         return x;
+    }
+    
+    public void enterPortal() throws IOException{
+        LabyrinthEngine la = new LabyrinthEngine();
+        la.setBounds(0, 0, 1920, 1080);
+        aeg.getFrame().getContentPane().add(la, 0);
+        //aeg.findPanel("subMenu").getParent().add(la, 0);
     }
     
     private ArrayList<Item> readInv(String name){
