@@ -269,6 +269,7 @@ public class GameEngine {
         LabyrinthEngine la = new LabyrinthEngine();
         la.setBounds(0, 0, 1920, 1080);
         aeg.getFrame().getContentPane().add(la, 0);
+        la.requestFocus();
         //aeg.findPanel("subMenu").getParent().add(la, 0);
     }
     

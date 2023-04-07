@@ -5,6 +5,7 @@
  */
 package aeternus.controller;
 
+import aeternus.controller.CombatEngine.enemy;
 import aeternus.model.Labyrinth;
 import aeternus.model.Monster;
 import aeternus.model.Player;
@@ -13,6 +14,10 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
@@ -29,23 +34,18 @@ public class LabyrinthEngine extends JPanel{
     private final int PLAYER_WIDTH = 25;
     private final int PLAYER_HEIGHT = 55;
     private final int PLAYER_MOVEMENT = 1;
-    private final int DRAGON_SIZE = 80;
+    private final int DRAGON_SIZE = 120;
 
     private boolean paused = false;
     private Image background;
     private static int levelNum = 0;
     private Labyrinth level;
     private Monster monster;
-    private Monster up;
-    private Monster down;
-    private Monster left;
-    private Monster right;
-    private Player player;
     private Player vignette;
-    private Player Up;
-    private Player Right;
-    private Player Down;
-    private Player Left;
+    private Player player;
+    private ArrayList<Player> playerHitbox = new ArrayList<Player>();
+    private ArrayList<Monster> monsters = new ArrayList<Monster>();
+    private ArrayList<Monster> monsterHitboxes = new ArrayList<Monster>();
     private Timer newFrameTimer;
 
     public LabyrinthEngine() {
@@ -132,19 +132,17 @@ public class LabyrinthEngine extends JPanel{
     
     public void setX(int x){
         player.setVelx(x);
-        Up.setVelx(x);
-        Right.setVelx(x);
-        Down.setVelx(x);
-        Left.setVelx(x);
+        for(Player p : playerHitbox){
+            p.setVelx(x);
+        }
         vignette.setVelx(x);
     }
     
     public void setY(int y){
         player.setVely(y);
-        Up.setVely(y);
-        Right.setVely(y);
-        Down.setVely(y);
-        Left.setVely(y);
+        for(Player p : playerHitbox){
+            p.setVely(y);
+        }
         vignette.setVely(y);
     }
     
@@ -155,31 +153,46 @@ public class LabyrinthEngine extends JPanel{
             Logger.getLogger(GameEngine.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         Image playerImage = new ImageIcon("src/images/betaSERVANTIcon.png").getImage();
-        Image vignetteImage = new ImageIcon("src/images/betaSERVANTIcon.png").getImage();
+        Image vignetteImage = new ImageIcon("src/images/vignette.png").getImage();
         int playerSpawnX = 152*4+10;
         int playerSpawnY = 152*4+5;
         player = new Player(playerSpawnX, playerSpawnY, PLAYER_WIDTH, PLAYER_HEIGHT, playerImage);
-        Up = new Player(playerSpawnX, playerSpawnY-5, PLAYER_WIDTH, PLAYER_HEIGHT, playerImage);
-        Right = new Player(playerSpawnX+5, playerSpawnY, PLAYER_WIDTH, PLAYER_HEIGHT, playerImage);
-        Down = new Player(playerSpawnX, playerSpawnY+5, PLAYER_WIDTH, PLAYER_HEIGHT, playerImage);
-        Left = new Player(playerSpawnX-5, playerSpawnY, PLAYER_WIDTH, PLAYER_HEIGHT, playerImage);
-        vignette = new Player(-2130, -150, 4537, 2190, vignetteImage);
-        Image dragonImage = new ImageIcon("src/images/betaMAGIC MERCHANTIcon.png").getImage();
-        int dragonX = (int) ((Math.random() * 30) + 1);
-        int dragonY = (int) ((Math.random() * 15) + 1);
-        monster = new Monster(60*dragonX, 60*dragonY, DRAGON_SIZE, DRAGON_SIZE, dragonImage);
-        up = new Monster(60*dragonX, (60*dragonY)-10, DRAGON_SIZE, DRAGON_SIZE, dragonImage);
-        right = new Monster((60*dragonX)+10, 60*dragonY, DRAGON_SIZE, DRAGON_SIZE, dragonImage);
-        down = new Monster(60*dragonX, (60*dragonY)+10, DRAGON_SIZE, DRAGON_SIZE, dragonImage);
-        left = new Monster((60*dragonX)-10, 60*dragonY, DRAGON_SIZE, DRAGON_SIZE, dragonImage);
-        while(level.collides(monster)){
-            dragonX = (int) ((Math.random() * 30) + 1);
-            dragonY = (int) ((Math.random() * 15) + 1);
-            monster = new Monster(60*dragonX, 60*dragonY, DRAGON_SIZE, DRAGON_SIZE, dragonImage);
-            up = new Monster(60*dragonX, (60*dragonY)-10, DRAGON_SIZE, DRAGON_SIZE, dragonImage);
-            right = new Monster((60*dragonX)+10, 60*dragonY, DRAGON_SIZE, DRAGON_SIZE, dragonImage);
-            down = new Monster(60*dragonX, (60*dragonY)+10, DRAGON_SIZE, DRAGON_SIZE, dragonImage);
-            left = new Monster((60*dragonX)-10, 60*dragonY, DRAGON_SIZE, DRAGON_SIZE, dragonImage);
+        Player Up = new Player(playerSpawnX, playerSpawnY-5, PLAYER_WIDTH, PLAYER_HEIGHT, playerImage);
+        Player Right = new Player(playerSpawnX+5, playerSpawnY, PLAYER_WIDTH, PLAYER_HEIGHT, playerImage);
+        Player Down = new Player(playerSpawnX, playerSpawnY+5, PLAYER_WIDTH, PLAYER_HEIGHT, playerImage);
+        Player Left = new Player(playerSpawnX-5, playerSpawnY, PLAYER_WIDTH, PLAYER_HEIGHT, playerImage);
+        List<Player> newHB = Arrays.asList(Up, Right, Down, Left);
+        playerHitbox.addAll(newHB);
+        vignette = new Player(-1600, -440, 4537, 2190, vignetteImage);
+        spawnMonster(5);
+    }
+    
+    public void spawnMonster(int amount){
+        for(int i = 0; i < amount; i++){
+            int random = (int) (Math.random() * 3);
+            int dragonX = (int) ((Math.random() * 28) + 1);
+            int dragonY = (int) ((Math.random() * 28) + 1);
+            Image dragonImage = new ImageIcon("src/images/Foes/Castle/" + enemy.values()[random].name() + ".png").getImage();
+            int hitbox = 10;
+            int ms = 120;
+            dragonX *= ms;
+            dragonY *= ms;
+            
+            Monster m = new Monster(dragonX, dragonY, DRAGON_SIZE, DRAGON_SIZE, dragonImage, enemy.values()[random]);
+            while(level.collides(m) || player.collides(m)){
+                dragonX = (int) ((Math.random() * 10) + 1);
+                dragonY = (int) ((Math.random() * 5) + 1);
+                dragonX *= ms;
+                dragonY *= ms;
+                m = new Monster(dragonX, dragonY, DRAGON_SIZE, DRAGON_SIZE, dragonImage, enemy.values()[random]);
+            }
+            Monster up = new Monster(dragonX, dragonY-hitbox, DRAGON_SIZE, DRAGON_SIZE, dragonImage, enemy.values()[random]);
+            Monster right = new Monster(dragonX+hitbox, dragonY, DRAGON_SIZE, DRAGON_SIZE, dragonImage, enemy.values()[random]);
+            Monster down = new Monster(dragonX, dragonY+hitbox, DRAGON_SIZE, DRAGON_SIZE, dragonImage, enemy.values()[random]);
+            Monster left = new Monster(dragonX-hitbox, dragonY, DRAGON_SIZE, DRAGON_SIZE, dragonImage, enemy.values()[random]);
+            List<Monster> newMHB = Arrays.asList(up, right, down, left);
+            monsterHitboxes.addAll(newMHB);
+            monsters.add(m);
         }
     }
 
@@ -190,8 +203,8 @@ public class LabyrinthEngine extends JPanel{
     private boolean moveViewport(){
         int xmin = 480;
         int xmax = 1440;
-        int ymin = 270;
-        int ymax = 810;
+        int ymin = 370;
+        int ymax = 710;
         int newx = 0;
         int newy = 0;
         if(player.getX() < xmin){
@@ -207,20 +220,24 @@ public class LabyrinthEngine extends JPanel{
             newy = -1;
         }
         level.shiftField(newx, newy);
+        vignette.setX(vignette.getX() + newx);
+        vignette.setY(vignette.getY() + newy);
         player.setX(player.getX() + newx);
         player.setY(player.getY() + newy);
         
-        Up.setX(Up.getX() + newx);
-        Up.setY(Up.getY() + newy);
+        for(Player p : playerHitbox){
+            p.setX(p.getX() + newx);
+            p.setY(p.getY() + newy);
+        }
         
-        Right.setX(Right.getX() + newx);
-        Right.setY(Right.getY() + newy);
-        
-        Down.setX(Down.getX() + newx);
-        Down.setY(Down.getY() + newy);
-        
-        Left.setX(Left.getX() + newx);
-        Left.setY(Left.getY() + newy);
+        for(Monster m : monsters){
+            m.setX(m.getX() + newx);
+            m.setY(m.getY() + newy);
+        }
+        for(Monster m : monsterHitboxes){
+            m.setX(m.getX() + newx);
+            m.setY(m.getY() + newy);
+        }
         if(newx != 0 || newy != 0){
             return true;
         }
@@ -233,11 +250,14 @@ public class LabyrinthEngine extends JPanel{
         grphcs.drawImage(background, 0, 0, 1920, 1080, null);
         level.draw(grphcs);
         player.draw(grphcs);
-        Up.draw(grphcs);
-        Down.draw(grphcs);
-        Left.draw(grphcs);
-        Right.draw(grphcs);
-        monster.draw(grphcs);
+        
+        for(Player p : playerHitbox){
+            p.draw(grphcs);
+        }
+        
+        for(Monster m : monsters){
+            m.draw(grphcs);
+        }
         //vignette.draw(grphcs);
     }
 
@@ -246,85 +266,29 @@ public class LabyrinthEngine extends JPanel{
         @Override
         public void actionPerformed(ActionEvent ae) {
             if (!paused) {
-                boolean viewMoved = moveViewport();
+                moveViewport();
                 int rnd = (int) (Math.random() * 2);
-                if(!level.collides(up) && monster.gety() == 0){
-                    if(rnd == 1){
-                        monster.changeDirection(1);
-                        up.changeDirection(1);
-                        down.changeDirection(1);
-                        left.changeDirection(1);
-                        right.changeDirection(1);
-                    }
-                }else if(!level.collides(right) && monster.getx() == 0){
-                    if(rnd == 1){
-                        monster.changeDirection(2);
-                        up.changeDirection(2);
-                        down.changeDirection(2);
-                        left.changeDirection(2);
-                        right.changeDirection(2);
-                    }
-                }else if(!level.collides(down) && monster.gety() == 0){
-                    if(rnd == 1){
-                        monster.changeDirection(3);
-                        up.changeDirection(3);
-                        down.changeDirection(3);
-                        left.changeDirection(3);
-                        right.changeDirection(3);
-                    }
-                }else if(!level.collides(left) && monster.getx() == 0){
-                    if(rnd == 1){
-                        monster.changeDirection(4);
-                        up.changeDirection(4);
-                        down.changeDirection(4);
-                        left.changeDirection(4);
-                        right.changeDirection(4);
+                monsterController(rnd);
+                //check for player death
+                for(Monster m : monsters){
+                    if(m.collides(player)){
+                        paused = true;
+                        CombatEngine c = new CombatEngine(m);
                     }
                 }
-                monster.move();
-                up.move();
-                down.move();
-                right.move();
-                left.move();
-                if (level.collides(monster)) {
-                    monster.stepBack();
-                    up.stepBack();
-                    left.stepBack();
-                    right.stepBack();
-                    down.stepBack();
-                    rnd = (int) ((Math.random() * 4) + 1);
-                    monster.changeDirection(rnd);
-                    up.changeDirection(rnd);
-                    down.changeDirection(rnd);
-                    left.changeDirection(rnd);
-                    right.changeDirection(rnd);
-                }
-                if (player.collides(monster)) {
-                    paused = true;
-                    //ded
-                }
-                if((!level.playerCollides(Up) && player.getVely() < 0) || (!level.playerCollides(Down) && player.getVely() > 0)){
+                if((!level.playerCollides(playerHitbox.get(0)) && player.getVely() < 0) || (!level.playerCollides(playerHitbox.get(2)) && player.getVely() > 0)){
                     player.moveY();
-                    Up.moveY();
-                    Left.moveY();
-                    Right.moveY();
-                    Down.moveY();
+                    for(Player p : playerHitbox){
+                        p.moveY();
+                    }
                     vignette.moveY();
                 }
-                if((!level.playerCollides(Left) && player.getVelx() < 0) || (!level.playerCollides(Right) && player.getVelx() > 0)){
+                if((!level.playerCollides(playerHitbox.get(3)) && player.getVelx() < 0) || (!level.playerCollides(playerHitbox.get(1)) && player.getVelx() > 0)){
                     player.moveX();
-                    Up.moveX();
-                    Left.moveX();
-                    Right.moveX();
-                    Down.moveX();
+                    for(Player p : playerHitbox){
+                        p.moveX();
+                    }
                     vignette.moveX();
-                }
-                if(monster.getY() <= 0){
-                    monster.changeDirection(3);
-                    up.changeDirection(3);
-                    down.changeDirection(3);
-                    left.changeDirection(3);
-                    right.changeDirection(3);
                 }
             }
             if (player.isOut()) {
@@ -334,5 +298,56 @@ public class LabyrinthEngine extends JPanel{
             repaint();
         }
 
+        private void monsterController(int rnd){
+            for(int i = 0; i < monsters.size(); i++){
+                int j = i*4;
+                if(rnd == 1){
+                    if(!level.collides(monsterHitboxes.get(j)) && monsters.get(i).gety() == 0){
+                        monsters.get(i).changeDirection(1);
+                        monsterHitboxes.get(j).changeDirection(1);
+                        monsterHitboxes.get(j+1).changeDirection(1);
+                        monsterHitboxes.get(j+2).changeDirection(1);
+                        monsterHitboxes.get(j+3).changeDirection(1);
+                    }else if(!level.collides(monsterHitboxes.get(j+1)) && monsters.get(i).getx() == 0){
+                        monsters.get(i).changeDirection(2);
+                        monsterHitboxes.get(j).changeDirection(2);
+                        monsterHitboxes.get(j+1).changeDirection(2);
+                        monsterHitboxes.get(j+2).changeDirection(2);
+                        monsterHitboxes.get(j+3).changeDirection(2);
+                    }else if(!level.collides(monsterHitboxes.get(j+2)) && monsters.get(i).gety() == 0){
+                        monsters.get(i).changeDirection(3);
+                        monsterHitboxes.get(j).changeDirection(3);
+                        monsterHitboxes.get(j+1).changeDirection(3);
+                        monsterHitboxes.get(j+2).changeDirection(3);
+                        monsterHitboxes.get(j+3).changeDirection(3);
+                    }else if(!level.collides(monsterHitboxes.get(j+3)) && monsters.get(i).getx() == 0){
+                        monsters.get(i).changeDirection(4);
+                        monsterHitboxes.get(j).changeDirection(4);
+                        monsterHitboxes.get(j+1).changeDirection(4);
+                        monsterHitboxes.get(j+2).changeDirection(4);
+                        monsterHitboxes.get(j+3).changeDirection(4);
+                    }
+                }
+                
+                monsters.get(i).move();
+                monsterHitboxes.get(j).move();
+                monsterHitboxes.get(j+1).move();
+                monsterHitboxes.get(j+2).move();
+                monsterHitboxes.get(j+3).move();
+                if (level.collides(monsters.get(i))) {
+                    monsters.get(i).stepBack();
+                    monsterHitboxes.get(j).stepBack();
+                    monsterHitboxes.get(j+1).stepBack();
+                    monsterHitboxes.get(j+2).stepBack();
+                    monsterHitboxes.get(j+3).stepBack();
+                    rnd = (int) ((Math.random() * 4) + 1);
+                    monsters.get(i).changeDirection(rnd);
+                    monsterHitboxes.get(j).changeDirection(rnd);
+                    monsterHitboxes.get(j+1).changeDirection(rnd);
+                    monsterHitboxes.get(j+2).changeDirection(rnd);
+                    monsterHitboxes.get(j+3).changeDirection(rnd);
+                }
+            }
+        }
     }
 }

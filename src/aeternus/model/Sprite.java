@@ -37,6 +37,10 @@ public class Sprite {
         Rectangle second = new Rectangle(other.x, other.y, other.width, other.height);        
         return first.intersects(second);
     }
+    
+    public Image getImg(){
+        return image;
+    }
 
     public int getX() {
         return x;
