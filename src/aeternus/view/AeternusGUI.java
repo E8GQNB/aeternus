@@ -604,23 +604,23 @@ public class AeternusGUI {
     
     public void refreshSouls(){
         if(!activeLabyrinth){
-            if(game.getSouls() > 1000000){
-            soulCount.setText(String.format("%.1f", game.getSouls()/1000000) + "M");
-        }else{
-            soulCount.setText(String.format("%.1f", game.getSouls()));
-        }
-        soulCount.getParent().revalidate();
-        soulCount.getParent().repaint();
-        double souls = game.getSouls();
-        
-        for(JLabel j : upgradeOptions){
-            j.setEnabled((souls - Double.parseDouble(j.getName())) >= 0);
-            if(!j.isEnabled()){
-                j.setBackground(new Color(30,30,30));
+                if(game.getSouls() > 1000000){
+                soulCount.setText(String.format("%.1f", game.getSouls()/1000000) + "M");
             }else{
-                j.setBackground(new Color(40,40,40));
+                soulCount.setText(String.format("%.1f", game.getSouls()));
             }
-        }
+            soulCount.getParent().revalidate();
+            soulCount.getParent().repaint();
+            double souls = game.getSouls();
+
+            for(JLabel j : upgradeOptions){
+                j.setEnabled((souls - Double.parseDouble(j.getName())) >= 0);
+                if(!j.isEnabled()){
+                    j.setBackground(new Color(30,30,30));
+                }else{
+                    j.setBackground(new Color(40,40,40));
+                }
+            }
         }
     }
     

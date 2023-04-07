@@ -44,6 +44,13 @@ public class MainFrame extends javax.swing.JFrame {
         logo = new javax.swing.JLabel();
         background = new javax.swing.JLabel();
         Main = new javax.swing.JPanel();
+        Prototype2 = new javax.swing.JPanel();
+        jLabel18 = new javax.swing.JLabel();
+        jLabel19 = new javax.swing.JLabel();
+        jLabel21 = new javax.swing.JLabel();
+        jLabel22 = new javax.swing.JLabel();
+        jLabel23 = new javax.swing.JLabel();
+        jLabel25 = new javax.swing.JLabel();
         Prototype1 = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
@@ -132,6 +139,49 @@ public class MainFrame extends javax.swing.JFrame {
         Main.setLayout(null);
         getContentPane().add(Main);
         Main.setBounds(0, 0, 1920, 1080);
+
+        Prototype2.setBackground(new java.awt.Color(0, 0, 0));
+        Prototype2.setMinimumSize(new java.awt.Dimension(1920, 1080));
+        Prototype2.setName("Prototype"); // NOI18N
+        Prototype2.setLayout(null);
+
+        jLabel18.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel18.setText("hp bar");
+        jLabel18.setOpaque(true);
+        Prototype2.add(jLabel18);
+        jLabel18.setBounds(180, 620, 460, 60);
+
+        jLabel19.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel19.setText("stats");
+        jLabel19.setOpaque(true);
+        Prototype2.add(jLabel19);
+        jLabel19.setBounds(180, 700, 460, 240);
+
+        jLabel21.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel21.setText("img");
+        jLabel21.setOpaque(true);
+        Prototype2.add(jLabel21);
+        jLabel21.setBounds(180, 140, 460, 460);
+
+        jLabel22.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel22.setText("hp bar");
+        jLabel22.setOpaque(true);
+        Prototype2.add(jLabel22);
+        jLabel22.setBounds(1280, 620, 460, 60);
+
+        jLabel23.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel23.setText("img");
+        jLabel23.setOpaque(true);
+        Prototype2.add(jLabel23);
+        jLabel23.setBounds(1280, 140, 460, 460);
+
+        jLabel25.setBackground(new java.awt.Color(102, 102, 102));
+        jLabel25.setOpaque(true);
+        Prototype2.add(jLabel25);
+        jLabel25.setBounds(100, 100, 1720, 880);
+
+        getContentPane().add(Prototype2);
+        Prototype2.setBounds(0, 0, 1920, 1080);
 
         Prototype1.setBackground(new java.awt.Color(0, 0, 0));
         Prototype1.setMinimumSize(new java.awt.Dimension(1920, 1080));
@@ -292,6 +342,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel MainMenu;
     private javax.swing.JPanel Prototype;
     private javax.swing.JPanel Prototype1;
+    private javax.swing.JPanel Prototype2;
     private javax.swing.JPanel SplashScreen;
     private javax.swing.JLabel background;
     private javax.swing.JLabel jLabel1;
@@ -302,7 +353,13 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel21;
+    private javax.swing.JLabel jLabel22;
+    private javax.swing.JLabel jLabel23;
+    private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;

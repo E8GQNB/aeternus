@@ -26,6 +26,7 @@ public class Labyrinth {
     private final int ACROSS = 29;
     private final int DOWN = 30;
     ArrayList<Cell> cells;
+    ArrayList<Cell> outer;
 
     public Labyrinth(String levelPath) throws IOException {
         genLevel();
@@ -53,13 +54,14 @@ public class Labyrinth {
     
     public void genLevel() throws IOException {
         cells = new ArrayList<>();
+        outer = new ArrayList<>();
         //Fill labyrinth with walls
         for(int i = 0; i < ACROSS; i++){
             for(int j = 0; j < DOWN; j++){
                 maze[i][j] = 1;
             }
         }
-        //random starting point for generation 
+        //random starting point for generation
         int x = ((int) (Math.random() * ACROSS/2) + 10);
         int y = ((int) (Math.random() * DOWN/2) + 10);
         if(x % 2 == 0){
@@ -88,17 +90,31 @@ public class Labyrinth {
             fronts.remove(r);
         }
         for(int i = 0; i < ACROSS; i++){
-                for(int j = 0; j < DOWN; j++){
-                    if(j < DOWN-1){
+            for(int j = 0; j < DOWN; j++){
+                if(j < DOWN-1){
+                    if(j == DOWN-2){
+                        Image image = new ImageIcon("src/images/castlewall.png").getImage();
+                        cells.add(new Cell(i * BLOCK_WIDTH, j * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT, image));
+                    }else{
                         if(maze[i][j] == 1 && maze[i][j+1] != 1){
-                        Image image = new ImageIcon("src/images/betaSERVANTIcon.png").getImage();
-                        cells.add(new Cell(i * BLOCK_WIDTH, j * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT, image));
-                    }else if(maze[i][j] == 1 && maze[i][j+1] == 1){
-                        Image image = new ImageIcon("src/images/betaSERVANTIcon.png").getImage();
-                        cells.add(new Cell(i * BLOCK_WIDTH, j * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT, image));
-                    }
+                            Image image = new ImageIcon("src/images/castlewall.png").getImage();
+                            cells.add(new Cell(i * BLOCK_WIDTH, j * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT, image));
+                        }else if(maze[i][j] == 1 && maze[i][j+1] == 1){
+                            Image image = new ImageIcon("src/images/castledark.png").getImage();
+                            cells.add(new Cell(i * BLOCK_WIDTH, j * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT, image));
+                        }
                     }
                 }
+            }
+        }
+        
+        for(int i = 0; i < ACROSS*4; i++){
+            for(int j = 0; j < DOWN*4; j++){
+                if((j < 10 || i < 10) || (j > 37 || i > 38)){
+                    Image image = new ImageIcon("src/images/castledark.png").getImage();
+                    outer.add(new Cell((i * BLOCK_WIDTH)-(BLOCK_WIDTH * 10), (j * BLOCK_HEIGHT)-(BLOCK_WIDTH * 10), BLOCK_WIDTH, BLOCK_HEIGHT, image));
+                }
+            }
         }
         //adjustCenter();
     }
@@ -112,6 +128,11 @@ public class Labyrinth {
     
     public void shiftField(int x, int y){
         for(Cell c : cells){
+            c.setX(c.getX() + x);
+            c.setY(c.getY() + y);
+        }
+        
+        for(Cell c : outer){
             c.setX(c.getX() + x);
             c.setY(c.getY() + y);
         }
@@ -270,6 +291,9 @@ public class Labyrinth {
 
     public void draw(Graphics g) {
         for (Cell c : cells) {
+            c.draw(g);
+        }
+        for(Cell c : outer){
             c.draw(g);
         }
     }
