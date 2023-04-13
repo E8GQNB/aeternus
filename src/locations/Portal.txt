@@ -1,2 +1,2 @@
-option;Initiate Portal
+option;Enter Portal
 option;Leave

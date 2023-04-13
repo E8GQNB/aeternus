@@ -3,4 +3,6 @@ Reaper Assistant;0;100;1;Smaller versions of the real deal.
 Shrine;0;1100;8;Here, you pray to the God of Death.
 Graveyard;0;12000;47;An excellent choice to add to your soul stream.
 Soylent Green Factory;0;130000;260;Food for the people, by the people.
+XYZ;0;1400000;1400;X
+XY;0;20000000;7800;X
 Leave;0;0;0;Back to the Base

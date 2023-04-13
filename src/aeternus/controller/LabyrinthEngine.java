@@ -21,6 +21,7 @@ import java.util.Random;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
@@ -43,13 +44,18 @@ public class LabyrinthEngine extends JPanel{
     private Monster monster;
     private Player vignette;
     private Player player;
+    private Boolean activeCombat = false;
     private ArrayList<Player> playerHitbox = new ArrayList<Player>();
     private ArrayList<Monster> monsters = new ArrayList<Monster>();
     private ArrayList<Monster> monsterHitboxes = new ArrayList<Monster>();
     private Timer newFrameTimer;
+    private CombatEngine c;
+    private GameEngine game;
 
-    public LabyrinthEngine() {
+    public LabyrinthEngine(GameEngine game) {
         super();
+        this.game = game;
+        this.setLayout(null);
         background = new ImageIcon("src/images/betaCaveBackground.png").getImage();
         
         this.getInputMap().put(KeyStroke.getKeyStroke("A"), "pressed left");
@@ -156,7 +162,8 @@ public class LabyrinthEngine extends JPanel{
         Image vignetteImage = new ImageIcon("src/images/vignette.png").getImage();
         int playerSpawnX = 152*4+10;
         int playerSpawnY = 152*4+5;
-        player = new Player(playerSpawnX, playerSpawnY, PLAYER_WIDTH, PLAYER_HEIGHT, playerImage);
+        int[] stats = new int[]{Integer.parseInt(game.getStat("str")), Integer.parseInt(game.getStat("con")), Integer.parseInt(game.getStat("dex")), Integer.parseInt(game.getStat("int")), Integer.parseInt(game.getStat("lck")), Integer.parseInt(game.getStat("lvl"))};
+        player = new Player(playerSpawnX, playerSpawnY, PLAYER_WIDTH, PLAYER_HEIGHT, playerImage, Integer.parseInt(game.getStat("con")), game.getDamage(), stats);
         Player Up = new Player(playerSpawnX, playerSpawnY-5, PLAYER_WIDTH, PLAYER_HEIGHT, playerImage);
         Player Right = new Player(playerSpawnX+5, playerSpawnY, PLAYER_WIDTH, PLAYER_HEIGHT, playerImage);
         Player Down = new Player(playerSpawnX, playerSpawnY+5, PLAYER_WIDTH, PLAYER_HEIGHT, playerImage);
@@ -258,8 +265,52 @@ public class LabyrinthEngine extends JPanel{
         for(Monster m : monsters){
             m.draw(grphcs);
         }
+        
         //vignette.draw(grphcs);
     }
+    
+    private JPanel getDest(){
+        return this;
+    }
+    
+    private void createCombatEngine(Monster m){
+        c = new CombatEngine(m, getDest(), player, this);
+    }
+    
+    public Player getPlayer(){
+        return player;
+    }
+    
+    public void deleteMonster(){
+        monsters.remove(monsterIndx);
+    }
+    
+    public void resume(){
+        if(monsters.size() > 0){
+            paused = false;
+        }else{
+            exit();
+        }
+    }
+    
+    public void deleteCombat(){
+        c = null;
+    }
+    
+    public void rollLvl(){
+        Random rnd = new Random();
+        double lvlupchance = Math.pow(0.5, Double.parseDouble(game.getStat("lvl")));
+        if(rnd.nextInt(100)+1 < lvlupchance*100){
+            game.addStat(5);
+        }
+    }
+    
+    public void exit(){
+        //this.getParent().remove(this);
+        game.exitPortal();
+    }
+    
+    private int monsterIndx = -1;
 
     class NewFrameListener implements ActionListener {
 
@@ -270,11 +321,15 @@ public class LabyrinthEngine extends JPanel{
                 int rnd = (int) (Math.random() * 2);
                 monsterController(rnd);
                 //check for player death
+                int cnt = 0;
                 for(Monster m : monsters){
                     if(m.collides(player)){
                         paused = true;
-                        CombatEngine c = new CombatEngine(m);
+                        createCombatEngine(m);
+                        monsterIndx = cnt;
+                        activeCombat = true;
                     }
+                    cnt++;
                 }
                 if((!level.playerCollides(playerHitbox.get(0)) && player.getVely() < 0) || (!level.playerCollides(playerHitbox.get(2)) && player.getVely() > 0)){
                     player.moveY();
@@ -290,12 +345,13 @@ public class LabyrinthEngine extends JPanel{
                     }
                     vignette.moveX();
                 }
+                repaint();
             }
             if (player.isOut()) {
                 levelNum++;
                 restart();
             }
-            repaint();
+            
         }
 
         private void monsterController(int rnd){

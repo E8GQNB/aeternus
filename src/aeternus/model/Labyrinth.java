@@ -13,6 +13,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 import javax.swing.ImageIcon;
 
 /**
@@ -97,7 +98,13 @@ public class Labyrinth {
                         cells.add(new Cell(i * BLOCK_WIDTH, j * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT, image));
                     }else{
                         if(maze[i][j] == 1 && maze[i][j+1] != 1){
-                            Image image = new ImageIcon("src/images/castlewall.png").getImage();
+                            Random rnd = new Random();
+                            Image image;
+                            if(rnd.nextInt(2) == 1){
+                                image = new ImageIcon("src/images/cw1.png").getImage();
+                            }else{
+                                image = new ImageIcon("src/images/cw2.png").getImage();
+                            }
                             cells.add(new Cell(i * BLOCK_WIDTH, j * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT, image));
                         }else if(maze[i][j] == 1 && maze[i][j+1] == 1){
                             Image image = new ImageIcon("src/images/castledark.png").getImage();

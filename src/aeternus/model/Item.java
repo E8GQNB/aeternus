@@ -6,6 +6,7 @@
 package aeternus.model;
 
 import aeternus.controller.GameEngine;
+import java.awt.Image;
 
 /**
  *
@@ -15,17 +16,23 @@ public class Item {
     private String id;
     private String rarity;
     private String name;
+    private Image image;
     GameEngine gm;
     
-    public Item(String id, String name, String rarity, GameEngine gm){
+    public Item(String id, String name, String rarity, GameEngine gm, Image image){
         this.id = id;
         this.name = name;
         this.rarity = rarity;
         this.gm = gm;
+        this.image = image;
     }
 
     public String getId() {
         return id;
+    }
+    
+    public Image getImg(){
+        return image;
     }
 
     public String getRarity() {

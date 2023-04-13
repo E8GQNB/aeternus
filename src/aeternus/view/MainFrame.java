@@ -75,7 +75,6 @@ public class MainFrame extends javax.swing.JFrame {
         setExtendedState(6);
         setLocation(new java.awt.Point(0, 0));
         setUndecorated(true);
-        setPreferredSize(new java.awt.Dimension(1920, 1080));
         setResizable(false);
         getContentPane().setLayout(null);
 
@@ -124,10 +123,10 @@ public class MainFrame extends javax.swing.JFrame {
         logo.setBounds(0, 330, 1920, 380);
 
         background.setBackground(new java.awt.Color(0, 0, 0));
-        background.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/betaMenuBackground.png"))); // NOI18N
+        background.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/menuBackground.png"))); // NOI18N
         background.setToolTipText("");
         MainMenu.add(background);
-        background.setBounds(0, 0, 1920, 1087);
+        background.setBounds(0, 0, 1920, 1080);
 
         getContentPane().add(MainMenu);
         MainMenu.setBounds(0, 0, 1920, 1080);
