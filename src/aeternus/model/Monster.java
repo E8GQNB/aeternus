@@ -16,7 +16,7 @@ public class Monster extends Sprite{
     private double velx;
     private double vely;
     private int maxHP;
-    private int hp;
+    private Double hp;
     private int damage;
 
     public Monster(int x, int y, int width, int height, Image image, enemy e) {
@@ -24,7 +24,7 @@ public class Monster extends Sprite{
         velx = 1;
         vely = 0;
         this.maxHP = e.getHp();
-        this.hp = e.getHp();
+        this.hp = e.getHp() * 1.0;
         this.damage = e.getDmg();
     }
     
@@ -32,12 +32,16 @@ public class Monster extends Sprite{
         return maxHP;
     }
     
-    public int getHp(){
+    public Double getHp(){
         return hp;
     }
     
     public int getDamage(){
         return damage;
+    }
+    
+    public void setHp(Double hp){
+        this.hp = hp;
     }
 
     public void move() {

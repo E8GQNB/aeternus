@@ -156,7 +156,7 @@ public class DialougeSystem {
                             if(s[0].length() > 0){
                                 speakerImage.setIcon(new javax.swing.ImageIcon(
                                         new javax.swing.ImageIcon(getClass().getResource(
-                                                "/images/beta" + s[0].toUpperCase() + "icon.png")).getImage().getScaledInstance(340, 340, Image.SCALE_DEFAULT)));
+                                                "/images/" + s[0].toUpperCase() + ".png")).getImage().getScaledInstance(340, 340, Image.SCALE_DEFAULT)));
                             }
                             //speaker name
                             speakerName.setText(s[0]);
@@ -204,8 +204,8 @@ public class DialougeSystem {
     }
     
     private ArrayList<String[]> readIn(String name) throws Exception{
-        //File file = new File("src/dialouge/" + name + ".txt");
-        File file = new File("src/dialouge/devmode.txt");
+        File file = new File("src/dialouge/" + name + ".txt");
+        //File file = new File("src/dialouge/devmode.txt");
         BufferedReader br = new BufferedReader(new FileReader(file));
         String st;
         ArrayList<String[]> dialouge = new ArrayList<String[]>();

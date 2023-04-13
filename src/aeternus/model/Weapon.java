@@ -5,6 +5,7 @@
  */
 package aeternus.model;
 import aeternus.controller.GameEngine;
+import java.awt.Image;
 import java.util.ArrayList;
 
 /**
@@ -13,8 +14,8 @@ import java.util.ArrayList;
  */
 public class Weapon extends Item{
     private final int damage;
-    public Weapon(String id, String name, String rarity, int damage, GameEngine gm){
-        super(id, name, rarity, gm);
+    public Weapon(String id, String name, String rarity, int damage, GameEngine gm, Image image){
+        super(id, name, rarity, gm, image);
         this.damage = damage;
     }
 

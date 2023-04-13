@@ -6,6 +6,7 @@
 package aeternus.model;
 
 import aeternus.controller.GameEngine;
+import java.awt.Image;
 import java.util.ArrayList;
 
 /**
@@ -14,8 +15,8 @@ import java.util.ArrayList;
  */
 public class Chestpiece extends Item{
     private final int defense;
-    public Chestpiece(String id, String name, String rarity, int defense, GameEngine gm){
-        super(id, name, rarity, gm);
+    public Chestpiece(String id, String name, String rarity, int defense, GameEngine gm, Image image){
+        super(id, name, rarity, gm, image);
         this.defense = defense;
     }
 

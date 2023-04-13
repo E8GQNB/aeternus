@@ -14,11 +14,45 @@ import java.awt.Image;
 public class Player extends Sprite{
     private double velx;
     private double vely;
+    private int maxHP;
+    private Double hp;
+    private Double damage;
+    private int[] stats = new int[6];
+    
+    public Player(int x, int y, int width, int height, Image image, int maxHP, Double damage, int[] stats) {
+        super(x, y, width, height, image);
+        this.maxHP = maxHP;
+        this.hp = maxHP * 1.0;
+        this.damage = damage;
+        this.stats = stats;
+    }
     
     public Player(int x, int y, int width, int height, Image image) {
         super(x, y, width, height, image);
+        this.maxHP = 0;
+        this.hp = 0.0;
+        this.damage = 0.0;
     }
     
+    public int getStat(int idx){
+        return stats[idx];
+    }
+    
+    public int getMaxHp(){
+        return maxHP;
+    }
+    
+    public Double getHp(){
+        return hp;
+    }
+    
+    public Double getDamage(){
+        return damage;
+    }
+    
+    public void setHp(Double hp){
+        this.hp = hp;
+    }
     
     public void moveX() {
         x += velx;

@@ -6,6 +6,7 @@
 package aeternus.model;
 
 import aeternus.controller.GameEngine;
+import java.awt.Image;
 import java.util.ArrayList;
 
 /**
@@ -14,8 +15,8 @@ import java.util.ArrayList;
  */
 public class Charm extends Item{
     private final String stat;
-    public Charm(String id, String name, String rarity, String stat, GameEngine gm){
-        super(id, name, rarity, gm);
+    public Charm(String id, String name, String rarity, String stat, GameEngine gm, Image image){
+        super(id, name, rarity, gm, image);
         this.stat = stat;
     }
 

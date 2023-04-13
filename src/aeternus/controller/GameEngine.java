@@ -12,6 +12,7 @@ import aeternus.model.Item;
 import aeternus.model.Labyrinth;
 import aeternus.model.Weapon;
 import aeternus.view.AeternusGUI;
+import java.awt.Image;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -25,6 +26,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
 public class GameEngine {
@@ -32,7 +34,7 @@ public class GameEngine {
     PLAYER, SERVANT, WEAPONMERCHANT, MAGICMERCHANT
 }
     public enum locations{
-        SQUARE("/images/betaMenuBackground.png", readIn("locations/Square")); 
+        SQUARE("/images/menuBackground.png", readIn("locations/Square")); 
         //BASE("/images/betaLab.png", readIn("Lab"));
         
         private final String path;
@@ -55,7 +57,6 @@ public class GameEngine {
     public enum interactables{
         MAGICSHOP(readIn("MagicShop")),
         WEAPONSHOP(readIn("WeaponShop")),
-        SOULSMITH(readIn("Soulsmith")),
         BASE(readIn("Base")),
         PORTAL(readIn("Portal"));
         
@@ -98,8 +99,10 @@ public class GameEngine {
     private Item[] equipped;
     private ArrayList<Item> inventory;
     private AeternusGUI aeg;
+    private LabyrinthEngine la;
     private double soulPower = 1.0;
     private double souls = 100000;
+    private int points = 20;
     
     public GameEngine(AeternusGUI aeg){
        this.flags = readIn("locations/eventflags");
@@ -107,7 +110,6 @@ public class GameEngine {
        this.lookupTable = readIn("locations/connections");
        this.engineUpgrades = readIn("upgrades/engine");
        this.shopStocks.put("MAGICSHOP", readIn("items/MAGICSHOPstock"));
-       this.shopStocks.put("SOULSMITH",readIn("items/SOULSMITHstock"));
        this.idList = readIn("items/idlist");
        this.stats = readIn("saves/playerStats");
        this.equipped = readGear("saves/playerGear");
@@ -157,6 +159,29 @@ public class GameEngine {
             }
         }
         return null;
+    }
+    
+    public void addStat(int idx){
+        int x = Integer.parseInt(stats.get(idx)[1]);
+        x += 1;
+        stats.get(idx)[1] = String.valueOf(x);
+        if(idx == 5){
+            points += 2;
+        }else{
+            points--;
+        }
+        
+    }
+    
+    public int getPoints(){
+        return points;
+    }
+    
+    public double getDamage(){
+        if(equipped[2] != null){
+            return (Double.parseDouble(getStat("str"))/10) * ((Weapon)equipped[2]).getDamage();
+        }
+        return (Double.parseDouble(getStat("str"))/10);
     }
     
     public ArrayList<Item> getInv(){
@@ -246,18 +271,23 @@ public class GameEngine {
         Item x = null;
         for(String[] s : idList){
             if(s[0].equals(in[0])){
+                Image img;
                 switch(s[2]){
                     case "weapon":
-                        x = new Weapon(s[0], s[1], in[1], Integer.parseInt(s[3]), this);
+                        img = new ImageIcon("src/images/Equipment/Weapon/" + s[1] + ".png").getImage();
+                        x = new Weapon(s[0], s[1], in[1], Integer.parseInt(s[3]), this, img);
                     break;
                     case "helmet":
-                        x = new Helmet(s[0], s[1], in[1], Integer.parseInt(s[3]), this);
+                        img = new ImageIcon("src/images/Equipment/Helmet/" + s[1] + ".png").getImage();
+                        x = new Helmet(s[0], s[1], in[1], Integer.parseInt(s[3]), this, img);
                     break;
                     case "chestpiece":
-                        x = new Chestpiece(s[0], s[1], in[1], Integer.parseInt(s[3]), this);
+                        img = new ImageIcon("src/images/Equipment/Chestplate/" + s[1] + ".png").getImage();
+                        x = new Chestpiece(s[0], s[1], in[1], Integer.parseInt(s[3]), this, img);
                     break;
                     case "charm":
-                        x = new Charm(s[0], s[1], in[1], s[3], this);
+                        img = new ImageIcon("src/images/Equipment/Charm/" + s[1] + ".png").getImage();
+                        x = new Charm(s[0], s[1], in[1], s[3], this, img);
                     break;
                 }
             }
@@ -266,11 +296,20 @@ public class GameEngine {
     }
     
     public void enterPortal() throws IOException{
-        LabyrinthEngine la = new LabyrinthEngine();
+        la = new LabyrinthEngine(this);
         la.setBounds(0, 0, 1920, 1080);
         aeg.getFrame().getContentPane().add(la, 0);
         la.requestFocus();
         //aeg.findPanel("subMenu").getParent().add(la, 0);
+    }
+    
+    public void exitPortal(){
+        la.setVisible(false);
+        aeg.getFrame().getContentPane().remove(la);
+        la = null;
+        aeg.setOptions(true);
+        aeg.setOptionsVisibility(true);
+        aeg.setActiveLabyrinth(true);
     }
     
     private ArrayList<Item> readInv(String name){

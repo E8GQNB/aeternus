@@ -1,5 +1,4 @@
 MAGICSHOP;true
 WEAPONSHOP;false
-SOULSMITH;false
 BASE;false
 PORTAL;true

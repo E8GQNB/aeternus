@@ -3,8 +3,8 @@
 003;Weathered Sword;weapon;12
 004;Iron Sword;weapon;15
 005;Coldiron Sword;weapon;20
-006;Tattered Helmet;helmet;1
-007;Leather Helmet;helmet;3
+006;Simple Helmet;helmet;1
+007;Fortified Leather Helmet;helmet;3
 008;Studded Leather Helmet;helmet;5
 009;Iron Helmet;helmet;8
 010;Coldiron Helmet;helmet;10
