@@ -15,8 +15,8 @@ import java.util.ArrayList;
  */
 public class Helmet extends Item{
     private final int defense;
-    public Helmet(String id, String name, String rarity, int defense, GameEngine gm, Image image){
-        super(id, name, rarity, gm, image);
+    public Helmet(String id, String name, String rarity, int defense, GameEngine gm, Image image, String stat){
+        super(id, name, rarity, gm, image, stat);
         this.defense = defense;
     }
 

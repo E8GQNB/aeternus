@@ -7,6 +7,7 @@ package aeternus.controller;
 
 import aeternus.model.CustomLabel;
 import aeternus.model.Item;
+import aeternus.model.Weapon;
 import aeternus.view.AeternusGUI;
 import java.awt.Color;
 import java.awt.Font;
@@ -26,6 +27,7 @@ public class InventoryManager {
     private AeternusGUI aeg;
     private ArrayList<JLabel> inventoryMenu = new ArrayList<JLabel>();
     private GameEngine game;
+    private Boolean warning;
     
     public InventoryManager(AeternusGUI aeg, GameEngine game){
         this.aeg = aeg;
@@ -36,7 +38,10 @@ public class InventoryManager {
         return inventoryMenu;
     }
     
-    public void showInventory(JPanel dest){
+    public void showInventory(JPanel dest, Boolean b){
+        inventoryMenu.clear();
+        game.calculateStats();
+        warning = b;
         JLabel invBg = new JLabel();
         JLabel invAvatar = new JLabel();
         CustomLabel invHelmet = new CustomLabel();
@@ -45,7 +50,13 @@ public class InventoryManager {
         CustomLabel invMagicItem1 = new CustomLabel();
         CustomLabel invMagicItem2 = new CustomLabel();
         JLabel invXp = new JLabel();
+        JLabel warningLabel = new JLabel();
         JLabel invStatBox = new JLabel();
+        JLabel helmOverlay = new JLabel();
+        JLabel chestOverlay = new JLabel();
+        JLabel weaponOverlay = new JLabel();
+        JLabel charm1Overlay = new JLabel();
+        JLabel charm2Overlay = new JLabel();
         CustomLabel strLabel = new CustomLabel();
         CustomLabel conLabel = new CustomLabel();
         CustomLabel dexLabel = new CustomLabel();
@@ -65,6 +76,12 @@ public class InventoryManager {
         inventoryMenu.add(dexLabel);
         inventoryMenu.add(intLabel);
         inventoryMenu.add(lckLabel);
+        inventoryMenu.add(warningLabel);
+        inventoryMenu.add(helmOverlay);
+        inventoryMenu.add(chestOverlay);
+        inventoryMenu.add(weaponOverlay);
+        inventoryMenu.add(charm1Overlay);
+        inventoryMenu.add(charm2Overlay);
         
         for(JLabel j : inventoryMenu){
             aeg.labelFactory(j, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
@@ -92,30 +109,62 @@ public class InventoryManager {
         invWeapon.setBounds(460, 460, 140, 140);
         invMagicItem1.setBounds(140, 460, 140, 140);
         invMagicItem2.setBounds(300, 460, 140, 140);
-        ArrayList<CustomLabel> gear = new ArrayList<CustomLabel>();
+        ArrayList<CustomLabel> gear = new ArrayList<>();
+        ArrayList<JLabel> gearGlow = new ArrayList<>();
         gear.add(invHelmet);
         gear.add(invChestplate);
         gear.add(invWeapon);
         gear.add(invMagicItem1);
         gear.add(invMagicItem2);
+        gearGlow.add(helmOverlay);
+        gearGlow.add(chestOverlay);
+        gearGlow.add(weaponOverlay);
+        gearGlow.add(charm1Overlay);
+        gearGlow.add(charm2Overlay);
         int cnt = 0;
         for(CustomLabel custom : gear){
             custom.getParent().setComponentZOrder(custom, 0);
+            gearGlow.get(cnt).getParent().setComponentZOrder(gearGlow.get(cnt), 0);
+            gearGlow.get(cnt).setOpaque(false);
+            gearGlow.get(cnt).setBounds(custom.getBounds());
             if(game.getEquipped()[cnt] != null){
                 Item x = game.getEquipped()[cnt];
                 custom.setIcon(new ImageIcon(game.getEquipped()[cnt].getImg().getScaledInstance(140, 140, Image.SCALE_DEFAULT)));
+                gearGlow.get(cnt).setIcon(new javax.swing.ImageIcon(
+                                    new javax.swing.ImageIcon(getClass().getResource(
+                                    "/images/rarity/" + x.getRarity() + ".png")).getImage().getScaledInstance(140, 140, Image.SCALE_DEFAULT)));
                 for(String[] s : game.getIds()){
                         if(s[0].equals(game.getEquipped()[cnt].getId())){
-                            custom.setToolTipText("<html>" + s[1] + "<br><b><em style='color: #" 
-                                    + getColor(game.getEquipped()[cnt].getRarity()) + "'>" 
-                                    +  game.getEquipped()[cnt].getRarity() 
-                                    + "</em></b><br>" + "<html>");
+                            String stat = decodeStat(x.getStat());
+                            if(!warning){
+                                if(x instanceof Weapon && stat.length() > 0){
+                                    custom.setToolTipText("<html>" + s[1] + "<br><b><em style='color: #" 
+                                        + getColor(x.getRarity()) 
+                                        + "'>" +  x.getRarity() 
+                                        + "</em></b><br>" + "Scales from " + stat + "<html>");
+                                }else if(stat.length() > 0){
+                                    custom.setToolTipText("<html>" + s[1] + "<br><b><em style='color: #" 
+                                        + getColor(x.getRarity()) 
+                                        + "'>" +  x.getRarity() 
+                                        + "</em></b><br>" + "Increases your " + stat + "<html>");
+                                }else{
+                                    custom.setToolTipText("<html>" + s[1] + "<br><b><em style='color: #" 
+                                        + getColor(x.getRarity()) 
+                                        + "'>" +  x.getRarity() 
+                                        + "</em></b><br>" + "<html>");
+                                }
+                            }else{
+                                custom.setToolTipText("<html>" + "You cannot burn items that you are wearing!" + "<html>");
+                            }
+                            
                         }
                 }
                 custom.addMouseListener(new java.awt.event.MouseAdapter() {
                     @Override
                     public void mouseClicked(java.awt.event.MouseEvent evt) {
-                        removeItem(x, dest);
+                        if(!warning){
+                            removeItem(x, dest);
+                        }
                     }
                 });
             }else{
@@ -170,7 +219,7 @@ public class InventoryManager {
                     public void mouseClicked(java.awt.event.MouseEvent evt) {
                         game.addStat(idx.get());
                         hideInventory(dest);
-                        showInventory(dest);
+                        showInventory(dest, warning);
                     }
                 });
             }
@@ -194,6 +243,7 @@ public class InventoryManager {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 6; j++) {
                 CustomLabel invSlot = new CustomLabel();
+                JLabel invGlow = new JLabel();
                 aeg.labelFactory(invSlot, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
                 new Color(204, 204, 204), 
                 new Color(0, 0, 0, 150), 
@@ -201,13 +251,30 @@ public class InventoryManager {
                 new Font("Agency FB", 0, 36));
                 if(inv.size() >= i*6 + j + 1){
                     invSlot.setIcon(new ImageIcon(inv.get(i*6 + j).getImg().getScaledInstance(150, 150, Image.SCALE_DEFAULT)));
-                    String id = inv.get(i*6 + j).getId();
+                    invGlow.setIcon(new javax.swing.ImageIcon(
+                                    new javax.swing.ImageIcon(getClass().getResource(
+                                    "/images/rarity/" + inv.get(i*6 + j).getRarity() + ".png")).getImage().getScaledInstance(150, 150, Image.SCALE_DEFAULT)));
+                    Item item = inv.get(i*6 + j);
                     for(String[] s : idList){
-                        if(s[0].equals(id)){
-                            invSlot.setToolTipText("<html>" + s[1] + "<br><b><em style='color: #" 
-                                    + getColor(inv.get(i*6 + j).getRarity()) 
-                                    + "'>" +  inv.get(i*6 + j).getRarity() 
+                        if(s[0].equals(item.getId())){
+                            String stat = decodeStat(item.getStat());
+                            if(inv.get(i*6 + j) instanceof Weapon && stat.length() > 0){
+                                invSlot.setToolTipText("<html>" + s[1] + "<br><b><em style='color: #" 
+                                    + getColor(item.getRarity()) 
+                                    + "'>" +  item.getRarity() 
+                                    + "</em></b><br>" + "Scales from " + stat + "<html>");
+                            }else if(stat.length() > 0){
+                                invSlot.setToolTipText("<html>" + s[1] + "<br><b><em style='color: #" 
+                                    + getColor(item.getRarity()) 
+                                    + "'>" +  item.getRarity() 
+                                    + "</em></b><br>" + "Increases your " + stat + "<html>");
+                            }else{
+                                invSlot.setToolTipText("<html>" + s[1] + "<br><b><em style='color: #" 
+                                    + getColor(item.getRarity()) 
+                                    + "'>" +  item.getRarity() 
                                     + "</em></b><br>" + "<html>");
+                            }
+                            
                         }
                     }
                 }
@@ -216,24 +283,58 @@ public class InventoryManager {
                     @Override
                     public void mouseClicked(java.awt.event.MouseEvent evt) {
                         if(invSlot.getIcon() != null){
-                            equipItem(Integer.parseInt(invSlot.getName()), dest);
+                            if(warning){
+                                destroyItem(Integer.parseInt(invSlot.getName()), dest);
+                            }else{
+                                equipItem(Integer.parseInt(invSlot.getName()), dest);
+                            }
+                            
                         }
                     }
                 });
                 
                 dest.add(invSlot, 0);
+                dest.add(invGlow, 0);
                 invSlot.setBounds(620 + j*200, 160 + i*200, 150, 150);
+                invGlow.setBounds(620 + j*200, 160 + i*200, 150, 150);
                 inventoryMenu.add(invSlot);
+                inventoryMenu.add(invGlow);
             }
         }
+        
+        //warning label
+        String warningMessage = "";
+        if(warning){
+            warningMessage += "Careful! Any item you click in your inventory is destroyed forever!";
+        }
+        if(game.getInv().size() > 20){
+            if(warningMessage.length() == 0){
+                warningMessage += "Your inventory space is running out. Consider burning some items.";
+            }
+        }
+        warningLabel.setText(warningMessage);
+        warningLabel.setBackground(new Color(50,0,0,150));
+        warningLabel.setOpaque(true);
+        warningLabel.setBounds(455, 50, 1010, 80);
+        warningLabel.setVisible(warningMessage.length() > 0);
+        dest.add(warningLabel, 0);
         
         if(aeg.getLocationOptions().size() > 0){
             aeg.setOptions(false);
         }else{
             aeg.setPOI(false);
         }
+        
         dest.revalidate();
         dest.repaint();
+    }
+    
+    public void destroyItem(int itemIdx, JPanel destination){
+        ArrayList<Item> inv = game.getInv();
+        game.calcBurn(inv.get(itemIdx));
+        inv.remove(itemIdx);
+        hideInventory(destination);
+        showInventory(destination, warning);
     }
     
     public void hideInventory(JPanel origin){
@@ -250,6 +351,28 @@ public class InventoryManager {
         origin.repaint();
     }
     
+    public String decodeStat(String st){
+        String stat = "";
+        switch(st){
+            case "str":
+                stat += "strength";
+            break;
+            case "con":
+                stat += "constitution";
+            break;
+            case "dex":
+                stat += "dexterity";
+            break;
+            case "int":
+                stat += "intelligence";
+            break;
+            case "lck":
+                stat += "luck";
+            break;
+        }
+        return stat;
+    }
+    
     public void removeItem(Item gear, JPanel destination){
         ArrayList<Item> inv = game.getInv();
         inv.add(gear);
@@ -261,14 +384,14 @@ public class InventoryManager {
         }
         game.setEquipped(gearSetup);
         hideInventory(destination);
-        showInventory(destination);
+        showInventory(destination, warning);
     }
     
     public void equipItem(int slot, JPanel destination){
         Item x = game.getInv().get(slot);
         x.equip(slot);
         hideInventory(destination);
-        showInventory(destination);
+        showInventory(destination, warning);
     }
     
     public String getColor(String input){

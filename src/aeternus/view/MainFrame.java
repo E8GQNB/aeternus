@@ -44,6 +44,15 @@ public class MainFrame extends javax.swing.JFrame {
         logo = new javax.swing.JLabel();
         background = new javax.swing.JLabel();
         Main = new javax.swing.JPanel();
+        Prototype3 = new javax.swing.JPanel();
+        jLabel26 = new javax.swing.JLabel();
+        jLabel32 = new javax.swing.JLabel();
+        jLabel33 = new javax.swing.JLabel();
+        jLabel34 = new javax.swing.JLabel();
+        jLabel35 = new javax.swing.JLabel();
+        jLabel36 = new javax.swing.JLabel();
+        jLabel37 = new javax.swing.JLabel();
+        jLabel29 = new javax.swing.JLabel();
         Prototype2 = new javax.swing.JPanel();
         jLabel18 = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
@@ -55,6 +64,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel9 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
+        jLabel17 = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
@@ -139,6 +149,61 @@ public class MainFrame extends javax.swing.JFrame {
         getContentPane().add(Main);
         Main.setBounds(0, 0, 1920, 1080);
 
+        Prototype3.setBackground(new java.awt.Color(0, 0, 0));
+        Prototype3.setMinimumSize(new java.awt.Dimension(1920, 1080));
+        Prototype3.setName("Prototype"); // NOI18N
+        Prototype3.setLayout(null);
+
+        jLabel26.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel26.setText("exit");
+        jLabel26.setOpaque(true);
+        Prototype3.add(jLabel26);
+        jLabel26.setBounds(730, 740, 460, 70);
+
+        jLabel32.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel32.setText("title");
+        jLabel32.setOpaque(true);
+        Prototype3.add(jLabel32);
+        jLabel32.setBounds(1530, 380, 240, 240);
+
+        jLabel33.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel33.setText("title");
+        jLabel33.setOpaque(true);
+        Prototype3.add(jLabel33);
+        jLabel33.setBounds(130, 280, 1660, 70);
+
+        jLabel34.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel34.setText("title");
+        jLabel34.setOpaque(true);
+        Prototype3.add(jLabel34);
+        jLabel34.setBounds(840, 380, 240, 240);
+
+        jLabel35.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel35.setText("title");
+        jLabel35.setOpaque(true);
+        Prototype3.add(jLabel35);
+        jLabel35.setBounds(490, 380, 240, 240);
+
+        jLabel36.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel36.setText("title");
+        jLabel36.setOpaque(true);
+        Prototype3.add(jLabel36);
+        jLabel36.setBounds(1190, 380, 240, 240);
+
+        jLabel37.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel37.setText("title");
+        jLabel37.setOpaque(true);
+        Prototype3.add(jLabel37);
+        jLabel37.setBounds(150, 380, 240, 240);
+
+        jLabel29.setBackground(new java.awt.Color(102, 102, 102));
+        jLabel29.setOpaque(true);
+        Prototype3.add(jLabel29);
+        jLabel29.setBounds(100, 255, 1720, 570);
+
+        getContentPane().add(Prototype3);
+        Prototype3.setBounds(0, 0, 1920, 1080);
+
         Prototype2.setBackground(new java.awt.Color(0, 0, 0));
         Prototype2.setMinimumSize(new java.awt.Dimension(1920, 1080));
         Prototype2.setName("Prototype"); // NOI18N
@@ -204,6 +269,12 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel12.setOpaque(true);
         Prototype1.add(jLabel12);
         jLabel12.setBounds(140, 700, 460, 240);
+
+        jLabel17.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel17.setText("warning");
+        jLabel17.setOpaque(true);
+        Prototype1.add(jLabel17);
+        jLabel17.setBounds(430, 50, 1010, 80);
 
         jLabel13.setBackground(new java.awt.Color(51, 51, 51));
         jLabel13.setText("helmet");
@@ -342,6 +413,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel Prototype;
     private javax.swing.JPanel Prototype1;
     private javax.swing.JPanel Prototype2;
+    private javax.swing.JPanel Prototype3;
     private javax.swing.JPanel SplashScreen;
     private javax.swing.JLabel background;
     private javax.swing.JLabel jLabel1;
@@ -352,6 +424,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
@@ -359,7 +432,15 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel25;
+    private javax.swing.JLabel jLabel26;
+    private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel32;
+    private javax.swing.JLabel jLabel33;
+    private javax.swing.JLabel jLabel34;
+    private javax.swing.JLabel jLabel35;
+    private javax.swing.JLabel jLabel36;
+    private javax.swing.JLabel jLabel37;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;

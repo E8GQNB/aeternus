@@ -14,14 +14,8 @@ import java.util.ArrayList;
  * @author User
  */
 public class Charm extends Item{
-    private final String stat;
     public Charm(String id, String name, String rarity, String stat, GameEngine gm, Image image){
-        super(id, name, rarity, gm, image);
-        this.stat = stat;
-    }
-
-    public String getStat() {
-        return stat;
+        super(id, name, rarity, gm, image, stat);
     }
     
     @Override
@@ -29,10 +23,14 @@ public class Charm extends Item{
         Item[] newGear = gm.getEquipped();
         ArrayList<Item> inv = gm.getInv();
         Item current = null;
-        if(newGear[3] != null){
-            current = newGear[3];
+        if(newGear[3] != null && newGear[4] == null){
+            newGear[4] = this;
+        }else if(newGear[3] == null){
+            newGear[3] = this;
+        }else{
+            current = newGear[4];
+            newGear[4] = this;
         }
-        newGear[3] = this;
         gm.setEquipped(newGear);
         if(current != null){
             inv.set(slot, current);

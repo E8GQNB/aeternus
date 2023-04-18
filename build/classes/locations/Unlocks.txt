@@ -1,4 +1,4 @@
 MAGICSHOP;true
 WEAPONSHOP;false
-BASE;false
+BASE;true
 PORTAL;true

@@ -1,0 +1,3 @@
+ItemsBurned;0
+PortalsEntered;0
+LabyrinthsWon;0

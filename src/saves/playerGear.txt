@@ -1,4 +1,4 @@
-helmet;006;common
+helmet;
 chestpiece;
 weapon;
 magic1;
