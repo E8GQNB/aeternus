@@ -6,6 +6,7 @@
 package aeternus.model;
 
 import aeternus.controller.CombatEngine.enemy;
+import java.awt.Graphics;
 import java.awt.Image;
 
 /**
@@ -18,7 +19,18 @@ public class Monster extends Sprite{
     private int maxHP;
     private Double hp;
     private int damage;
+    private Image token;
 
+    public Monster(int x, int y, int width, int height, Image image, enemy e, Image token) {
+        super(x, y, width, height, image);
+        velx = 1;
+        vely = 0;
+        this.maxHP = e.getHp();
+        this.hp = e.getHp() * 1.0;
+        this.damage = e.getDmg();
+        this.token = token;
+    }
+    
     public Monster(int x, int y, int width, int height, Image image, enemy e) {
         super(x, y, width, height, image);
         velx = 1;
@@ -26,6 +38,16 @@ public class Monster extends Sprite{
         this.maxHP = e.getHp();
         this.hp = e.getHp() * 1.0;
         this.damage = e.getDmg();
+        this.token = token;
+    }
+    
+    @Override
+    public void draw(Graphics g) {
+        g.drawImage(token, x, y, width, height, null);
+    }
+    
+    public Image getToken(){
+        return token;
     }
     
     public int getMaxHp(){

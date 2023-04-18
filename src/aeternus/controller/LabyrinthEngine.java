@@ -6,9 +6,13 @@
 package aeternus.controller;
 
 import aeternus.controller.CombatEngine.enemy;
+import aeternus.model.CustomLabel;
+import aeternus.model.Item;
 import aeternus.model.Labyrinth;
 import aeternus.model.Monster;
 import aeternus.model.Player;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -24,6 +28,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
 import javax.swing.Timer;
 
 /**
@@ -35,7 +40,7 @@ public class LabyrinthEngine extends JPanel{
     private final int PLAYER_WIDTH = 25;
     private final int PLAYER_HEIGHT = 55;
     private final int PLAYER_MOVEMENT = 1;
-    private final int DRAGON_SIZE = 120;
+    private final int MONSTER_SIZE = 120;
 
     private boolean paused = false;
     private Image background;
@@ -171,32 +176,33 @@ public class LabyrinthEngine extends JPanel{
         List<Player> newHB = Arrays.asList(Up, Right, Down, Left);
         playerHitbox.addAll(newHB);
         vignette = new Player(-1600, -440, 4537, 2190, vignetteImage);
-        spawnMonster(5);
+        spawnMonster(1);
     }
     
     public void spawnMonster(int amount){
         for(int i = 0; i < amount; i++){
             int random = (int) (Math.random() * 3);
-            int dragonX = (int) ((Math.random() * 28) + 1);
-            int dragonY = (int) ((Math.random() * 28) + 1);
-            Image dragonImage = new ImageIcon("src/images/Foes/Castle/" + enemy.values()[random].name() + ".png").getImage();
+            int monsterX = (int) ((Math.random() * 28) + 1);
+            int monsterY = (int) ((Math.random() * 28) + 1);
+            Image monsterImage = new ImageIcon("src/images/Foes/Castle/" + enemy.values()[random].name() + ".png").getImage();
+            Image monsterToken = new ImageIcon("src/images/Foes/Castle/Tokens/" + enemy.values()[random].name() + ".png").getImage();
             int hitbox = 10;
             int ms = 120;
-            dragonX *= ms;
-            dragonY *= ms;
+            monsterX *= ms;
+            monsterY *= ms;
             
-            Monster m = new Monster(dragonX, dragonY, DRAGON_SIZE, DRAGON_SIZE, dragonImage, enemy.values()[random]);
+            Monster m = new Monster(monsterX, monsterY, MONSTER_SIZE, MONSTER_SIZE, monsterImage, enemy.values()[random], monsterToken);
             while(level.collides(m) || player.collides(m)){
-                dragonX = (int) ((Math.random() * 10) + 1);
-                dragonY = (int) ((Math.random() * 5) + 1);
-                dragonX *= ms;
-                dragonY *= ms;
-                m = new Monster(dragonX, dragonY, DRAGON_SIZE, DRAGON_SIZE, dragonImage, enemy.values()[random]);
+                monsterX = (int) ((Math.random() * 10) + 1);
+                monsterY = (int) ((Math.random() * 5) + 1);
+                monsterX *= ms;
+                monsterY *= ms;
+                m = new Monster(monsterX, monsterY, MONSTER_SIZE, MONSTER_SIZE, monsterImage, enemy.values()[random], monsterToken);
             }
-            Monster up = new Monster(dragonX, dragonY-hitbox, DRAGON_SIZE, DRAGON_SIZE, dragonImage, enemy.values()[random]);
-            Monster right = new Monster(dragonX+hitbox, dragonY, DRAGON_SIZE, DRAGON_SIZE, dragonImage, enemy.values()[random]);
-            Monster down = new Monster(dragonX, dragonY+hitbox, DRAGON_SIZE, DRAGON_SIZE, dragonImage, enemy.values()[random]);
-            Monster left = new Monster(dragonX-hitbox, dragonY, DRAGON_SIZE, DRAGON_SIZE, dragonImage, enemy.values()[random]);
+            Monster up = new Monster(monsterX, monsterY-hitbox, MONSTER_SIZE, MONSTER_SIZE, monsterImage, enemy.values()[random]);
+            Monster right = new Monster(monsterX+hitbox, monsterY, MONSTER_SIZE, MONSTER_SIZE, monsterImage, enemy.values()[random]);
+            Monster down = new Monster(monsterX, monsterY+hitbox, MONSTER_SIZE, MONSTER_SIZE, monsterImage, enemy.values()[random]);
+            Monster left = new Monster(monsterX-hitbox, monsterY, MONSTER_SIZE, MONSTER_SIZE, monsterImage, enemy.values()[random]);
             List<Monster> newMHB = Arrays.asList(up, right, down, left);
             monsterHitboxes.addAll(newMHB);
             monsters.add(m);
@@ -266,15 +272,15 @@ public class LabyrinthEngine extends JPanel{
             m.draw(grphcs);
         }
         
+        /*for(Monster m : monsterHitboxes){
+            m.draw(grphcs);
+        }*/
+        
         //vignette.draw(grphcs);
     }
     
-    private JPanel getDest(){
-        return this;
-    }
-    
     private void createCombatEngine(Monster m){
-        c = new CombatEngine(m, getDest(), player, this);
+        c = new CombatEngine(m, this, player, this);
     }
     
     public Player getPlayer(){
@@ -283,13 +289,17 @@ public class LabyrinthEngine extends JPanel{
     
     public void deleteMonster(){
         monsters.remove(monsterIndx);
+        for(int i = 0; i < 4; i++){
+            monsterHitboxes.remove(monsterIndx*4);
+        }
     }
     
     public void resume(){
         if(monsters.size() > 0){
             paused = false;
         }else{
-            exit();
+            paused = false;
+            endScreen();
         }
     }
     
@@ -305,9 +315,152 @@ public class LabyrinthEngine extends JPanel{
         }
     }
     
-    public void exit(){
-        //this.getParent().remove(this);
-        game.exitPortal();
+    public void exit(Boolean win){
+        game.exitPortal(win);
+    }
+    
+    public void labelFactory(JLabel j, boolean opacity, boolean vis, int[] alignment, Color fG, Color bG, Font f){
+        j.setOpaque(opacity);
+        j.setVisible(vis);
+        j.setHorizontalAlignment(alignment[0]);
+        j.setVerticalAlignment(alignment[1]);
+        j.setForeground(fG);
+        j.setBackground(bG);
+        j.setFont(f);
+    }
+    
+    private static boolean isBetween(int x, int lower, int upper) {
+        return lower <= x && x <= upper;
+    }
+    
+    private int getChance(int boost){
+        Random rnd = new Random();
+        int chance = rnd.nextInt(100);
+        chance += boost;
+        if(isBetween(chance, 0, 39)){
+            return 0;
+        }else if(isBetween(chance, 40, 69)){
+            return 1;
+        }else if(isBetween(chance, 70, 89)){
+            return 2;
+        }else if(isBetween(chance, 90, 98)){
+            return 3;
+        }else if(isBetween(chance, 99, Integer.MAX_VALUE)){
+            return 4;
+        }
+        return 0;
+    }
+    
+    public void endScreen(){
+        Random rnd = new Random();
+        ArrayList<Item> loot = new ArrayList<Item>();
+        ArrayList<JLabel> menu = new ArrayList<JLabel>();
+        
+        //generate loot
+        int amount = getChance(0)+1;
+        for(int i = 0; i < amount; i++){
+            int quality = rnd.nextInt(100);
+            quality += player.getStat(5);
+            String itemQuality = "";
+            switch(getChance(player.getStat(5))){
+                case 0:
+                    itemQuality += "common";
+                break;
+                case 1:
+                    itemQuality += "uncommon";
+                break;
+                case 2:
+                    itemQuality += "rare";
+                break;
+                case 3:
+                    itemQuality += "epic";
+                break;
+                case 4:
+                    itemQuality += "legendary";
+                break;
+            }
+            String[] item = game.getIds().get(rnd.nextInt(game.getIds().size()-1));
+            loot.add(game.createItem(new String[]{item[0], itemQuality}));
+            JLabel newl = new JLabel();
+            newl.setName(String.valueOf(i));
+            menu.add(newl);
+        }
+        
+        //Add items to inv
+        ArrayList<Item> newInv = game.getInv();
+        for(Item i : loot){
+            newInv.add(i);
+        }
+        
+        game.setInventory(newInv);
+        
+        //build menu
+        JLabel bg, button, title;
+        bg = new JLabel();
+        button = new JLabel();
+        title = new JLabel();
+        menu.add(bg);
+        menu.add(button);
+        menu.add(title);
+        bg.setBounds(100, 255, 1720, 570);
+        button.setBounds(730, 740, 460, 70);
+        title.setBounds(130, 280, 1660, 70);
+        
+        for(JLabel l : menu){
+            labelFactory(l, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
+                new Color(204, 204, 204), 
+                new Color(0, 0, 30, 150),
+                new Font("Agency FB", 1, 36));
+            this.add(l, 0);
+        }
+        
+        title.setText("You have acquired the following items");
+        button.setText("Leave Labyrinth");
+        int max = loot.size();
+        for(JLabel l : menu){
+            if(l.getName() != null){
+                if(loot.size() > 0){
+                    CustomLabel cl = new CustomLabel();
+                    cl.setBounds(150 + ((max - loot.size())*340), 380, 240, 240);
+                    cl.setIcon(new javax.swing.ImageIcon(loot.get(0).getImg().getScaledInstance(240, 240, Image.SCALE_DEFAULT)));
+                    cl.setToolTipText("<html>" + loot.get(0).getName() + "<br><b><em style='color: #" 
+                                    + getColor(loot.get(0).getRarity()) + "'>" 
+                                    +  loot.get(0).getRarity()
+                                    + "</em></b><br>" + "<html>");
+                    this.add(cl, 0);
+                    loot.remove(0);
+                }
+            }
+        }
+        
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                exit(true);
+            }
+        });
+    }
+    
+    private String getColor(String input){
+        String out = "";
+        switch(input){
+            case "common":
+                out = "ffffff";
+            break;
+            case "uncommon":
+                out = "0000ff";
+            break;
+            case "rare":
+                out = "00ff00";
+            break;
+            case "epic":
+                out = "ff00ff";
+            break;
+            case "legendary":
+                out = "ffff00";
+            break;
+        }
+        return out;
     }
     
     private int monsterIndx = -1;
@@ -320,7 +473,7 @@ public class LabyrinthEngine extends JPanel{
                 moveViewport();
                 int rnd = (int) (Math.random() * 2);
                 monsterController(rnd);
-                //check for player death
+                //check for potential combat
                 int cnt = 0;
                 for(Monster m : monsters){
                     if(m.collides(player)){
@@ -346,10 +499,6 @@ public class LabyrinthEngine extends JPanel{
                     vignette.moveX();
                 }
                 repaint();
-            }
-            if (player.isOut()) {
-                levelNum++;
-                restart();
             }
             
         }

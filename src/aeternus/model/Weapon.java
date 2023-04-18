@@ -13,14 +13,8 @@ import java.util.ArrayList;
  * @author User
  */
 public class Weapon extends Item{
-    private final int damage;
-    public Weapon(String id, String name, String rarity, int damage, GameEngine gm, Image image){
-        super(id, name, rarity, gm, image);
-        this.damage = damage;
-    }
-
-    public int getDamage() {
-        return damage;
+    public Weapon(String id, String name, String rarity, GameEngine gm, Image image, String stat){
+        super(id, name, rarity, gm, image, stat);
     }
     
     @Override

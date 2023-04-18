@@ -26,7 +26,7 @@ public class DialougeSystem {
     private AeternusGUI ae;
     private volatile boolean flag = true;
     
-    public DialougeSystem(GameEngine.characters c1, GameEngine.characters c2, JPanel destination, AeternusGUI ae){
+    public DialougeSystem(JPanel destination, AeternusGUI ae){
         this.destination = destination;
         this.ae = ae;
         
@@ -204,8 +204,8 @@ public class DialougeSystem {
     }
     
     private ArrayList<String[]> readIn(String name) throws Exception{
-        File file = new File("src/dialouge/" + name + ".txt");
-        //File file = new File("src/dialouge/devmode.txt");
+        //File file = new File("src/dialouge/" + name + ".txt");
+        File file = new File("src/dialouge/devmode.txt");
         BufferedReader br = new BufferedReader(new FileReader(file));
         String st;
         ArrayList<String[]> dialouge = new ArrayList<String[]>();

@@ -93,6 +93,7 @@ public class GameEngine {
     private ArrayList<String[]> unlocks;
     private ArrayList<String[]> lookupTable;
     private ArrayList<String[]> engineUpgrades;
+    private ArrayList<String[]> genericStats;
     private static ArrayList<String[]> idList;
     private Map<String, ArrayList<String[]>> shopStocks = new HashMap();
     private ArrayList<String[]> stats;
@@ -101,8 +102,8 @@ public class GameEngine {
     private AeternusGUI aeg;
     private LabyrinthEngine la;
     private double soulPower = 1.0;
-    private double souls = 100000;
-    private int points = 20;
+    private double souls = 0;
+    private int points = 0;
     
     public GameEngine(AeternusGUI aeg){
        this.flags = readIn("locations/eventflags");
@@ -114,6 +115,7 @@ public class GameEngine {
        this.stats = readIn("saves/playerStats");
        this.equipped = readGear("saves/playerGear");
        this.inventory = readInv("saves/playerInventory");
+       this.genericStats = readIn("saves/genericStats");
        this.aeg = aeg;
     }
     
@@ -126,14 +128,63 @@ public class GameEngine {
         return null;
     }
     
-    public void soulCountThread(){
-        int x = 0;
-        Runnable newThread = new Runnable() {
-            @Override
-            public void run() {
-                addSouls();
-                aeg.refreshSouls();
+    public String getFlag(String i){
+        for(String[] s : flags){
+            if(s[0].equals(i)){
+                return s[1];
             }
+        }
+        return null;
+    }
+    
+    public void setFlag(String f, String value){
+        for(String[] s : flags){
+            if(s[0].equals(f)){
+                s[1] = value;
+            }
+        }
+    }
+    
+    public void calcBurn(Item x){
+        alterSouls(1000 * ((double)getGenericStat("ItemsBurned")/10+1) * Integer.parseInt(getStat("lvl")));
+        setGenericStat("ItemsBurned", getGenericStat("ItemsBurned")+1);
+    }
+    
+    public void calculateStats(){
+        stats.forEach(s ->{
+            s[1] = s[2];
+        });
+        stats.forEach(s -> {
+            for(Item i : equipped){
+                if(i != null && i.getStat().equals(s[0]) && !(i instanceof Weapon)){
+                    double x = Integer.parseInt(s[1]);
+                    switch(i.getRarity()){
+                        case "common":
+                            x *= 1.1;
+                        break;
+                        case "uncommon":
+                            x *= 1.2;
+                        break;
+                        case "rare":
+                            x *= 1.3;
+                        break;
+                        case "epic":
+                            x *= 1.4;
+                        break;
+                        case "legendary":
+                            x *= 1.5;
+                        break;
+                    }
+                    s[1] = String.valueOf((int)x);
+                }
+            }
+        });
+    }
+    
+    public void soulCountThread(){
+        Runnable newThread = () -> {
+            addSouls();
+            aeg.refreshSouls();
         };
 
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
@@ -148,6 +199,14 @@ public class GameEngine {
         return soulPower;
     }
     
+    public void refreshSoulPower(){
+        double newsp = 1;
+        for(int i = 0; i < Integer.parseInt(getStat("lvl"))-1;i++){
+            newsp *= 1.5;
+        }
+        soulPower = newsp;
+    }
+    
     public double getSouls(){
         return souls;
     }
@@ -158,19 +217,36 @@ public class GameEngine {
                 return s[1];
             }
         }
-        return null;
+        return "10";
     }
     
     public void addStat(int idx){
-        int x = Integer.parseInt(stats.get(idx)[1]);
+        int x = Integer.parseInt(stats.get(idx)[2]);
         x += 1;
-        stats.get(idx)[1] = String.valueOf(x);
+        stats.get(idx)[2] = String.valueOf(x);
         if(idx == 5){
             points += 2;
         }else{
             points--;
         }
-        
+    }
+    
+    public int getGenericStat(String stat){
+        int out = 0;
+        for(String[] s : genericStats){
+            if(s[0].equals(stat)){
+                out = Integer.parseInt(s[1]);
+            }
+        }
+        return out;
+    }
+    
+    public void setGenericStat(String stat, int value){
+        for(String[] s : genericStats){
+            if(s[0].equals(stat)){
+                s[1] = String.valueOf(value);
+            }
+        }
     }
     
     public int getPoints(){
@@ -178,8 +254,26 @@ public class GameEngine {
     }
     
     public double getDamage(){
+        double div = 1;
         if(equipped[2] != null){
-            return (Double.parseDouble(getStat("str"))/10) * ((Weapon)equipped[2]).getDamage();
+            switch(equipped[2].getRarity()){
+                case "common":
+                    div *= 2;
+                break;
+                case "uncommon":
+                    div *= 1.8;
+                break;
+                case "rare":
+                    div *= 1.5;
+                break;
+                case "epic":
+                    div *= 1.2;
+                break;
+                case "legendary":
+                   //
+                break;
+            }
+            return Double.parseDouble(getStat(((Weapon)equipped[2]).getStat()))/div;
         }
         return (Double.parseDouble(getStat("str"))/10);
     }
@@ -195,8 +289,6 @@ public class GameEngine {
     public void setInventory(ArrayList<Item> inventory) {
         this.inventory = inventory;
     }
-    
-    
 
     public void setEquipped(Item[] equipped) {
         this.equipped = equipped;
@@ -275,15 +367,15 @@ public class GameEngine {
                 switch(s[2]){
                     case "weapon":
                         img = new ImageIcon("src/images/Equipment/Weapon/" + s[1] + ".png").getImage();
-                        x = new Weapon(s[0], s[1], in[1], Integer.parseInt(s[3]), this, img);
+                        x = new Weapon(s[0], s[1], in[1], this, img, s[3]);
                     break;
                     case "helmet":
                         img = new ImageIcon("src/images/Equipment/Helmet/" + s[1] + ".png").getImage();
-                        x = new Helmet(s[0], s[1], in[1], Integer.parseInt(s[3]), this, img);
+                        x = new Helmet(s[0], s[1], in[1], Integer.parseInt(s[3]), this, img, s[4]);
                     break;
                     case "chestpiece":
                         img = new ImageIcon("src/images/Equipment/Chestplate/" + s[1] + ".png").getImage();
-                        x = new Chestpiece(s[0], s[1], in[1], Integer.parseInt(s[3]), this, img);
+                        x = new Chestpiece(s[0], s[1], in[1], Integer.parseInt(s[3]), this, img, s[4]);
                     break;
                     case "charm":
                         img = new ImageIcon("src/images/Equipment/Charm/" + s[1] + ".png").getImage();
@@ -303,13 +395,15 @@ public class GameEngine {
         //aeg.findPanel("subMenu").getParent().add(la, 0);
     }
     
-    public void exitPortal(){
+    public void exitPortal(Boolean win){
         la.setVisible(false);
         aeg.getFrame().getContentPane().remove(la);
         la = null;
         aeg.setOptions(true);
         aeg.setOptionsVisibility(true);
-        aeg.setActiveLabyrinth(true);
+        aeg.setActiveLabyrinth(false);
+        aeg.afterPortalExit(win);
+        refreshSoulPower();
     }
     
     private ArrayList<Item> readInv(String name){

@@ -2,3 +2,4 @@ MAGICSHOP;FirstMeetMagic
 WEAPONSHOP;FirstMeetWeapon
 BASE;FirstEnterBase
 PORTAL;FirstVisitPortal
+Burn Items;ItemBurner

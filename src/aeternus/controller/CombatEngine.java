@@ -7,6 +7,7 @@ package aeternus.controller;
 
 import aeternus.model.Monster;
 import aeternus.model.Player;
+import aeternus.model.Sprite;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -27,7 +28,7 @@ import javax.swing.SwingConstants;
  */
 public class CombatEngine {
     public enum enemy{
-        KNIGHT(10, 2), MAGE(5, 5), BRUTE(20, 2), KING(15, 5);
+        KNIGHT(10, 2), MAGE(5, 5), VANGUARD(20, 2), KING(15, 5);
         private int hp;
         private int dmg;
         
@@ -58,10 +59,12 @@ public class CombatEngine {
     }
     
     private void renderMenu(JPanel dest, Monster m){
-        JLabel bg, img1, img2, hp1, hpBox1, hp2, hpBox2, stats, str, dex, con, lck, inT;
+        JLabel bg, img1, img2, dmg1, dmg2, hp1, hpBox1, hp2, hpBox2, stats, str, dex, con, lck, inT;
         bg = new JLabel();
         img1 = new JLabel();
         img2 = new JLabel();
+        dmg1 = new JLabel();
+        dmg2 = new JLabel();
         hp1 = new JLabel();
         hp2 = new JLabel();
         hpBox1 = new JLabel();
@@ -72,21 +75,29 @@ public class CombatEngine {
         dex = new JLabel();
         lck = new JLabel();
         inT = new JLabel();
-        combatMenu = new ArrayList<>(List.of(bg, img1, img2, hpBox1, hpBox2, hp1, hp2, stats, str, dex, inT, con, lck));
+        combatMenu = new ArrayList<>(List.of(bg, img1, img2, dmg1, dmg2, hpBox1, hpBox2, hp1, hp2, stats, str, dex, inT, con, lck));
         for(JLabel l : combatMenu){
-            labelFactory(l, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
+            lab.labelFactory(l, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
                 new Color(204, 204, 204), 
-                new Color(0, 0, 50, 150), 
-                null, 
+                new Color(0, 0, 30, 150),
                 new Font("Agency FB", 1, 36));
             dest.add(l, 0);
         }
         bg.setBounds(100, 100, 1720, 880);
         img1.setBounds(180, 140, 460, 460);
         img1.setIcon(new ImageIcon(new javax.swing.ImageIcon(getClass().getResource(
-                                   "/images/betaPLAYERIcon.png")).getImage().getScaledInstance(460, 460, Image.SCALE_DEFAULT)));
+                                   "/images/PLAYER.png")).getImage().getScaledInstance(460, 460, Image.SCALE_DEFAULT)));
         img2.setBounds(1280, 140, 460, 460);
         img2.setIcon(new ImageIcon(m.getImg().getScaledInstance(460, 460, Image.SCALE_DEFAULT)));
+        
+        dmg1.setBackground(new Color(0, 0, 0, 0));
+        dmg2.setBackground(new Color(0, 0, 0, 0));
+        dmg1.setName("playerDamage");
+        dmg2.setName("monsterDamage");
+        dmg1.setBounds(180, 140, 460, 460);
+        dmg2.setBounds(1280, 140, 460, 460);
+        dest.setComponentZOrder(dmg1, 0);
+        dest.setComponentZOrder(dmg2, 0);
         
         hp1.setBounds(180, 620, (int)(460*(p.getHp()/p.getMaxHp())), 60);
         hp1.setBackground(new Color(0, 90, 0));
@@ -104,6 +115,12 @@ public class CombatEngine {
         con.setBounds(180, 800, 460, 40);
         lck.setBounds(180, 850, 460, 40);
         inT.setBounds(180, 900, 460, 40);
+        
+        str.setText("Strength: " + p.getStat(0));
+        con.setText("Constitution: " + p.getStat(1));
+        dex.setText("Dexterity: " + p.getStat(2));
+        inT.setText("Intelligence: " + p.getStat(3));
+        lck.setText("Luck: " + p.getStat(4));
         
         dest.revalidate();
         dest.repaint();
@@ -130,12 +147,14 @@ public class CombatEngine {
                     }
                 }
                 if(p.getHp() > 0){
+                    //monster beaten
                     lab.getPlayer().setHp(p.getHp());
                     lab.deleteMonster();
                     lab.rollLvl();
                     lab.resume();
                 }else{
-                    lab.exit();
+                    //player died
+                    lab.exit(false);
                 }
                 for(JLabel j : combatMenu){
                     j.getParent().remove(j);
@@ -147,17 +166,64 @@ public class CombatEngine {
         
     }
     
+    public void fadeIn(JLabel l, int length){
+            try {
+                for(int i = 0; i < 200; i++){
+                    l.setBackground(new Color(146, 0, 0, i));
+                    l.getParent().validate();
+                    l.getParent().repaint();
+                    Thread.sleep(length);
+                }
+            } catch(InterruptedException v) {
+                System.out.println(v);
+            }
+    }
+    
+    public void fadeOut(JLabel l, int length){
+            try {
+                for(int i = 0; i < 200; i++){
+                    l.setBackground(new Color(146, 0, 0, 200-i));
+                    l.getParent().validate();
+                    l.getParent().repaint();
+                    Thread.sleep(length);
+                }
+            } catch(InterruptedException v) {
+                System.out.println(v);
+            }
+    }
+    
+    private void attackEffect(Sprite s){
+        if(s instanceof Player){
+            for(JLabel j : combatMenu){
+                if(j.getName() != null && j.getName().equals("monsterDamage")){
+                    fadeIn(j, 1);
+                    fadeOut(j, 1);
+                }
+            }
+        }else{
+            for(JLabel j : combatMenu){
+                if(j.getName() != null && j.getName().equals("playerDamage")){
+                    fadeIn(j, 1);
+                    fadeOut(j, 1);
+                }
+            }
+        }
+    }
+    
     private void attack(Boolean dir){
         Random rnd = new Random();
         if(dir){
             if(rnd.nextInt(100)+1 < (p.getStat(4)/p.getStat(5))){
                 m.setHp(m.getHp()-p.getDamage()*(p.getStat(3)/100 + 2));
+                attackEffect(p);
+            }else{
+                m.setHp(m.getHp()-p.getDamage());
+                attackEffect(p);
             }
-            m.setHp(m.getHp()-p.getDamage());
         }else{
-            
             if(rnd.nextInt(100)+1 > (p.getStat(2) / 5)){
                 p.setHp(p.getHp()-m.getDamage());
+                attackEffect(m);
             }else{
                 //miss
             }
@@ -179,14 +245,4 @@ public class CombatEngine {
         return combatMenu;
     }
     
-    private void labelFactory(JLabel j, boolean opacity, boolean vis, int[] alignment, Color fG, Color bG, String text, Font f){
-        j.setOpaque(opacity);
-        j.setVisible(vis);
-        j.setHorizontalAlignment(alignment[0]);
-        j.setVerticalAlignment(alignment[1]);
-        j.setForeground(fG);
-        j.setBackground(bG);
-        j.setText(text);
-        j.setFont(f);
-    }
 }

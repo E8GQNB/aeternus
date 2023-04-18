@@ -28,6 +28,7 @@ public class Labyrinth {
     private final int DOWN = 30;
     ArrayList<Cell> cells;
     ArrayList<Cell> outer;
+    ArrayList<Cell> floorTiles;
 
     public Labyrinth(String levelPath) throws IOException {
         genLevel();
@@ -52,10 +53,12 @@ public class Labyrinth {
     }
     private int[][] maze = new int[ACROSS][DOWN];
     private ArrayList<int[]> fronts = new ArrayList<int[]>();
+    private int[][] floor = new int[ACROSS][DOWN];
     
     public void genLevel() throws IOException {
         cells = new ArrayList<>();
         outer = new ArrayList<>();
+        floorTiles = new ArrayList<>();
         //Fill labyrinth with walls
         for(int i = 0; i < ACROSS; i++){
             for(int j = 0; j < DOWN; j++){
@@ -92,6 +95,13 @@ public class Labyrinth {
         }
         for(int i = 0; i < ACROSS; i++){
             for(int j = 0; j < DOWN; j++){
+                if(maze[i][j] == 0){
+                    floor[i][j] = 1;
+                }
+            }
+        }
+        for(int i = 0; i < ACROSS; i++){
+            for(int j = 0; j < DOWN; j++){
                 if(j < DOWN-1){
                     if(j == DOWN-2){
                         Image image = new ImageIcon("src/images/castlewall.png").getImage();
@@ -109,6 +119,9 @@ public class Labyrinth {
                         }else if(maze[i][j] == 1 && maze[i][j+1] == 1){
                             Image image = new ImageIcon("src/images/castledark.png").getImage();
                             cells.add(new Cell(i * BLOCK_WIDTH, j * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT, image));
+                        }else{
+                            Image image = new ImageIcon("src/images/floor.png").getImage();
+                            floorTiles.add(new Cell(i * BLOCK_WIDTH, j * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT, image));
                         }
                     }
                 }
@@ -134,6 +147,11 @@ public class Labyrinth {
     }
     
     public void shiftField(int x, int y){
+        for(Cell c : floorTiles){
+            c.setX(c.getX() + x);
+            c.setY(c.getY() + y);
+        }
+        
         for(Cell c : cells){
             c.setX(c.getX() + x);
             c.setY(c.getY() + y);
@@ -297,6 +315,10 @@ public class Labyrinth {
     }
 
     public void draw(Graphics g) {
+        for (Cell c : floorTiles) {
+            c.draw(g);
+        }
+        
         for (Cell c : cells) {
             c.draw(g);
         }

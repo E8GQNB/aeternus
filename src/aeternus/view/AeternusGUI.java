@@ -16,8 +16,18 @@ import aeternus.model.Item;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseListener;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+import static java.time.temporal.ChronoUnit.MINUTES;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -47,12 +57,16 @@ public class AeternusGUI {
     private ArrayList<JLabel> shopMenu = new ArrayList<JLabel>();
     private InventoryManager inventory;
     private JLabel soulCount = new JLabel();
+    private JLabel invLabel = new JLabel();
     private JLabel engine = new JLabel();
     private GameEngine game;
     private GameEngine.locations currentLocale;
+    private LocalTime portalEntry = LocalTime.now().minusMinutes(10);
+    private MouseListener ml;
     
     public AeternusGUI(){ 
         s.setVisible(true);
+        s.setIconImage(Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("images/gameIcon.png")));
         this.game = new GameEngine(this);
         inventory = new InventoryManager(this, game);
         new java.util.Timer().schedule( 
@@ -65,7 +79,7 @@ public class AeternusGUI {
         100
 );
         
-        engineClickEffect(510);
+        engineClickEffect();
     }
 
     public void initiateGame(){
@@ -149,6 +163,7 @@ public class AeternusGUI {
     }
     
     public void fadeIn(JLabel l, int length){
+        transitionCover.setFocusable(false);
             try {
                 for(int i = 0; i < 255; i++){
                     l.setBackground(new Color(0, 0, 0, i));
@@ -201,10 +216,50 @@ public class AeternusGUI {
         findPanel("Main").getParent().repaint();
     }
     
+    public void refreshPortal(){
+        for(JLabel j : locationOptions){
+            if(j.getName().equals("Enter Portal")){
+                long minutes = Duration.between(LocalTime.now(), portalEntry.plusMinutes(5)).toMinutes();
+                long seconds = Duration.between(LocalTime.now(), portalEntry.plusMinutes(5)).toSecondsPart();
+                if(!activeLabyrinth){
+                    if(minutes > 0 || seconds > 0){
+                        j.setEnabled(false);
+                        String s = "";
+                        if(seconds < 10){
+                            s = minutes + ":0" + seconds;
+                        }else{
+                            s = minutes + ":" + seconds;
+                        }
+
+                        j.setText(s);
+                        j.getParent().revalidate();
+                        j.getParent().repaint();
+                    }else if(!j.isEnabled()){
+                        j.setEnabled(true);
+                        j.setText("Enter Portal");
+                    }
+                }
+            }
+        }
+    }
+    
+    public void afterPortalExit(Boolean win){
+        LocalTime l2 = portalEntry.plusMinutes(5);
+        long difference = LocalTime.now().until(l2, ChronoUnit.MINUTES);
+        if(win && game.getGenericStat("PortalsEntered") == 0){
+            startDialouge("FirstLabyrinthWon");
+        }else if(!win && game.getGenericStat("PortalsEntered") == 0){
+            startDialouge("FirstLabyrinthLost");
+        }
+        game.setGenericStat("PortalsEntered", game.getGenericStat("PortalsEntered")+1);
+        portalThread(difference);
+    }
+    
     private void loadPointsOfInterest(GameEngine.locations x){
         ArrayList<String[]> POI = x.getPOI();
         currentLocale = x;
         setSoulCount(findPanel("Main"));
+        invLabel.setEnabled(true);
         for(String[] point : POI){
             JLabel newLabel = new javax.swing.JLabel();
             labelFactory(newLabel, false, game.getLockState(point[5]), new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
@@ -264,25 +319,15 @@ public class AeternusGUI {
     private void loadLocation(java.awt.event.MouseEvent evt){
         createNewPanel("subMenu", 0);
         setSoulCount(findPanel("subMenu"));
-        DialougeSystem event = new DialougeSystem(GameEngine.characters.PLAYER, GameEngine.characters.MAGICMERCHANT, findPanel("subMenu"), this);
         String flag = game.getFlag(GameEngine.interactables.valueOf(evt.getComponent().getName()));
-        System.out.println(flag);
         ArrayList<String[]> options = GameEngine.interactables.valueOf(evt.getComponent().getName()).getOptions();
         Thread one = new Thread() {
+            @Override
             public void run() {
                 setPOI(false);
                 setBackground("/images/" + evt.getComponent().getName() + ".png", 2, true, subBackground, findPanel("subMenu"));
-                if(flag != ""){
-                    dialougeState = true;
-                    try {
-                        event.play(flag);
-                        while(dialougeState){}
-                    } catch (Exception ex) {
-                        Logger.getLogger(AeternusGUI.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    while(dialougeState){}
-                    game.checkConnections(flag);
-                    game.removeFlag(flag);
+                if(flag != null && flag != ""){
+                    startDialouge(flag);
                 }
                 int cnt = 0;
                 for(String[] row : options){
@@ -291,9 +336,27 @@ public class AeternusGUI {
                         cnt++;
                     }
                 }
+                invLabel.setEnabled(true);
             }
         };
         one.start();
+    }
+    
+    private void portalThread(long difference){
+        Thread two = new Thread() {
+            @Override
+            public void run() {
+                while(difference > 0){
+                    refreshPortal();
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(AeternusGUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                }
+            }
+            };
+        two.start();
     }
     
     private void addOption(String name, String id, int place){
@@ -317,6 +380,50 @@ public class AeternusGUI {
         });
     }
     
+    private void option(java.awt.event.MouseEvent evt, String id, String name){
+        if(!dialougeState){
+            setOptions(false);
+            String flag = game.getFlag(name);
+            if(flag != null && !flag.equals("")){
+                startDialouge(flag);
+                return;
+            }
+            switch(name){
+                case "Leave":
+                    leaveSubMenu();
+                break;
+                case "Shop":
+                    loadShop(id);
+                break;
+                case "Engine":
+                    setOptionsVisibility(false);
+                    showEngineMenu();
+                break;
+                case "Talk":
+                    startDialouge(id + (int)(Math.random()*5));
+                break;
+                case "Burn Items":
+                    showBurner();
+                break;
+                case "Enter Portal":
+                {
+                    try {
+                        portalEntry = LocalTime.now();
+                        setOptions(false);
+                        setOptionsVisibility(false);
+                        activeLabyrinth = true;
+                        game.enterPortal();
+                    } catch (IOException ex) {
+                        Logger.getLogger(AeternusGUI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                break;
+
+            }
+        }
+        
+    }
+    
     public void setOptions(boolean b){
         for(JLabel l : locationOptions){
             l.setEnabled(b);
@@ -338,12 +445,13 @@ public class AeternusGUI {
         j.setBackground(bG);
         j.setText(text);
         j.setFont(f);
+        j.setName(text);
     }
     
     private void setSoulCount(JPanel destination){
         labelFactory(soulCount, true, true, new int[]{SwingConstants.LEFT, SwingConstants.TOP}, 
                 new Color(204, 204, 204), 
-                new Color(0, 0, 0, 50), 
+                new Color(0, 0, 0, 100), 
                 String.valueOf(game.getSouls()), 
                 new Font("Agency FB", 1, 36));
         destination.add(soulCount, 0);
@@ -352,25 +460,27 @@ public class AeternusGUI {
     }
     
     private void createInvButton(JPanel destination){
-        JLabel inv = new JLabel();
-        labelFactory(inv, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
+        invLabel.removeMouseListener(ml);
+        invLabel.setEnabled(false);
+        labelFactory(invLabel, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
                 new Color(204, 204, 204), 
                 new Color(0, 0, 0, 50), 
                 "Inv", 
                 new Font("Agency FB", 1, 28));
-        destination.add(inv, 0);
-        inv.setBounds(1860, 0, 60, 60);
-        inv.addMouseListener(new java.awt.event.MouseAdapter() {
+        destination.add(invLabel, 0);
+        invLabel.setBounds(1860, 0, 60, 60);
+        ml = new MouseAdapter(){
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 if(inventory.getInventoryMenu().size()>0){
                     inventory.hideInventory(destination);
                 }else{
-                    inventory.showInventory(destination);
+                    inventory.showInventory(destination, false);
                 }
                 
             }
-        });
+        };
+        invLabel.addMouseListener(ml);
     }
     
     public void refreshSouls(){
@@ -407,8 +517,10 @@ public class AeternusGUI {
     
     private void startDialouge(String name){
         dialougeState = true;
-        DialougeSystem d = new DialougeSystem(GameEngine.characters.PLAYER, GameEngine.characters.MAGICMERCHANT, findPanel("subMenu"), this);
+        setOptions(false);
+        DialougeSystem d = new DialougeSystem(findPanel("subMenu"), this);
         Thread one = new Thread() {
+            @Override
             public void run() {
                 try {
                     d.play(name);
@@ -433,47 +545,19 @@ public class AeternusGUI {
             }else if(game.getSouls() >= 10000 && !game.getLockState("PORTAL")){
                 startDialouge("UnlockPortalsMagic");
             }else{
-                openShop("MAGICSHOP");
+                openShop(id);
             }
         }else if(id.equals("WEAPONSHOP")){
             if(!game.getLockState("PORTAL")){
                 startDialouge("BeforePortalsWEAPONSHOP");
             }else{
-                openShop("WEAPONSHOP");
+                openShop(id);
             }
         }
     }
     
-    private void option(java.awt.event.MouseEvent evt, String id, String name){
-        setOptions(false);
-        switch(name){
-            case "Leave":
-                leaveSubMenu();
-            break;
-            case "Shop":
-                loadShop(id);
-            break;
-            case "Engine":
-                setOptionsVisibility(false);
-                showEngineMenu();
-            break;
-            case "Talk":
-                startDialouge(id + (int)(Math.random()*5));
-            break;
-            case "Enter Portal":
-            {
-                try {
-                    setOptions(false);
-                    setOptionsVisibility(false);
-                    activeLabyrinth = true;
-                    game.enterPortal();
-                } catch (IOException ex) {
-                    Logger.getLogger(AeternusGUI.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            break;
-
-        }
+    public void showBurner(){
+        inventory.showInventory(findPanel("subMenu"), true);
     }
     
     public void setActiveLabyrinth(Boolean b){
@@ -591,13 +675,13 @@ public class AeternusGUI {
         engine.setBounds(200, 320, 500, 500);
         engine.setIcon(new javax.swing.ImageIcon(
                                         new javax.swing.ImageIcon(getClass().getResource(
-                                                "/images/betaENGINE.png")).getImage().getScaledInstance(500, 500, Image.SCALE_DEFAULT)));
+                                                "/images/ENGINE.png")).getImage().getScaledInstance(500, 500, Image.SCALE_DEFAULT)));
         engine.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 game.alterSouls(game.getSoulPower());
                 refreshSouls();
-                growing = 1;
+                spawnEngineEffect();
             }
         });
         ArrayList<String[]> upgrades = game.getEngineUpgrades();
@@ -659,43 +743,46 @@ public class AeternusGUI {
         }
     }
     
-    private int growing = 0;
-    private void engineClickEffect(int maxSize){
-        Runnable newThread = new Runnable() {
-            @Override
-            public void run() {
-                if(growing > 0){
-                    engine.setBounds(engine.getLocation().x-1, engine.getLocation().y-1, engine.getHeight()+2, engine.getWidth()+2);
-                    engine.setIcon(new javax.swing.ImageIcon(
-                                        new javax.swing.ImageIcon(getClass().getResource(
-                                                "/images/betaENGINE.png")).getImage().getScaledInstance(engine.getHeight()+2, engine.getWidth()+2, Image.SCALE_DEFAULT)));
-                    engine.getParent().revalidate();
-                    engine.getParent().repaint();
-                    if(engine.getWidth() >= maxSize){
-                        growing = -1;
-                    }
-                }else if(growing < 0){
-                    engine.setBounds(engine.getLocation().x+1, engine.getLocation().y+1, engine.getHeight()-2, engine.getWidth()-2);
-                    engine.setIcon(new javax.swing.ImageIcon(
-                                        new javax.swing.ImageIcon(getClass().getResource(
-                                                "/images/betaENGINE.png")).getImage().getScaledInstance(engine.getHeight()-2, engine.getWidth()-2, Image.SCALE_DEFAULT)));
-                    engine.getParent().revalidate();
-                    engine.getParent().repaint();
-                    if(engine.getWidth() <= maxSize-20){
-                        growing = 0;
-                    }
+    private ArrayList<JLabel> engineEffects = new ArrayList<JLabel>();
+    private ArrayList<Integer> engineEffectLifespan = new ArrayList<Integer>();
+    private void spawnEngineEffect(){
+        JLabel j = new JLabel();
+        labelFactory(j, false, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
+                new Color(204, 204, 204), 
+                new Color(0, 0, 0, 100), 
+                String.valueOf(game.getSoulPower()), 
+                new Font("Agency FB", 1, 30));
+        Point p = MouseInfo.getPointerInfo().getLocation();
+        Random rnd = new Random();
+        j.setBounds(p.x + rnd.nextInt(50)-30, p.y - rnd.nextInt(50), 30, 30);
+        findPanel("subMenu").add(j);
+        findPanel("subMenu").setComponentZOrder(j, 0);
+        engineEffects.add(j);
+        engineEffectLifespan.add(40);
+    }
+    
+    private void engineClickEffect(){
+        Runnable newThread = () -> {
+            for(int i = 0; i < engineEffects.size(); i++){
+                engineEffects.get(i).setLocation(engineEffects.get(i).getLocation().x, engineEffects.get(i).getLocation().y-1);
+                if(engineEffectLifespan.get(i) > 1){
+                    engineEffectLifespan.set(i, engineEffectLifespan.get(i)-1);
+                }else{
+                    engineEffects.get(i).getParent().remove(engineEffects.get(i));
+                    engineEffects.remove(i);
+                    engineEffectLifespan.remove(i);
                 }
+                
             }
-            
         };
 
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        executor.scheduleAtFixedRate(newThread, 0, 5, TimeUnit.MILLISECONDS);
+        executor.scheduleAtFixedRate(newThread, 0, 15, TimeUnit.MILLISECONDS);
     }
     
     public void newGame(){
         dialougeState = true;
-        DialougeSystem d = new DialougeSystem(GameEngine.characters.PLAYER, GameEngine.characters.SERVANT, findPanel("Main"), this);
+        DialougeSystem d = new DialougeSystem(findPanel("Main"), this);
         new java.util.Timer().schedule( 
         new java.util.TimerTask() {
             @Override
