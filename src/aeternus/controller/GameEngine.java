@@ -95,14 +95,14 @@ public class GameEngine {
     private ArrayList<String[]> engineUpgrades;
     private ArrayList<String[]> genericStats;
     private static ArrayList<String[]> idList;
-    private Map<String, ArrayList<String[]>> shopStocks = new HashMap();
+    private Map<String, ArrayList<Item>> shopStocks = new HashMap();
     private ArrayList<String[]> stats;
     private Item[] equipped;
     private ArrayList<Item> inventory;
     private AeternusGUI aeg;
     private LabyrinthEngine la;
     private double soulPower = 1.0;
-    private double souls = 0;
+    private double souls = 1;
     private int points = 0;
     
     public GameEngine(AeternusGUI aeg){
@@ -110,8 +110,9 @@ public class GameEngine {
        this.unlocks = readIn("locations/Unlocks");
        this.lookupTable = readIn("locations/connections");
        this.engineUpgrades = readIn("upgrades/engine");
-       this.shopStocks.put("MAGICSHOP", readIn("items/MAGICSHOPstock"));
        this.idList = readIn("items/idlist");
+       this.shopStocks.put("MAGICSHOP", readInv("items/MAGICSHOPstock"));
+       this.shopStocks.put("WEAPONSHOP", readInv("items/WEAPONSHOPstock"));
        this.stats = readIn("saves/playerStats");
        this.equipped = readGear("saves/playerGear");
        this.inventory = readInv("saves/playerInventory");
@@ -308,11 +309,11 @@ public class GameEngine {
         return engineUpgrades;
     }
     
-    public ArrayList<String[]> getStock(String shop){
+    public ArrayList<Item> getStock(String shop){
         return shopStocks.get(shop);
     }
     
-    public void setStock(String shop, ArrayList<String[]> stock){
+    public void setStock(String shop, ArrayList<Item> stock){
         shopStocks.replace(shop, stock);
     }
     
@@ -408,7 +409,7 @@ public class GameEngine {
     
     private ArrayList<Item> readInv(String name){
         File file = new File("src/" + name + ".txt");
-        ArrayList<Item> inv = new ArrayList<Item>();
+        ArrayList<Item> inv = new ArrayList<>();
         BufferedReader br;
             try {
                 br = new BufferedReader(new FileReader(file));

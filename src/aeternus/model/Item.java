@@ -7,6 +7,7 @@ package aeternus.model;
 
 import aeternus.controller.GameEngine;
 import java.awt.Image;
+import java.util.Random;
 
 /**
  *
@@ -18,6 +19,7 @@ public class Item {
     private String name;
     private Image image;
     private String stat;
+    private int shopPrice = -1;
     GameEngine gm;
     
     public Item(String id, String name, String rarity, GameEngine gm, Image image, String stat){
@@ -27,10 +29,15 @@ public class Item {
         this.gm = gm;
         this.image = image;
         this.stat = stat;
+        this.shopPrice = calcPrice();
     }
 
     public String getId() {
         return id;
+    }
+    
+    public int getShopPrice(){
+        return shopPrice;
     }
     
     public Image getImg(){
@@ -40,6 +47,23 @@ public class Item {
     public String getRarity() {
         return rarity;
     }
+    
+    public void boostRarity(){
+        switch(rarity){
+            case "common":
+                rarity = "uncommon";
+            break;
+            case "uncommon":
+                rarity = "rare";
+            break;
+            case "rare":
+                rarity = "epic";
+            break;
+            case "epic":
+                rarity = "legendary";
+            break;
+        }
+    }
 
     public String getName() {
         return name;
@@ -47,6 +71,34 @@ public class Item {
     
     public String getStat(){
         return stat;
+    }
+    
+    public int calcPrice(){
+        int out = 10000;
+        switch(rarity){
+            case "common":
+                out *= 1;
+            break;
+            case "uncommon":
+                out *= 2;
+            break;
+            case "rare":
+                out *= 3;
+            break;
+            case "epic":
+                out *= 4;
+            break;
+            case "legendary":
+                out *= 5;
+            break;
+        }
+        Random rnd = new Random();
+        out += rnd.nextInt(10000);
+        return out;
+    }
+    
+    public int getPrice(){
+        return shopPrice;
     }
     
     public void equip(int slot){}

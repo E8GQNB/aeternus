@@ -10,6 +10,8 @@ import javax.swing.JPanel;
 import aeternus.controller.DialougeSystem;
 import aeternus.controller.GameEngine;
 import aeternus.controller.InventoryManager;
+import aeternus.controller.PopupFloatingText;
+import aeternus.controller.ShopManager;
 import aeternus.model.CustomLabel;
 import aeternus.model.InfoText;
 import aeternus.model.Item;
@@ -54,7 +56,6 @@ public class AeternusGUI {
     private ArrayList<JLabel> mapLocations = new ArrayList<JLabel>();
     private ArrayList<JLabel> locationOptions = new ArrayList<JLabel>();
     private ArrayList<JLabel> upgradeOptions = new ArrayList<JLabel>();
-    private ArrayList<JLabel> shopMenu = new ArrayList<JLabel>();
     private InventoryManager inventory;
     private JLabel soulCount = new JLabel();
     private JLabel invLabel = new JLabel();
@@ -63,6 +64,7 @@ public class AeternusGUI {
     private GameEngine.locations currentLocale;
     private LocalTime portalEntry = LocalTime.now().minusMinutes(10);
     private MouseListener ml;
+    private ShopManager shop;
     
     public AeternusGUI(){ 
         s.setVisible(true);
@@ -77,9 +79,7 @@ public class AeternusGUI {
             }
         }, 
         100
-);
-        
-        engineClickEffect();
+        );
     }
 
     public void initiateGame(){
@@ -405,6 +405,9 @@ public class AeternusGUI {
                 case "Burn Items":
                     showBurner();
                 break;
+                case "Merge Items":
+                    showMerger();
+                break;
                 case "Enter Portal":
                 {
                     try {
@@ -422,6 +425,10 @@ public class AeternusGUI {
             }
         }
         
+    }
+    
+    public void showMerger(){
+        inventory.showInventory(findPanel("subMenu"), "merge");
     }
     
     public void setOptions(boolean b){
@@ -474,8 +481,14 @@ public class AeternusGUI {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 if(inventory.getInventoryMenu().size()>0){
                     inventory.hideInventory(destination);
+                    if(shop != null){
+                        shop.setAll(true);
+                    }
                 }else{
-                    inventory.showInventory(destination, false);
+                    inventory.showInventory(destination, "");
+                    if(shop != null){
+                        shop.setAll(false);
+                    }
                 }
                 
             }
@@ -545,127 +558,29 @@ public class AeternusGUI {
             }else if(game.getSouls() >= 10000 && !game.getLockState("PORTAL")){
                 startDialouge("UnlockPortalsMagic");
             }else{
-                openShop(id);
+                shop = new ShopManager(this, game, id);
+                shop.openShop();
             }
         }else if(id.equals("WEAPONSHOP")){
             if(!game.getLockState("PORTAL")){
                 startDialouge("BeforePortalsWEAPONSHOP");
             }else{
-                openShop(id);
+                shop = new ShopManager(this, game, id);
+                shop.openShop();
             }
         }
     }
     
     public void showBurner(){
-        inventory.showInventory(findPanel("subMenu"), true);
+        inventory.showInventory(findPanel("subMenu"), "burn");
     }
     
     public void setActiveLabyrinth(Boolean b){
         activeLabyrinth = b;
     }
-    
-    private void openShop(String shop){
-        JLabel shopBg = new JLabel();
-        labelFactory(shopBg, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
-                new Color(204, 204, 204), 
-                new Color(0, 0, 0, 150), 
-                null, 
-                new Font("Agency FB", 0, 36));
-        findPanel("subMenu").add(shopBg, 0);
-        shopBg.setBounds(100, 100, 1720, 880);
-        setOptions(false);
-        setOptionsVisibility(false);
-        shopMenu.add(shopBg);
-        ArrayList<String[]> stock = game.getStock(shop);
-        ArrayList<String[]> idList = game.getIds();
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 8; j++) {
-                CustomLabel shopSlot = new CustomLabel();
-                labelFactory(shopSlot, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
-                new Color(204, 204, 204), 
-                new Color(0, 0, 0, 150), 
-                null, 
-                new Font("Agency FB", 0, 36));
-                if(stock.size() >= i*8 + j + 1){
-                    shopSlot.setIcon(new javax.swing.ImageIcon(
-                                    new javax.swing.ImageIcon(getClass().getResource(
-                                    "/items/itemImages/tempImage.png")).getImage().getScaledInstance(200, 200, Image.SCALE_DEFAULT)));
-                    String id = stock.get(i*8 + j)[0];
-                    for(String[] s : idList){
-                        if(s[0].equals(id)){
-                            shopSlot.setToolTipText("<html>" + s[1] + "<br><b><em style='color: #" 
-                                    + inventory.getColor(stock.get(i*6 + j)[1]) + "'>" 
-                                    +  stock.get(i*8 + j)[1] 
-                                    + "</em></b><br>§" + stock.get(i*6 + j)[2] + "<br><html>");
-                        }
-                    }
-                    int slotnum = i*8 + j;
-                    shopSlot.addMouseListener(new java.awt.event.MouseAdapter() {
-                        @Override
-                        public void mouseClicked(java.awt.event.MouseEvent evt) {
-                            purchaseItem(slotnum, shop);
-                        }
-                    });
-                }
-                
-                findPanel("subMenu").add(shopSlot, 0);
-                shopSlot.setName("slot" + j*8 + i);
-                shopSlot.setBounds(190 + j*200, 150 + i*200, 150, 150);
-                setOptionsVisibility(false);
-                shopMenu.add(shopSlot);
-            }
-        }
-        JLabel exit = new JLabel();
-        labelFactory(exit, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
-                Color.white, 
-                new Color(0, 0, 0, 150), 
-                null, 
-                new Font("Agency FB", 0, 26));
-        exit.setText("Leave");
-        findPanel("subMenu").add(exit, 0);
-        exit.setBounds(760, 915, 400, 50);
-        shopMenu.add(exit);
-        exit.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                for(JLabel j : shopMenu){
-                    j.getParent().remove(j);
-                }
-                shopMenu.clear();
-                setOptions(true);
-                setOptionsVisibility(true);
-                findPanel("subMenu").revalidate();
-                findPanel("subMenu").repaint();
-            }
-        });
-        
-        findPanel("subMenu").revalidate();
-        findPanel("subMenu").repaint();
-    }
-    
-    private void purchaseItem(int slot, String shop){
-        ArrayList<String[]> stock = game.getStock(shop);
-        ArrayList<Item> inv = game.getInv();
-        if(game.getSouls() >= Integer.parseInt(stock.get(slot)[2])){
-            Item x = game.createItem(new String[]{stock.get(slot)[0], stock.get(slot)[1]});
-            game.alterSouls(-Integer.parseInt(stock.get(slot)[2]));
-            stock.remove(slot);
-            inv.add(x);
-            game.setInventory(inv);
-            
-            for(JLabel j : shopMenu){
-                    j.getParent().remove(j);
-                }
-                shopMenu.clear();
-                setOptions(true);
-                setOptionsVisibility(true);
-                findPanel("subMenu").revalidate();
-                findPanel("subMenu").repaint();
-            openShop(shop);
-        }
-    }
-    
+    private PopupFloatingText pop;
     private void showEngineMenu(){
+        pop = new PopupFloatingText(this, game, findPanel("subMenu"), 15);
         labelFactory(engine, false, true, new int[]{SwingConstants.LEFT, SwingConstants.TOP}, 
                 new Color(204, 204, 204), 
                 new Color(0, 0, 0, 150), 
@@ -681,7 +596,7 @@ public class AeternusGUI {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 game.alterSouls(game.getSoulPower());
                 refreshSouls();
-                spawnEngineEffect();
+                pop.spawnEffect(String.valueOf(game.getSoulPower()), true);
             }
         });
         ArrayList<String[]> upgrades = game.getEngineUpgrades();
@@ -741,43 +656,6 @@ public class AeternusGUI {
             }
             indx++;
         }
-    }
-    
-    private ArrayList<JLabel> engineEffects = new ArrayList<JLabel>();
-    private ArrayList<Integer> engineEffectLifespan = new ArrayList<Integer>();
-    private void spawnEngineEffect(){
-        JLabel j = new JLabel();
-        labelFactory(j, false, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
-                new Color(204, 204, 204), 
-                new Color(0, 0, 0, 100), 
-                String.valueOf(game.getSoulPower()), 
-                new Font("Agency FB", 1, 30));
-        Point p = MouseInfo.getPointerInfo().getLocation();
-        Random rnd = new Random();
-        j.setBounds(p.x + rnd.nextInt(50)-30, p.y - rnd.nextInt(50), 30, 30);
-        findPanel("subMenu").add(j);
-        findPanel("subMenu").setComponentZOrder(j, 0);
-        engineEffects.add(j);
-        engineEffectLifespan.add(40);
-    }
-    
-    private void engineClickEffect(){
-        Runnable newThread = () -> {
-            for(int i = 0; i < engineEffects.size(); i++){
-                engineEffects.get(i).setLocation(engineEffects.get(i).getLocation().x, engineEffects.get(i).getLocation().y-1);
-                if(engineEffectLifespan.get(i) > 1){
-                    engineEffectLifespan.set(i, engineEffectLifespan.get(i)-1);
-                }else{
-                    engineEffects.get(i).getParent().remove(engineEffects.get(i));
-                    engineEffects.remove(i);
-                    engineEffectLifespan.remove(i);
-                }
-                
-            }
-        };
-
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        executor.scheduleAtFixedRate(newThread, 0, 15, TimeUnit.MILLISECONDS);
     }
     
     public void newGame(){
