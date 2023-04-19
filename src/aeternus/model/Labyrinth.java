@@ -110,11 +110,7 @@ public class Labyrinth {
                         if(maze[i][j] == 1 && maze[i][j+1] != 1){
                             Random rnd = new Random();
                             Image image;
-                            if(rnd.nextInt(2) == 1){
-                                image = new ImageIcon("src/images/cw1.png").getImage();
-                            }else{
-                                image = new ImageIcon("src/images/cw2.png").getImage();
-                            }
+                                image = new ImageIcon("src/images/Labyrinth/Castle/Walls/" + rnd.nextInt(5) + ".png").getImage();
                             cells.add(new Cell(i * BLOCK_WIDTH, j * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT, image));
                         }else if(maze[i][j] == 1 && maze[i][j+1] == 1){
                             Image image = new ImageIcon("src/images/castledark.png").getImage();

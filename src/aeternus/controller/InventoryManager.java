@@ -13,6 +13,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Image;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -27,7 +28,8 @@ public class InventoryManager {
     private AeternusGUI aeg;
     private ArrayList<JLabel> inventoryMenu = new ArrayList<JLabel>();
     private GameEngine game;
-    private Boolean warning;
+    private String mode;
+    private PopupFloatingText pop;
     
     public InventoryManager(AeternusGUI aeg, GameEngine game){
         this.aeg = aeg;
@@ -38,10 +40,11 @@ public class InventoryManager {
         return inventoryMenu;
     }
     
-    public void showInventory(JPanel dest, Boolean b){
+    public void showInventory(JPanel dest, String b){
+        pop = new PopupFloatingText(aeg, game, dest, 35);
         inventoryMenu.clear();
         game.calculateStats();
-        warning = b;
+        mode = b;
         JLabel invBg = new JLabel();
         JLabel invAvatar = new JLabel();
         CustomLabel invHelmet = new CustomLabel();
@@ -136,7 +139,7 @@ public class InventoryManager {
                 for(String[] s : game.getIds()){
                         if(s[0].equals(game.getEquipped()[cnt].getId())){
                             String stat = decodeStat(x.getStat());
-                            if(!warning){
+                            if(mode.length() == 0){
                                 if(x instanceof Weapon && stat.length() > 0){
                                     custom.setToolTipText("<html>" + s[1] + "<br><b><em style='color: #" 
                                         + getColor(x.getRarity()) 
@@ -153,8 +156,10 @@ public class InventoryManager {
                                         + "'>" +  x.getRarity() 
                                         + "</em></b><br>" + "<html>");
                                 }
-                            }else{
+                            }else if(mode.equals("burn")){
                                 custom.setToolTipText("<html>" + "You cannot burn items that you are wearing!" + "<html>");
+                            }else if(mode.equals("merge")){
+                                custom.setToolTipText("<html>" + "You cannot merge items that you are wearing!" + "<html>");
                             }
                             
                         }
@@ -162,7 +167,7 @@ public class InventoryManager {
                 custom.addMouseListener(new java.awt.event.MouseAdapter() {
                     @Override
                     public void mouseClicked(java.awt.event.MouseEvent evt) {
-                        if(!warning){
+                        if(mode.length() == 0){
                             removeItem(x, dest);
                         }
                     }
@@ -219,7 +224,7 @@ public class InventoryManager {
                     public void mouseClicked(java.awt.event.MouseEvent evt) {
                         game.addStat(idx.get());
                         hideInventory(dest);
-                        showInventory(dest, warning);
+                        showInventory(dest, mode);
                     }
                 });
             }
@@ -283,8 +288,10 @@ public class InventoryManager {
                     @Override
                     public void mouseClicked(java.awt.event.MouseEvent evt) {
                         if(invSlot.getIcon() != null){
-                            if(warning){
+                            if(mode.equals("burn")){
                                 destroyItem(Integer.parseInt(invSlot.getName()), dest);
+                            }else if(mode.equals("merge")){
+                                openMerge(Integer.parseInt(invSlot.getName()), dest);
                             }else{
                                 equipItem(Integer.parseInt(invSlot.getName()), dest);
                             }
@@ -304,12 +311,13 @@ public class InventoryManager {
         
         //warning label
         String warningMessage = "";
-        if(warning){
+        if(mode.equals("burn")){
             warningMessage += "Careful! Any item you click in your inventory is destroyed forever!";
-        }
-        if(game.getInv().size() > 20){
+        }else if(mode.equals("merge")){
+            warningMessage += "Pick an item that you will bring onto the merge screen";
+        }else if(game.getInv().size() > 20){
             if(warningMessage.length() == 0){
-                warningMessage += "Your inventory space is running out. Consider burning some items.";
+                warningMessage += "Your inventory space is running out. Consider burning or merging some items.";
             }
         }
         warningLabel.setText(warningMessage);
@@ -329,15 +337,139 @@ public class InventoryManager {
         dest.repaint();
     }
     
+    private ArrayList<JLabel> mergeScreen = new ArrayList<>();
+    private void openMerge(int itemIdx, JPanel destination){
+        //find match
+        ArrayList<Item> inv = game.getInv();
+        Item item1 = inv.get(itemIdx);
+        Item item2 = null;
+        
+        for(Item i : inv){
+            if(i.getName().equals(item1.getName()) && i.getRarity().equals(item1.getRarity()) && inv.indexOf(i) != itemIdx){
+                item2 = i;
+            }
+        }
+        if(item2 == null){
+            pop.spawnEffect("You need at least 2 of this item!", false);
+            return;
+        }
+
+        JLabel mBg = new JLabel();
+        JLabel it1 = new JLabel();
+        JLabel it2 = new JLabel();
+        JLabel soul = new JLabel();
+        JLabel bttn = new JLabel();
+        mergeScreen.add(mBg);
+        mergeScreen.add(it1);
+        mergeScreen.add(it2);
+        mergeScreen.add(soul);
+        mergeScreen.add(bttn);
+        it1.setIcon(new ImageIcon(item1.getImg().getScaledInstance(240, 240, Image.SCALE_DEFAULT)));
+        it2.setIcon(new ImageIcon(item2.getImg().getScaledInstance(240, 240, Image.SCALE_DEFAULT)));
+        for(JLabel j : mergeScreen){
+            aeg.labelFactory(j, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
+                new Color(204, 204, 204), 
+                new Color(0, 0, 0, 150), 
+                null, 
+                new Font("Agency FB", 0, 36));
+            destination.add(j, 0);
+        }
+        mBg.setBounds(100, 255, 1720, 570);
+        it1.setBounds(490, 380, 240, 240);
+        it2.setBounds(1170, 380, 240, 240);
+        soul.setBounds(130, 280, 1660, 70);
+        bttn.setBounds(730, 740, 460, 70);
+        bttn.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                if(bttn.getText().equals("Merge")){
+                    attemptMerge(item1);
+                }else{
+                    for(JLabel j : mergeScreen){
+                        j.getParent().remove(j);
+                    }
+                    mergeScreen.clear();
+                    destination.revalidate();
+                    destination.repaint();
+                    aeg.setOptions(true);
+                }
+            }
+        });
+        int price = getRarityValue(item1) * 5000;
+        if(game.getSouls() >= price){
+            soul.setText(String.valueOf(price));
+            bttn.setText("Merge");
+        }else{
+            soul.setForeground(new Color(200,0,0));
+            soul.setText(String.valueOf(price));
+            bttn.setText("Insufficient Souls");
+            inv.add(item1);
+            inv.add(item2);
+        }
+        
+        
+        for(JLabel j : inventoryMenu){
+            j.setVisible(false);
+        }
+        inv.remove(item1);
+        inv.remove(item2);
+        game.setInventory(inv);
+        
+        mBg.getParent().revalidate();
+        mBg.getParent().repaint();
+    }
+    
+    public void attemptMerge(Item item1){
+        Random rnd = new Random();
+        int chance = 25 + game.getGenericStat("ItemsMerged");
+        mergeScreen.get(2).setVisible(false);
+        mergeScreen.get(1).setLocation(mergeScreen.get(1).getLocation().x+340, mergeScreen.get(1).getLocation().y);
+        if(rnd.nextInt(100) <= chance){
+            //success
+            game.setGenericStat("ItemsMerged", game.getGenericStat("ItemsMerged")+1);
+            item1.boostRarity();
+            mergeScreen.get(4).setText("Success!");
+        }else{
+            //failure
+            mergeScreen.get(4).setText("Failure.");
+        }
+        ArrayList<Item> inv = game.getInv();
+        inv.add(item1);
+        game.setInventory(inv);
+    }
+    
+    public int getRarityValue(Item i){
+        int out = 1;
+        switch(i.getRarity()){
+                case "common":
+                    out *= 1;
+                break;
+                case "uncommon":
+                    out *= 2;
+                break;
+                case "rare":
+                    out *= 3;
+                break;
+                case "epic":
+                    out *= 4;
+                break;
+                case "legendary":
+                   out *= 5;
+                break;
+            }
+        return out;
+    }
+    
     public void destroyItem(int itemIdx, JPanel destination){
         ArrayList<Item> inv = game.getInv();
         game.calcBurn(inv.get(itemIdx));
         inv.remove(itemIdx);
         hideInventory(destination);
-        showInventory(destination, warning);
+        showInventory(destination, mode);
     }
     
     public void hideInventory(JPanel origin){
+        pop = null;
         for(JLabel j : getInventoryMenu()){
             j.getParent().remove(j);
         }
@@ -384,14 +516,14 @@ public class InventoryManager {
         }
         game.setEquipped(gearSetup);
         hideInventory(destination);
-        showInventory(destination, warning);
+        showInventory(destination, mode);
     }
     
     public void equipItem(int slot, JPanel destination){
         Item x = game.getInv().get(slot);
         x.equip(slot);
         hideInventory(destination);
-        showInventory(destination, warning);
+        showInventory(destination, mode);
     }
     
     public String getColor(String input){
@@ -401,10 +533,10 @@ public class InventoryManager {
                 out = "ffffff";
             break;
             case "uncommon":
-                out = "0000ff";
+                out = "00ff00";
             break;
             case "rare":
-                out = "00ff00";
+                out = "0000ff";
             break;
             case "epic":
                 out = "ff00ff";

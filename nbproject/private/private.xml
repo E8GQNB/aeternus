@@ -7,12 +7,13 @@
             <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/controller/LabyrinthEngine.java</file>
             <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/model/Labyrinth.java</file>
             <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/view/MainFrame.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/model/Player.java</file>
             <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/view/AeternusGUI.java</file>
             <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/model/Item.java</file>
             <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/controller/DialougeSystem.java</file>
             <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/controller/InventoryManager.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/model/Monster.java</file>
             <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/controller/CombatEngine.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/model/Helmet.java</file>
         </group>
     </open-files>
 </project-private>

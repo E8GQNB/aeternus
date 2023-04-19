@@ -43,7 +43,6 @@ public class LabyrinthEngine extends JPanel{
     private final int MONSTER_SIZE = 120;
 
     private boolean paused = false;
-    private Image background;
     private static int levelNum = 0;
     private Labyrinth level;
     private Monster monster;
@@ -61,7 +60,6 @@ public class LabyrinthEngine extends JPanel{
         super();
         this.game = game;
         this.setLayout(null);
-        background = new ImageIcon("src/images/betaCaveBackground.png").getImage();
         
         this.getInputMap().put(KeyStroke.getKeyStroke("A"), "pressed left");
         this.getActionMap().put("pressed left", new AbstractAction() {
@@ -260,7 +258,6 @@ public class LabyrinthEngine extends JPanel{
     @Override
     protected void paintComponent(Graphics grphcs) {
         super.paintComponent(grphcs);
-        grphcs.drawImage(background, 0, 0, 1920, 1080, null);
         level.draw(grphcs);
         player.draw(grphcs);
         
@@ -353,8 +350,8 @@ public class LabyrinthEngine extends JPanel{
     
     public void endScreen(){
         Random rnd = new Random();
-        ArrayList<Item> loot = new ArrayList<Item>();
-        ArrayList<JLabel> menu = new ArrayList<JLabel>();
+        ArrayList<Item> loot = new ArrayList<>();
+        ArrayList<JLabel> menu = new ArrayList<>();
         
         //generate loot
         int amount = getChance(0)+1;
