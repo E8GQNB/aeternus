@@ -11,6 +11,7 @@ import aeternus.model.Item;
 import aeternus.model.Labyrinth;
 import aeternus.model.Monster;
 import aeternus.model.Player;
+import aeternus.view.AeternusGUI;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -37,8 +38,8 @@ import javax.swing.Timer;
  */
 public class LabyrinthEngine extends JPanel{
     private final int FPS = 240;
-    private final int PLAYER_WIDTH = 25;
-    private final int PLAYER_HEIGHT = 55;
+    private final int PLAYER_WIDTH = 60;
+    private final int PLAYER_HEIGHT = 60;
     private final int PLAYER_MOVEMENT = 1;
     private final int MONSTER_SIZE = 120;
 
@@ -55,11 +56,13 @@ public class LabyrinthEngine extends JPanel{
     private Timer newFrameTimer;
     private CombatEngine c;
     private GameEngine game;
+    private AeternusGUI gui;
 
-    public LabyrinthEngine(GameEngine game) {
+    public LabyrinthEngine(GameEngine game, AeternusGUI gui) {
         super();
         this.game = game;
         this.setLayout(null);
+        this.gui = gui;
         
         this.getInputMap().put(KeyStroke.getKeyStroke("A"), "pressed left");
         this.getActionMap().put("pressed left", new AbstractAction() {
@@ -156,13 +159,9 @@ public class LabyrinthEngine extends JPanel{
     }
     
     public void restart() {
-        try {
-            level = new Labyrinth("data/levels/lvl0" + levelNum + ".txt");
-        } catch (IOException ex) {
-            Logger.getLogger(GameEngine.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        Image playerImage = new ImageIcon("src/images/betaSERVANTIcon.png").getImage();
-        Image vignetteImage = new ImageIcon("src/images/vignette.png").getImage();
+        level = new Labyrinth();
+        Image playerImage = new ImageIcon("src/images/playerIcon.png").getImage();
+        Image vignetteImage = new ImageIcon("src/images/vignetteTP.png").getImage();
         int playerSpawnX = 152*4+10;
         int playerSpawnY = 152*4+5;
         int[] stats = new int[]{Integer.parseInt(game.getStat("str")), Integer.parseInt(game.getStat("con")), Integer.parseInt(game.getStat("dex")), Integer.parseInt(game.getStat("int")), Integer.parseInt(game.getStat("lck")), Integer.parseInt(game.getStat("lvl"))};
@@ -174,14 +173,14 @@ public class LabyrinthEngine extends JPanel{
         List<Player> newHB = Arrays.asList(Up, Right, Down, Left);
         playerHitbox.addAll(newHB);
         vignette = new Player(-1600, -440, 4537, 2190, vignetteImage);
-        spawnMonster(1);
+        spawnMonster(3 + Integer.parseInt(game.getStat("lvl")));
     }
     
     public void spawnMonster(int amount){
         for(int i = 0; i < amount; i++){
             int random = (int) (Math.random() * 3);
-            int monsterX = (int) ((Math.random() * 28) + 1);
-            int monsterY = (int) ((Math.random() * 28) + 1);
+            int monsterX = (int) ((Math.random() * 15) + 1);
+            int monsterY = (int) ((Math.random() * 15) + 1);
             Image monsterImage = new ImageIcon("src/images/Foes/Castle/" + enemy.values()[random].name() + ".png").getImage();
             Image monsterToken = new ImageIcon("src/images/Foes/Castle/Tokens/" + enemy.values()[random].name() + ".png").getImage();
             int hitbox = 10;
@@ -261,23 +260,15 @@ public class LabyrinthEngine extends JPanel{
         level.draw(grphcs);
         player.draw(grphcs);
         
-        for(Player p : playerHitbox){
-            p.draw(grphcs);
-        }
-        
         for(Monster m : monsters){
             m.draw(grphcs);
         }
         
-        /*for(Monster m : monsterHitboxes){
-            m.draw(grphcs);
-        }*/
-        
-        //vignette.draw(grphcs);
+        vignette.draw(grphcs);
     }
     
     private void createCombatEngine(Monster m){
-        c = new CombatEngine(m, this, player, this);
+        c = new CombatEngine(m, this, player, this, gui, game);
     }
     
     public Player getPlayer(){
@@ -330,9 +321,9 @@ public class LabyrinthEngine extends JPanel{
         return lower <= x && x <= upper;
     }
     
-    private int getChance(int boost){
+    private int getChance(int boost, int max){
         Random rnd = new Random();
-        int chance = rnd.nextInt(100);
+        int chance = rnd.nextInt(max);
         chance += boost;
         if(isBetween(chance, 0, 39)){
             return 0;
@@ -354,12 +345,13 @@ public class LabyrinthEngine extends JPanel{
         ArrayList<JLabel> menu = new ArrayList<>();
         
         //generate loot
-        int amount = getChance(0)+1;
+        int amount = (int)(5 * Math.pow(rnd.nextDouble(), 1.5))+1;
+        if(game.getInvSpaces() > amount){
+            amount = game.getInvSpaces();
+        }
         for(int i = 0; i < amount; i++){
-            int quality = rnd.nextInt(100);
-            quality += player.getStat(5);
             String itemQuality = "";
-            switch(getChance(player.getStat(5))){
+            switch(getChance(player.getStat(5), 94)){
                 case 0:
                     itemQuality += "common";
                 break;
@@ -445,10 +437,10 @@ public class LabyrinthEngine extends JPanel{
                 out = "ffffff";
             break;
             case "uncommon":
-                out = "0000ff";
+                out = "00ff00";
             break;
             case "rare":
-                out = "00ff00";
+                out = "0000ff";
             break;
             case "epic":
                 out = "ff00ff";

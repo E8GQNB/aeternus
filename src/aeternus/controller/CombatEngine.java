@@ -8,10 +8,12 @@ package aeternus.controller;
 import aeternus.model.Monster;
 import aeternus.model.Player;
 import aeternus.model.Sprite;
+import aeternus.view.AeternusGUI;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -50,11 +52,16 @@ public class CombatEngine {
     private Player p;
     private Monster m;
     private LabyrinthEngine lab;
+    private PopupFloatingText pop;
+    private AeternusGUI gui;
+    private GameEngine game;
     
-    public CombatEngine(Monster mon, JPanel dest, Player pl, LabyrinthEngine lab){
+    public CombatEngine(Monster mon, JPanel dest, Player pl, LabyrinthEngine lab, AeternusGUI gui, GameEngine game){
         this.lab = lab;
         this.p = pl;
         this.m = mon;
+        this.gui = gui;
+        this.game = game;
         renderMenu(dest, m);
     }
     
@@ -90,8 +97,8 @@ public class CombatEngine {
         img2.setBounds(1280, 140, 460, 460);
         img2.setIcon(new ImageIcon(m.getImg().getScaledInstance(460, 460, Image.SCALE_DEFAULT)));
         
-        dmg1.setBackground(new Color(0, 0, 0, 0));
-        dmg2.setBackground(new Color(0, 0, 0, 0));
+        dmg1.setBackground(new Color(146, 0, 0, 0));
+        dmg2.setBackground(new Color(146, 0, 0, 0));
         dmg1.setName("playerDamage");
         dmg2.setName("monsterDamage");
         dmg1.setBounds(180, 140, 460, 460);
@@ -122,13 +129,16 @@ public class CombatEngine {
         inT.setText("Intelligence: " + p.getStat(3));
         lck.setText("Luck: " + p.getStat(4));
         
+        pop = new PopupFloatingText(gui, game, dest, 15);
         dest.revalidate();
         dest.repaint();
         simulateCombat();
     }
     
     private void simulateCombat(){
+        Random rnd = new Random();
         Thread one = new Thread() {
+            Boolean x = rnd.nextBoolean();
             public void run() {
                 while(p.getHp() > 0 && m.getHp() > 0){
                     try {
@@ -136,14 +146,14 @@ public class CombatEngine {
                     } catch (InterruptedException ex) {
                         Logger.getLogger(CombatEngine.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    attack(true);
+                    attack(x);
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(CombatEngine.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    if(m.getHp() > 0){
-                        attack(false);
+                    if(m.getHp() > 0 && p.getHp() > 0){
+                        attack(!x);
                     }
                 }
                 if(p.getHp() > 0){
@@ -168,8 +178,9 @@ public class CombatEngine {
     
     public void fadeIn(JLabel l, int length){
             try {
+                Color c = l.getBackground();
                 for(int i = 0; i < 200; i++){
-                    l.setBackground(new Color(146, 0, 0, i));
+                    l.setBackground(new Color(c.getRed(), c.getGreen(), c.getBlue(), i));
                     l.getParent().validate();
                     l.getParent().repaint();
                     Thread.sleep(length);
@@ -181,8 +192,9 @@ public class CombatEngine {
     
     public void fadeOut(JLabel l, int length){
             try {
+                Color c = l.getBackground();
                 for(int i = 0; i < 200; i++){
-                    l.setBackground(new Color(146, 0, 0, 200-i));
+                    l.setBackground(new Color(c.getRed(), c.getGreen(), c.getBlue(), 200-i));
                     l.getParent().validate();
                     l.getParent().repaint();
                     Thread.sleep(length);
@@ -192,7 +204,7 @@ public class CombatEngine {
             }
     }
     
-    private void attackEffect(Sprite s){
+    private void attackEffect(Sprite s, Boolean hit){
         if(s instanceof Player){
             for(JLabel j : combatMenu){
                 if(j.getName() != null && j.getName().equals("monsterDamage")){
@@ -203,8 +215,12 @@ public class CombatEngine {
         }else{
             for(JLabel j : combatMenu){
                 if(j.getName() != null && j.getName().equals("playerDamage")){
+                    if(!hit){
+                        j.setBackground(Color.white);
+                    }
                     fadeIn(j, 1);
                     fadeOut(j, 1);
+                    j.setBackground(new Color(146, 0, 0, 0));
                 }
             }
         }
@@ -214,19 +230,33 @@ public class CombatEngine {
         Random rnd = new Random();
         if(dir){
             if(rnd.nextInt(100)+1 < (p.getStat(4)/p.getStat(5))){
+                pop.spawnEffect("Critical! " + String.valueOf(p.getDamage()*(p.getStat(3)/100 + 2)), false, new Point(1510, 300), 200);
                 m.setHp(m.getHp()-p.getDamage()*(p.getStat(3)/100 + 2));
-                attackEffect(p);
+                attackEffect(p, true);
             }else{
                 m.setHp(m.getHp()-p.getDamage());
-                attackEffect(p);
+                pop.spawnEffect(String.valueOf(p.getDamage()), false, new Point(1510, 300), 200);
+                attackEffect(p, true);
             }
         }else{
-            if(rnd.nextInt(100)+1 > (p.getStat(2) / 5)){
-                p.setHp(p.getHp()-m.getDamage());
-                attackEffect(m);
-            }else{
+            if(rnd.nextInt(100)+1 <= (p.getStat(2) / 5)){
                 //miss
+                pop.spawnEffect("Miss", true, new Point(410, 300), 200);
+                attackEffect(m, false);
+                return;
             }
+            
+            if(rnd.nextInt(100)+1 <= ((p.getStat(0) +  game.getArmor()) / 5)){
+                //withstood
+                pop.spawnEffect("Withstood", true, new Point(410, 300), 200);
+                attackEffect(m, false);
+                return;
+            }
+            
+            p.setHp(p.getHp()-m.getDamage());
+            pop.spawnEffect(String.valueOf(m.getDamage()), false, new Point(410, 300), 200);
+            attackEffect(m, true);
+            
         }
         for(JLabel j : combatMenu){
             if(j.getName() != null && j.getName().equals("hp1")){

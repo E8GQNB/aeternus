@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
-import javax.swing.plaf.LabelUI;
 
 /**
  *
@@ -118,17 +117,64 @@ public class ShopManager {
         exit.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                for(JLabel j : shopMenu){
-                    j.getParent().remove(j);
-                }
-                shopMenu.clear();
-                gui.setOptions(true);
-                gui.setOptionsVisibility(true);
-                gui.findPanel("subMenu").revalidate();
-                gui.findPanel("subMenu").repaint();
+                exitShop();
             }
         });
         
+        JLabel refresh = new CustomLabel();
+        gui.labelFactory(refresh, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
+                Color.white, 
+                new Color(0, 0, 0, 150), 
+                null, 
+                new Font("Agency FB", 0, 26));
+        refresh.setToolTipText("<html>" + "This action will cost " + paidRefreshCost() + " souls." + "<html>");
+        refresh.setText("Refresh Shop");
+        gui.findPanel("subMenu").add(refresh, 0);
+        refresh.setBounds(1400, 915, 400, 50);
+        shopMenu.add(refresh);
+        refresh.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                if(game.getSouls() > paidRefreshCost() && game.getInv().size() < 32){
+                    game.alterSouls(-paidRefreshCost());
+                    game.refreshShops();
+                    for(JLabel j : shopMenu){
+                        j.getParent().remove(j);
+                    }
+                    shopMenu.clear();
+                    gui.setOptions(true);
+                    gui.setOptionsVisibility(true);
+                    gui.findPanel("subMenu").revalidate();
+                    gui.findPanel("subMenu").repaint();
+                openShop();
+                }else if(game.getSouls() < paidRefreshCost()){
+                    pop.spawnEffect("You cannot afford this.", false);
+                }else{
+                    pop.spawnEffect("You do not have inventory space!", false);
+                }
+            }
+        });
+        
+        gui.findPanel("subMenu").revalidate();
+        gui.findPanel("subMenu").repaint();
+    }
+    
+    public double paidRefreshCost(){
+        ArrayList<Item> stock = game.getStock(shopID);
+        int out = 1;
+        for(Item it : stock){
+            out += it.getPrice();
+        }
+        return out *= Double.parseDouble(game.getStat("lvl"));
+    }
+    
+    public void exitShop(){
+        for(JLabel j : shopMenu){
+            j.getParent().remove(j);
+        }
+        shopMenu.clear();
+        gui.setOptions(true);
+        gui.setOptionsVisibility(true);
         gui.findPanel("subMenu").revalidate();
         gui.findPanel("subMenu").repaint();
     }

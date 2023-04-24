@@ -45,7 +45,6 @@ public class DialougeSystem {
         destination.remove(dialougeBackground);
         destination.revalidate();
         destination.repaint();
-        System.out.println(destination.getComponents());
     }
     
     private void createTextBox(){
@@ -150,7 +149,6 @@ public class DialougeSystem {
             Thread one = new Thread() {
                 public void run() {
                     try {
-                        //setZorders();
                         for(String[] s : dialouge){
                             //Speaker image
                             if(s[0].length() > 0){

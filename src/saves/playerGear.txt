@@ -1,5 +1,4 @@
-helmet;
-chestpiece;
-weapon;
-magic1;
-magic2;
+009;legendary
+014;epic
+003;common
+021;epic

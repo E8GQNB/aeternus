@@ -48,6 +48,28 @@ public class Item {
         return rarity;
     }
     
+    public int getRarityTier(){
+        int out = 0;
+        switch(rarity){
+            case "common":
+                out = 0;
+            break;
+            case "uncommon":
+                out = 1;
+            break;
+            case "rare":
+                out = 2;
+            break;
+            case "epic":
+                out = 3;
+            break;
+            case "legendary":
+                out = 4;
+            break;
+        }
+        return out;
+    }
+    
     public void boostRarity(){
         switch(rarity){
             case "common":

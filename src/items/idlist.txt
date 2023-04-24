@@ -19,3 +19,11 @@
 019;Amulet of Health;charm;con
 020;Ring of Lion Strength;charm;str
 021;Strange Pocketwatch;charm;dex
+022;Belt of Giant Strength;charm;str
+023;Moonstone Shard;charm;int
+024;Vial of Life;charm;con
+025;Ring of the Towermaster;charm;int
+026;2 Headed Coin;charm;lck
+027;Deck of Many Things;charm;lck
+028;Warhero Medallion;charm;con
+029;Ring of Featherweight;charm;dex

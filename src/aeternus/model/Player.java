@@ -6,6 +6,7 @@
 package aeternus.model;
 
 import java.awt.Image;
+import java.text.DecimalFormat;
 
 /**
  *
@@ -47,7 +48,8 @@ public class Player extends Sprite{
     }
     
     public Double getDamage(){
-        return damage;
+        int scale = (int) Math.pow(10, 2);
+        return (double) Math.round(damage * scale) / scale;
     }
     
     public void setHp(Double hp){

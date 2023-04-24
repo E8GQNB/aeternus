@@ -12,16 +12,12 @@ import javax.swing.JPanel;
 
 public class InfoText {
     private JLabel infoText = new javax.swing.JLabel();
-    private JLabel infoBackground = new javax.swing.JLabel();
     private JPanel destination;
-    private int length;
-    public InfoText(JPanel destination, String x, int length) throws InterruptedException{
+    public InfoText(JPanel destination) throws InterruptedException{
         this.destination = destination;
-        this.length = length;
-        createText(x, length);
     }
     
-    private void createText(String x, int length) throws InterruptedException{
+    public void createText(String x, int length) throws InterruptedException{
         infoText.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         infoText.setForeground(new java.awt.Color(204, 204, 204));
         infoText.setOpaque(true);
