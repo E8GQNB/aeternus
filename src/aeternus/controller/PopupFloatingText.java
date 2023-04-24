@@ -55,6 +55,22 @@ public class PopupFloatingText {
         effectLifespan.add(40);
     }
     
+    public void spawnEffect(String s, Boolean miss, Point p, int zone){
+        JLabel j = new JLabel();
+        Color c = ((miss) ? new Color(200,200,200) : new Color(200,0,0));
+        gui.labelFactory(j, false, true, new int[]{SwingConstants.LEFT, SwingConstants.CENTER}, 
+                c, 
+                null, 
+                s, 
+                new Font("Agency FB", 1, 30));
+        Random rnd = new Random();
+        j.setBounds(p.x + rnd.nextInt(zone)-(zone/2), p.y - rnd.nextInt(zone), 300, 50);
+        jp.add(j);
+        jp.setComponentZOrder(j, 0);
+        effects.add(j);
+        effectLifespan.add(40);
+    }
+    
     private void effectThread(int speed){
         Runnable newThread = () -> {
             for(int i = 0; i < effects.size(); i++){

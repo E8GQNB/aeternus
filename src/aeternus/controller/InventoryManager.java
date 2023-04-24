@@ -236,10 +236,10 @@ public class InventoryManager {
         intLabel.setText("Intelligence: " + game.getStat("int") + points);
         lckLabel.setText("Luck: " + game.getStat("lck") + points);
         
-        strLabel.setToolTipText("<html>" + "Your strength determines your damage. The formula is as follows:<br> (Strength score / 10) * Weapon damage" + "<html>");
+        strLabel.setToolTipText("<html>" + "Your strength determines your chance at whitstanding an attack. The formula is as follows:<br> Strength / 5" + "<html>");
         conLabel.setToolTipText("<html>" + "Your constitution directly correlates with your hp. It is a 1:1 ratio." +"<html>");
-        dexLabel.setToolTipText("<html>" + "Your dexterity determines how well you can dodge attacks. The formula for evasion is as follows:<br> Dex / 5" +"<html>");
-        intLabel.setToolTipText("<html>" + "Your intelligence determines how you pick your attack spots. The higher it is the bigger the critical damage you deal. Each point correlates to a %" +"<html>");
+        dexLabel.setToolTipText("<html>" + "Your dexterity determines how well you can dodge attacks. The formula for evasion is as follows:<br> Dexterity / 5" +"<html>");
+        intLabel.setToolTipText("<html>" + "Your intelligence determines how you pick your attack spots. The higher it is the bigger the critical damage you deal. <br>Each point correlates to a % above 100" +"<html>");
         lckLabel.setToolTipText("<html>" + "Your luck determines the chance at a critical strike on your opponent. The formula is as follows:<br> Luck / Monster level." +"<html>");
         
         //inventory
@@ -423,7 +423,7 @@ public class InventoryManager {
         Random rnd = new Random();
         int chance = 25 + game.getGenericStat("ItemsMerged");
         mergeScreen.get(2).setVisible(false);
-        mergeScreen.get(1).setLocation(mergeScreen.get(1).getLocation().x+340, mergeScreen.get(1).getLocation().y);
+        mergeScreen.get(1).setBounds(800, 350, 330, 320);
         if(rnd.nextInt(100) <= chance){
             //success
             game.setGenericStat("ItemsMerged", game.getGenericStat("ItemsMerged")+1);

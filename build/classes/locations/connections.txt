@@ -1,3 +1,0 @@
-FirstMeetMagic;unlock;BASE
-UnlockPortalsMagic;unlock;PORTAL
-FirstVisitPortal;unlock;WEAPONSHOP

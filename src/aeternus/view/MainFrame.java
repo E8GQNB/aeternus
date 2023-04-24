@@ -8,6 +8,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -41,9 +43,19 @@ public class MainFrame extends javax.swing.JFrame {
         MainMenu = new javax.swing.JPanel();
         transitionOut = new javax.swing.JLabel();
         startButton = new javax.swing.JButton();
+        loadButton = new javax.swing.JButton();
         logo = new javax.swing.JLabel();
         background = new javax.swing.JLabel();
         Main = new javax.swing.JPanel();
+        Prototype4 = new javax.swing.JPanel();
+        jLabel27 = new javax.swing.JLabel();
+        jLabel45 = new javax.swing.JLabel();
+        jLabel44 = new javax.swing.JLabel();
+        jLabel43 = new javax.swing.JLabel();
+        jLabel39 = new javax.swing.JLabel();
+        jLabel40 = new javax.swing.JLabel();
+        jLabel41 = new javax.swing.JLabel();
+        jLabel42 = new javax.swing.JLabel();
         Prototype3 = new javax.swing.JPanel();
         jLabel26 = new javax.swing.JLabel();
         jLabel32 = new javax.swing.JLabel();
@@ -81,14 +93,16 @@ public class MainFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Aeternus");
-        setBackground(new java.awt.Color(102, 102, 102));
+        setBackground(new java.awt.Color(0, 0, 0));
         setExtendedState(6);
+        setForeground(new java.awt.Color(0, 0, 0));
         setLocation(new java.awt.Point(0, 0));
         setUndecorated(true);
         setResizable(false);
         getContentPane().setLayout(null);
 
-        SplashScreen.setBackground(new java.awt.Color(102, 102, 102));
+        SplashScreen.setBackground(new java.awt.Color(0, 0, 0));
+        SplashScreen.setForeground(new java.awt.Color(0, 0, 0));
         SplashScreen.setName("SplashScreen"); // NOI18N
         SplashScreen.setPreferredSize(new java.awt.Dimension(1920, 1080));
         SplashScreen.setLayout(null);
@@ -102,7 +116,8 @@ public class MainFrame extends javax.swing.JFrame {
         getContentPane().add(SplashScreen);
         SplashScreen.setBounds(0, 0, 1920, 1080);
 
-        MainMenu.setBackground(new java.awt.Color(102, 102, 102));
+        MainMenu.setBackground(new java.awt.Color(0, 0, 0));
+        MainMenu.setForeground(new java.awt.Color(0, 0, 0));
         MainMenu.setName("MainMenu"); // NOI18N
         MainMenu.setPreferredSize(new java.awt.Dimension(1920, 1080));
         MainMenu.setLayout(null);
@@ -113,17 +128,42 @@ public class MainFrame extends javax.swing.JFrame {
         transitionOut.setVisible(false);
 
         startButton.setBackground(new java.awt.Color(0, 0, 0));
-        startButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/startIcon.png"))); // NOI18N
+        startButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/startNewGameIcon.png"))); // NOI18N
         startButton.setBorderPainted(false);
         startButton.setContentAreaFilled(false);
         startButton.setFocusPainted(false);
+        startButton.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         startButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 startButtonMouseClicked(evt);
             }
         });
+        startButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                startButtonActionPerformed(evt);
+            }
+        });
         MainMenu.add(startButton);
-        startButton.setBounds(0, 900, 1920, 180);
+        startButton.setBounds(0, 900, 960, 180);
+
+        loadButton.setBackground(new java.awt.Color(0, 0, 0));
+        loadButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/loadGameIcon.png"))); // NOI18N
+        loadButton.setBorderPainted(false);
+        loadButton.setContentAreaFilled(false);
+        loadButton.setFocusPainted(false);
+        loadButton.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        loadButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                loadButtonMouseClicked(evt);
+            }
+        });
+        loadButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadButtonActionPerformed(evt);
+            }
+        });
+        MainMenu.add(loadButton);
+        loadButton.setBounds(960, 900, 960, 180);
 
         logo.setBackground(new Color(0, 0, 0, 120));
         logo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -142,12 +182,69 @@ public class MainFrame extends javax.swing.JFrame {
         MainMenu.setBounds(0, 0, 1920, 1080);
 
         Main.setBackground(new java.awt.Color(0, 0, 0));
+        Main.setForeground(new java.awt.Color(0, 0, 0));
         Main.setMinimumSize(new java.awt.Dimension(1920, 1080));
         Main.setName("Main"); // NOI18N
         Main.setPreferredSize(new java.awt.Dimension(1920, 1080));
         Main.setLayout(null);
         getContentPane().add(Main);
         Main.setBounds(0, 0, 1920, 1080);
+
+        Prototype4.setBackground(new java.awt.Color(0, 0, 0));
+        Prototype4.setMinimumSize(new java.awt.Dimension(1920, 1080));
+        Prototype4.setName("Prototype"); // NOI18N
+        Prototype4.setLayout(null);
+
+        jLabel27.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel27.setText("saveIcon");
+        jLabel27.setOpaque(true);
+        Prototype4.add(jLabel27);
+        jLabel27.setBounds(1760, 920, 140, 140);
+
+        jLabel45.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel45.setText("confirmText");
+        jLabel45.setOpaque(true);
+        Prototype4.add(jLabel45);
+        jLabel45.setBounds(650, 420, 590, 90);
+
+        jLabel44.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel44.setText("confirm");
+        jLabel44.setOpaque(true);
+        Prototype4.add(jLabel44);
+        jLabel44.setBounds(660, 580, 240, 60);
+
+        jLabel43.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel43.setText("back");
+        jLabel43.setOpaque(true);
+        Prototype4.add(jLabel43);
+        jLabel43.setBounds(980, 580, 240, 60);
+
+        jLabel39.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel39.setText("confirmCard");
+        jLabel39.setOpaque(true);
+        Prototype4.add(jLabel39);
+        jLabel39.setBounds(610, 395, 670, 290);
+
+        jLabel40.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel40.setText("icon");
+        jLabel40.setOpaque(true);
+        Prototype4.add(jLabel40);
+        jLabel40.setBounds(820, 80, 280, 270);
+
+        jLabel41.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel41.setText("savebttn");
+        jLabel41.setOpaque(true);
+        Prototype4.add(jLabel41);
+        jLabel41.setBounds(840, 400, 240, 60);
+
+        jLabel42.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel42.setText("exitbttn");
+        jLabel42.setOpaque(true);
+        Prototype4.add(jLabel42);
+        jLabel42.setBounds(840, 500, 240, 60);
+
+        getContentPane().add(Prototype4);
+        Prototype4.setBounds(0, 0, 1920, 1080);
 
         Prototype3.setBackground(new java.awt.Color(0, 0, 0));
         Prototype3.setMinimumSize(new java.awt.Dimension(1920, 1080));
@@ -367,9 +464,32 @@ public class MainFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private Boolean start = false;
     private void startButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_startButtonMouseClicked
-        ae.initiateGame();
+        if(!start){
+            start = !start;
+            ae.initiateGame(true);
+        }
     }//GEN-LAST:event_startButtonMouseClicked
+
+    private void loadButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_loadButtonMouseClicked
+        Path path = Paths.get("src/saves");
+        if(!start && path.toFile().listFiles().length != 0){
+            start = !start;
+            ae.initiateGame(false);
+        }else if(!start){
+            start = !start;
+            ae.initiateGame(true);
+        }
+    }//GEN-LAST:event_loadButtonMouseClicked
+
+    private void loadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_loadButtonActionPerformed
+
+    private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_startButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -414,6 +534,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel Prototype1;
     private javax.swing.JPanel Prototype2;
     private javax.swing.JPanel Prototype3;
+    private javax.swing.JPanel Prototype4;
     private javax.swing.JPanel SplashScreen;
     private javax.swing.JLabel background;
     private javax.swing.JLabel jLabel1;
@@ -433,6 +554,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel26;
+    private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel32;
@@ -441,12 +563,20 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel35;
     private javax.swing.JLabel jLabel36;
     private javax.swing.JLabel jLabel37;
+    private javax.swing.JLabel jLabel39;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel40;
+    private javax.swing.JLabel jLabel41;
+    private javax.swing.JLabel jLabel42;
+    private javax.swing.JLabel jLabel43;
+    private javax.swing.JLabel jLabel44;
+    private javax.swing.JLabel jLabel45;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JButton loadButton;
     private javax.swing.JLabel logo;
     private javax.swing.JButton startButton;
     private javax.swing.JLabel transitionOut;

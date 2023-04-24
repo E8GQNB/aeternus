@@ -9,7 +9,6 @@ import aeternus.model.Charm;
 import aeternus.model.Chestpiece;
 import aeternus.model.Helmet;
 import aeternus.model.Item;
-import aeternus.model.Labyrinth;
 import aeternus.model.Weapon;
 import aeternus.view.AeternusGUI;
 import java.awt.Image;
@@ -19,23 +18,23 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 
 public class GameEngine {
     public enum characters {
     PLAYER, SERVANT, WEAPONMERCHANT, MAGICMERCHANT
 }
     public enum locations{
-        SQUARE("/images/menuBackground.png", readIn("locations/Square")); 
-        //BASE("/images/betaLab.png", readIn("Lab"));
+        SQUARE("/images/menuBackground.png", readIn("locations/Square"));
         
         private final String path;
         private ArrayList<String[]> POI = new ArrayList<String[]>();
@@ -70,9 +69,20 @@ public class GameEngine {
             return data;
         }
         
+        public Boolean addOptions(int idx, String[] s){
+            if(idx == -1){
+                data.add(s);
+                return false;
+            }else{
+                data.add(idx, s);
+                return true;
+            }
+            
+        }
+        
         static private ArrayList<String[]> readIn(String name){
             File file = new File("src/locations/" + name + ".txt");
-            ArrayList<String[]> data = new ArrayList<String[]>();
+            ArrayList<String[]> data = new ArrayList<>();
             data.clear();
             BufferedReader br;
                 try {
@@ -94,6 +104,7 @@ public class GameEngine {
     private ArrayList<String[]> lookupTable;
     private ArrayList<String[]> engineUpgrades;
     private ArrayList<String[]> genericStats;
+    private ArrayList<String[]> general;
     private static ArrayList<String[]> idList;
     private Map<String, ArrayList<Item>> shopStocks = new HashMap();
     private ArrayList<String[]> stats;
@@ -102,53 +113,153 @@ public class GameEngine {
     private AeternusGUI aeg;
     private LabyrinthEngine la;
     private double soulPower = 1.0;
-    private double souls = 1;
+    private double souls = 0;
     private int points = 0;
+    private int worldSeed = -1;
     
-    public GameEngine(AeternusGUI aeg){
-       this.flags = readIn("locations/eventflags");
-       this.unlocks = readIn("locations/Unlocks");
-       this.lookupTable = readIn("locations/connections");
-       this.engineUpgrades = readIn("upgrades/engine");
-       this.idList = readIn("items/idlist");
-       this.shopStocks.put("MAGICSHOP", readInv("items/MAGICSHOPstock"));
-       this.shopStocks.put("WEAPONSHOP", readInv("items/WEAPONSHOPstock"));
-       this.stats = readIn("saves/playerStats");
-       this.equipped = readGear("saves/playerGear");
-       this.inventory = readInv("saves/playerInventory");
-       this.genericStats = readIn("saves/genericStats");
-       this.aeg = aeg;
+    public GameEngine(AeternusGUI aeg, int seed, Boolean newGame){
+        this.idList = readIn("items/idlist");
+        if(newGame){
+            this.flags = readIn("changes/eventflags");
+            this.unlocks = readIn("changes/Unlocks");
+            this.lookupTable = readIn("changes/connections");
+            this.engineUpgrades = readIn("upgrades/engine");
+            this.shopStocks.put("MAGICSHOP", readInv("items/MAGICSHOPstock"));
+            this.shopStocks.put("WEAPONSHOP", readInv("items/WEAPONSHOPstock"));
+            this.stats = readIn("playerData/playerStats");
+            this.equipped = readGear("playerData/playerGear");
+            this.inventory = readInv("playerData/playerInventory");
+            this.genericStats = readIn("playerData/genericStats");
+        }else{
+            this.flags = readIn("saves/eventflags");
+            this.unlocks = readIn("saves/Unlocks");
+            this.lookupTable = readIn("saves/connections");
+            this.engineUpgrades = readIn("saves/engine");
+            this.shopStocks.put("MAGICSHOP", readInv("saves/MAGICSHOPstock"));
+            this.shopStocks.put("WEAPONSHOP", readInv("saves/WEAPONSHOPstock"));
+            this.stats = readIn("saves/playerStats");
+            this.equipped = readGear("saves/playerGear");
+            this.inventory = readInv("saves/playerInventory");
+            this.genericStats = readIn("saves/genericStats");
+            this.general = readIn("saves/general");
+            loadGeneral();
+        }
+        this.aeg = aeg;
+        this.worldSeed = seed;
     }
     
     public String getFlag(interactables i){
         for(String[] s : flags){
-            if(s[0].equals(i.name())){
+            if(s[0].equals(i.name()) && s.length > 1){
                 return s[1];
             }
         }
         return null;
+    }
+    
+    private void loadGeneral(){
+        souls = Double.parseDouble(general.get(0)[0]);
+        worldSeed = Integer.parseInt(general.get(1)[0]);
     }
     
     public String getFlag(String i){
         for(String[] s : flags){
-            if(s[0].equals(i)){
+            if(s[0].equals(i) && s.length > 1){
                 return s[1];
             }
         }
         return null;
     }
     
-    public void setFlag(String f, String value){
-        for(String[] s : flags){
-            if(s[0].equals(f)){
-                s[1] = value;
-            }
-        }
+    public int getSeed(){
+        return worldSeed;
     }
     
-    public void calcBurn(Item x){
-        alterSouls(1000 * ((double)getGenericStat("ItemsBurned")/10+1) * Integer.parseInt(getStat("lvl")));
+    public Boolean setFlag(String f, String value){
+        for(String[] s : flags){
+            if(s[0].equals(f)){
+                if(s.length > 1){
+                   s[1] = value; 
+                }else{
+                    s = new String[]{s[0], value};
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public int getInvSpaces(){
+        return 32-inventory.size();
+    }
+    
+    public double calcBurn(Item x){
+        double price = 1000 * ((double)getGenericStat("ItemsBurned")/10+1) * Integer.parseInt(getStat("lvl"));
+        alterSouls(price);
         setGenericStat("ItemsBurned", getGenericStat("ItemsBurned")+1);
+        return price;
+    }
+    
+    public ArrayList<String[]> itemToList(ArrayList<Item> items){
+        ArrayList<String[]> out = new ArrayList<>();
+        for(Item i : items){
+            out.add(new String[]{String.valueOf(i.getId()), String.valueOf(i.getRarity())});
+        }
+        return out;
+    }
+    
+    public void WriteSave(){
+        try {
+            FileWriter fw = new FileWriter("src/saves/general.txt");
+            fw.write(String.valueOf(getSouls()) + System.getProperty( "line.separator" ));
+            fw.write(String.valueOf(worldSeed));
+            fw.close();
+            
+            ArrayList<Item> gear = new ArrayList<>();
+            for(Item x : equipped){
+                if(x != null){
+                    gear.add(x);
+                }
+            }
+            var files = Arrays.asList("Unlocks", "eventflags", "engine", "connections", "playerStats", "genericStats", "MAGICSHOPstock", "WEAPONSHOPstock", "playerGear", "playerInventory");
+            var data = Arrays.asList(unlocks, flags, engineUpgrades, lookupTable, stats, genericStats, itemToList(shopStocks.get("MAGICSHOP")), itemToList(shopStocks.get("WEAPONSHOP")), itemToList(gear), itemToList(inventory));
+            for(int i = 0; i < files.size(); i++){
+                try {
+                    FileWriter f = new FileWriter("src/saves/" + files.get(i) + ".txt");
+                    for(int j = 0; j < data.get(i).size(); j++){
+                        String out = "";
+                        for(String s : data.get(i).get(j)){
+                            out += ";" + s;
+                        }
+                        out = out.substring(1);
+                        f.write(out);
+                        if(j + 1 < data.get(i).size()){
+                            f.write(System.getProperty( "line.separator" ));
+                        }
+                    }
+                    f.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+    }
+    
+    public int getArmor(){
+        int out = 0;
+        if(equipped[0] != null){
+            out += ((Helmet)equipped[0]).getDefense();
+        }
+        if(equipped[1] != null){
+            out += ((Chestpiece)equipped[1]).getDefense();
+        }
+        return out;
+    }
+    
+    public void setGear(Item[] items){
+        equipped = items;
     }
     
     public void calculateStats(){
@@ -187,7 +298,6 @@ public class GameEngine {
             addSouls();
             aeg.refreshSouls();
         };
-
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
         executor.scheduleAtFixedRate(newThread, 0, 100, TimeUnit.MILLISECONDS);
     }
@@ -203,13 +313,22 @@ public class GameEngine {
     public void refreshSoulPower(){
         double newsp = 1;
         for(int i = 0; i < Integer.parseInt(getStat("lvl"))-1;i++){
-            newsp *= 1.5;
+            newsp *= 5;
         }
         soulPower = newsp;
     }
     
     public double getSouls(){
         return souls;
+    }
+    
+    public Boolean endReq(){
+        for(Item i : equipped){
+            if(i == null || !i.getRarity().equals("legendary")){
+                return false;
+            }
+        }
+        return true;
     }
     
     public String getStat(String name){
@@ -227,9 +346,64 @@ public class GameEngine {
         stats.get(idx)[2] = String.valueOf(x);
         if(idx == 5){
             points += 2;
+            stats.get(idx)[1] = String.valueOf(x);
+            refreshShops();
         }else{
             points--;
         }
+    }
+    
+    public void refreshShops(){
+        Random rnd = new Random();
+        shopStocks.entrySet().forEach(shop -> {
+            ArrayList<Item> newStock = new ArrayList<>();
+            int amount = (int)(31 * Math.pow(rnd.nextDouble(), 2))+1;
+            for(int i = 0; i < amount; i++){
+                newStock.add(genRandomItem(shop.getKey(), rnd));
+            }
+            setStock(shop.getKey(), newStock);
+        });
+    }
+    
+    public Item genRandomItem(String shop, Random rnd){
+        Item x = null;
+        while(x == null){
+            int id = rnd.nextInt(idList.size());
+            int quality = (int)(5 * Math.pow(rnd.nextDouble(), 3));
+            
+            if(!idList.get(id)[2].equals("charm") && shop.equals("MAGICSHOP")){
+                continue;
+            }
+            
+            if(idList.get(id)[2].equals("charm") && !shop.equals("MAGICSHOP")){
+                continue;
+            }
+            
+            if(Integer.parseInt(getStat("lvl")) <= 5 && quality > 0){
+                quality--;
+            }
+            
+            String itemQuality = "";
+            switch(quality){
+                case 0:
+                    itemQuality += "common";
+                break;
+                case 1:
+                    itemQuality += "uncommon";
+                break;
+                case 2:
+                    itemQuality += "rare";
+                break;
+                case 3:
+                    itemQuality += "epic";
+                break;
+                case 4:
+                    itemQuality += "legendary";
+                break;
+            }
+            x = createItem(new String[]{idList.get(id)[0], itemQuality});
+        }
+        return x;
     }
     
     public int getGenericStat(String stat){
@@ -323,11 +497,10 @@ public class GameEngine {
     
     public void removeFlag(String name){
         for(String[] s : flags){
-            if(s[1].equals(name)){
+            if(s.length > 1 && s[1].equals(name)){
                 s[1] = "";
             }
         }
-        //writeFlags("eventflags");
     }
     
     public boolean getLockState(String tst){
@@ -346,6 +519,9 @@ public class GameEngine {
                     case "unlock":
                         setLockState(interactables.valueOf(line[2]), "true");
                     break;
+                    case "setFlag":
+                        setFlag(line[2], line[3]);
+                    break;
                 }
             }
         }
@@ -357,7 +533,6 @@ public class GameEngine {
                 s[1] = lockstate;
             }
         }
-        //writeUnlocks("Unlocks");
     }
     
     public Item createItem(String[] in){
@@ -389,7 +564,7 @@ public class GameEngine {
     }
     
     public void enterPortal() throws IOException{
-        la = new LabyrinthEngine(this);
+        la = new LabyrinthEngine(this, aeg);
         la.setBounds(0, 0, 1920, 1080);
         aeg.getFrame().getContentPane().add(la, 0);
         la.requestFocus();
@@ -407,7 +582,7 @@ public class GameEngine {
         refreshSoulPower();
     }
     
-    private ArrayList<Item> readInv(String name){
+    public ArrayList<Item> readInv(String name){
         File file = new File("src/" + name + ".txt");
         ArrayList<Item> inv = new ArrayList<>();
         BufferedReader br;
@@ -431,13 +606,35 @@ public class GameEngine {
             try {
                 br = new BufferedReader(new FileReader(file));
                 String st;
-                int cnt = 0;
                 while ((st = br.readLine()) != null){
                     String[] line = st.split(";");
-                    if(line.length > 1){
-                        inv[cnt] = createItem(new String[]{line[1], line[2]});
+                    for(String[] s : idList){
+                        int idx = -1;
+                        Boolean chrm = false;
+                        if(line[0].equals(s[0])){
+                            switch(s[2]){
+                                case "helmet":
+                                    idx = 0;
+                                break;
+                                case "chestpiece":
+                                    idx = 1;
+                                break;
+                                case "weapon":
+                                    idx = 2;
+                                break;
+                                case "charm":
+                                    if(!chrm){
+                                        chrm = true;
+                                        idx = 3;
+                                    }else{
+                                        idx = 4;
+                                    }
+                                break;
+                            }
+                            inv[idx] = createItem(new String[]{line[0], line[1]});
+                        }
+                        
                     }
-                    cnt++;
                 }
             } catch (Exception ex) {
                 Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
@@ -461,23 +658,4 @@ public class GameEngine {
             }
         return data;
     }
-    
-    private void writeFlags(String name){
-            try {
-                FileWriter fw = new FileWriter("src/locations/" + name + ".txt");
-                for(int i = 0; i < flags.size(); i++){
-                    fw.write(flags.get(i)[0] + ";" + flags.get(i)[1]);
-                    if(i + 1 < flags.size()){
-                        fw.write(System.getProperty( "line.separator" ));
-                    }
-                }
-                fw.close();
-                readIn("locations/" + name);
-              } catch (IOException e) {
-                e.printStackTrace();
-              }
-            
-        }
-    
-    
 }

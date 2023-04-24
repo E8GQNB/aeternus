@@ -32,13 +32,10 @@ public class CustomLabel extends JLabel {
    
    @Override
    public Point getToolTipLocation(MouseEvent e) {
-       //if(e.getComponent().isEnabled()){
-           Point p = MouseInfo.getPointerInfo().getLocation();
-           p.x -= e.getComponent().getLocationOnScreen().x;
-           p.y -= e.getComponent().getLocationOnScreen().y;
-           return p;
-       //}
-        //return MouseInfo.getPointerInfo().getLocation();
+        Point p = MouseInfo.getPointerInfo().getLocation();
+        p.x -= e.getComponent().getLocationOnScreen().x;
+        p.y -= e.getComponent().getLocationOnScreen().y;
+        return p;
    }
 }
 

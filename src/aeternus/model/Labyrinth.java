@@ -7,10 +7,6 @@ package aeternus.model;
 
 import java.awt.Graphics;
 import java.awt.Image;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -30,32 +26,15 @@ public class Labyrinth {
     ArrayList<Cell> outer;
     ArrayList<Cell> floorTiles;
 
-    public Labyrinth(String levelPath) throws IOException {
+    public Labyrinth(){
         genLevel();
     }
-
-    public void loadLevel(String levelPath) throws FileNotFoundException, IOException {
-        BufferedReader br = new BufferedReader(new FileReader(levelPath));
-        cells = new ArrayList<>();
-        int y = 0;
-        String line;
-        while ((line = br.readLine()) != null) {
-            int x = 0;
-            for (char blockType : line.toCharArray()) {
-                if (blockType == '1') {
-                    Image image = new ImageIcon("src/images/betaSERVANTIcon.png").getImage();
-                    cells.add(new Cell(x * BLOCK_WIDTH, y * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT, image));
-                }
-                x++;
-            }
-            y++;
-        }
-    }
+    
     private int[][] maze = new int[ACROSS][DOWN];
     private ArrayList<int[]> fronts = new ArrayList<int[]>();
     private int[][] floor = new int[ACROSS][DOWN];
     
-    public void genLevel() throws IOException {
+    public void genLevel(){
         cells = new ArrayList<>();
         outer = new ArrayList<>();
         floorTiles = new ArrayList<>();
@@ -105,19 +84,38 @@ public class Labyrinth {
                 if(j < DOWN-1){
                     if(j == DOWN-2){
                         Image image = new ImageIcon("src/images/castlewall.png").getImage();
-                        cells.add(new Cell(i * BLOCK_WIDTH, j * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT, image));
+                        cells.add(new Cell(i * BLOCK_WIDTH, j * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT, new Image[]{image, null, null, null, null}));
                     }else{
                         if(maze[i][j] == 1 && maze[i][j+1] != 1){
                             Random rnd = new Random();
-                            Image image;
-                                image = new ImageIcon("src/images/Labyrinth/Castle/Walls/" + rnd.nextInt(5) + ".png").getImage();
-                            cells.add(new Cell(i * BLOCK_WIDTH, j * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT, image));
+                            Image image = new ImageIcon("src/images/Labyrinth/Castle/Walls/" + rnd.nextInt(5) + ".png").getImage();
+                            Image shadow = new ImageIcon("src/images/Labyrinth/Shadows/2.png").getImage();
+                            cells.add(new Cell(i * BLOCK_WIDTH, j * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT, new Image[]{image, null, null, shadow, null}));
                         }else if(maze[i][j] == 1 && maze[i][j+1] == 1){
                             Image image = new ImageIcon("src/images/castledark.png").getImage();
-                            cells.add(new Cell(i * BLOCK_WIDTH, j * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT, image));
+                            cells.add(new Cell(i * BLOCK_WIDTH, j * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT, new Image[]{image, null, null, null, null}));
                         }else{
-                            Image image = new ImageIcon("src/images/floor.png").getImage();
-                            floorTiles.add(new Cell(i * BLOCK_WIDTH, j * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT, image));
+                            Image image = new ImageIcon("src/images/floor1.png").getImage();
+                            Image[] imgs = new Image[5];
+                            imgs[0] = image;
+                            for(int f = 0; f < 4; f++){
+                                Image newImg = new ImageIcon("src/images/Labyrinth/Shadows/" + f + ".png").getImage();
+                                imgs[f+1] = newImg;
+                            }
+                            if(maze[i][j-1] == 0){
+                                imgs[1] = null;
+                            }
+                            if(maze[i+1][j] == 0){
+                                imgs[2] = null;
+                            }
+                            if(maze[i][j+1] == 0){
+                                imgs[3] = null;
+                            }
+                            if(maze[i-1][j] == 0){
+                                imgs[4] = null;
+                            }
+                            
+                            floorTiles.add(new Cell(i * BLOCK_WIDTH, j * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT, imgs));
                         }
                     }
                 }
@@ -131,14 +129,6 @@ public class Labyrinth {
                     outer.add(new Cell((i * BLOCK_WIDTH)-(BLOCK_WIDTH * 10), (j * BLOCK_HEIGHT)-(BLOCK_WIDTH * 10), BLOCK_WIDTH, BLOCK_HEIGHT, image));
                 }
             }
-        }
-        //adjustCenter();
-    }
-    
-    private void adjustCenter(){
-        for(Cell c : cells){
-            c.setX(c.getX()-((ACROSS/2)*BLOCK_WIDTH)+940);
-            c.setY(c.getY()-((DOWN/2)*BLOCK_HEIGHT)+540);
         }
     }
     
@@ -312,11 +302,11 @@ public class Labyrinth {
 
     public void draw(Graphics g) {
         for (Cell c : floorTiles) {
-            c.draw(g);
+            c.draw(g, true);
         }
         
         for (Cell c : cells) {
-            c.draw(g);
+            c.draw(g, true);
         }
         for(Cell c : outer){
             c.draw(g);

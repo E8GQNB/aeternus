@@ -1,11 +1,10 @@
-Magic Merchant;50;We're here.€ You need to spend the souls to bring the ancient magic into motion.
-Player;50;What then?
-Magic Merchant;50;Then, you enter and fight.€ This gate is dialed to take you to closed spaces.€ Dungeons, labyrinths, castles and the sort.€ You must reach the final chamber and fight whatever is in there.
-Player;50;Will this always cost me 10.000 souls?
-Magic Merchant;50;No.€ This is to kickstart the gate.€ Time is the major factor in your visits.€ Activating the gate sends it into a cooldown of sorts.€ You can however shorten it if you provide souls to do so.
-Player;50;Then let's see if this still works
-;50;<Expending souls>
-;50;<Mechanism whirrs to life>
-Magic Merchant;50;Merlin's beard.€ It still lives.€
+Magic Merchant;50;Merlin's beard.€ It's still in one piece.€
 Player;50;You weren't sure?
-Magic Merchant;50;Not by a long shot.€ Anywho, we've no time to waste.€ Good luck.€ I shall await your arrival.
+Magic Merchant;50;Not by a longshot.€ Anywho, you need to spend the souls to bring the ancient magic into motion.
+Player;50;What then?
+Magic Merchant;50;Then, you enter and fight.€ The labyrinth is ever changing.€ Whenever you enter you will be faced with a different layout.
+Player;50;Will this trip always cost me 10.000 souls?
+Magic Merchant;50;No.€ This is to kickstart the gate.€ Time is the major factor in your visits.€ Activating the gate sends it into a cooldown of sorts.€ Until the magic can recuperate from ambient mana.
+Player;50;Then let's see if this still works
+Player;50;<Lifts hand to expend souls>
+Magic Merchant;50;Good luck.€ I shall await your arrival.
