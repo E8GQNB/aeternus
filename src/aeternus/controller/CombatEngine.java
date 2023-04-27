@@ -11,7 +11,6 @@ import aeternus.model.Sprite;
 import aeternus.view.AeternusGUI;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
 import java.util.ArrayList;
@@ -29,6 +28,7 @@ import javax.swing.SwingConstants;
  * @author User
  */
 public class CombatEngine {
+    //Enemy types can be adjusted here. There is a special unused KING variety as well
     public enum enemy{
         KNIGHT(10, 2), MAGE(5, 5), VANGUARD(20, 2), KING(15, 5);
         private int hp;
@@ -65,6 +65,7 @@ public class CombatEngine {
         renderMenu(dest, m);
     }
     
+    //Renders Combat menu
     private void renderMenu(JPanel dest, Monster m){
         JLabel bg, img1, img2, dmg1, dmg2, hp1, hpBox1, hp2, hpBox2, stats, str, dex, con, lck, inT;
         bg = new JLabel();
@@ -129,12 +130,13 @@ public class CombatEngine {
         inT.setText("Intelligence: " + p.getStat(3));
         lck.setText("Luck: " + p.getStat(4));
         
-        pop = new PopupFloatingText(gui, game, dest, 15);
+        pop = new PopupFloatingText(dest, 15);
         dest.revalidate();
         dest.repaint();
         simulateCombat();
     }
     
+    //Simulates combat encounter
     private void simulateCombat(){
         Random rnd = new Random();
         Thread one = new Thread() {
@@ -176,6 +178,7 @@ public class CombatEngine {
         
     }
     
+    //Specialized fade effects
     public void fadeIn(JLabel l, int length){
             try {
                 Color c = l.getBackground();
@@ -204,6 +207,7 @@ public class CombatEngine {
             }
     }
     
+    //Custom fade varieties
     private void attackEffect(Sprite s, Boolean hit){
         if(s instanceof Player){
             for(JLabel j : combatMenu){
@@ -226,6 +230,7 @@ public class CombatEngine {
         }
     }
     
+    //Attack logic
     private void attack(Boolean dir){
         Random rnd = new Random();
         if(dir){

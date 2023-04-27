@@ -12,7 +12,9 @@ import aeternus.view.AeternusGUI;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.MouseInfo;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.ImageIcon;
@@ -26,7 +28,7 @@ import javax.swing.SwingConstants;
  */
 public class InventoryManager {
     private AeternusGUI aeg;
-    private ArrayList<JLabel> inventoryMenu = new ArrayList<JLabel>();
+    private ArrayList<JLabel> inventoryMenu = new ArrayList<>();
     private GameEngine game;
     private String mode;
     private PopupFloatingText pop;
@@ -40,8 +42,9 @@ public class InventoryManager {
         return inventoryMenu;
     }
     
+    //Renders Inventory
     public void showInventory(JPanel dest, String b){
-        pop = new PopupFloatingText(aeg, game, dest, 35);
+        pop = new PopupFloatingText(dest, 35);
         inventoryMenu.clear();
         game.calculateStats();
         mode = b;
@@ -65,26 +68,8 @@ public class InventoryManager {
         CustomLabel dexLabel = new CustomLabel();
         CustomLabel intLabel = new CustomLabel();
         CustomLabel lckLabel = new CustomLabel();
-        inventoryMenu.add(invBg);
-        inventoryMenu.add(invAvatar);
-        inventoryMenu.add(invHelmet);
-        inventoryMenu.add(invChestplate);
-        inventoryMenu.add(invWeapon);
-        inventoryMenu.add(invMagicItem1);
-        inventoryMenu.add(invMagicItem2);
-        inventoryMenu.add(invXp);
-        inventoryMenu.add(invStatBox);
-        inventoryMenu.add(strLabel);
-        inventoryMenu.add(conLabel);
-        inventoryMenu.add(dexLabel);
-        inventoryMenu.add(intLabel);
-        inventoryMenu.add(lckLabel);
-        inventoryMenu.add(warningLabel);
-        inventoryMenu.add(helmOverlay);
-        inventoryMenu.add(chestOverlay);
-        inventoryMenu.add(weaponOverlay);
-        inventoryMenu.add(charm1Overlay);
-        inventoryMenu.add(charm2Overlay);
+        inventoryMenu = new ArrayList<>(List.of(invBg, invAvatar, invHelmet, invChestplate, invWeapon, invMagicItem1, invMagicItem2, invXp, invStatBox, 
+                strLabel, conLabel, dexLabel, intLabel, lckLabel, warningLabel, helmOverlay, chestOverlay, weaponOverlay, charm1Overlay, charm2Overlay));
         
         for(JLabel j : inventoryMenu){
             aeg.labelFactory(j, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
@@ -138,30 +123,24 @@ public class InventoryManager {
                                     "/images/rarity/" + x.getRarity() + ".png")).getImage().getScaledInstance(140, 140, Image.SCALE_DEFAULT)));
                 for(String[] s : game.getIds()){
                         if(s[0].equals(game.getEquipped()[cnt].getId())){
-                            String stat = decodeStat(x.getStat());
                             if(mode.length() == 0){
+                                String stat = decodeStat(x.getStat());
+                                String flavor = "";
                                 if(x instanceof Weapon && stat.length() > 0){
-                                    custom.setToolTipText("<html>" + s[1] + "<br><b><em style='color: #" 
-                                        + getColor(x.getRarity()) 
-                                        + "'>" +  x.getRarity() 
-                                        + "</em></b><br>" + "Scales from " + stat + "<html>");
+                                    flavor += "Scales from your " + stat;
                                 }else if(stat.length() > 0){
-                                    custom.setToolTipText("<html>" + s[1] + "<br><b><em style='color: #" 
-                                        + getColor(x.getRarity()) 
-                                        + "'>" +  x.getRarity() 
-                                        + "</em></b><br>" + "Increases your " + stat + "<html>");
-                                }else{
-                                    custom.setToolTipText("<html>" + s[1] + "<br><b><em style='color: #" 
-                                        + getColor(x.getRarity()) 
-                                        + "'>" +  x.getRarity() 
-                                        + "</em></b><br>" + "<html>");
+                                    flavor += "Increases your " + stat;
                                 }
+
+                                custom.setToolTipText("<html>" + s[1] + "<br>§" + x.getPrice() + "<br><b><em style='color: #" 
+                                        + x.getColor() 
+                                        + "'>" +  x.getRarity() 
+                                        + "</em></b><br>" + flavor + "<html>");
                             }else if(mode.equals("burn")){
                                 custom.setToolTipText("<html>" + "You cannot burn items that you are wearing!" + "<html>");
                             }else if(mode.equals("merge")){
                                 custom.setToolTipText("<html>" + "You cannot merge items that you are wearing!" + "<html>");
                             }
-                            
                         }
                 }
                 custom.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -263,22 +242,17 @@ public class InventoryManager {
                     for(String[] s : idList){
                         if(s[0].equals(item.getId())){
                             String stat = decodeStat(item.getStat());
-                            if(inv.get(i*6 + j) instanceof Weapon && stat.length() > 0){
-                                invSlot.setToolTipText("<html>" + s[1] + "<br><b><em style='color: #" 
-                                    + getColor(item.getRarity()) 
-                                    + "'>" +  item.getRarity() 
-                                    + "</em></b><br>" + "Scales from " + stat + "<html>");
+                            String flavor = "";
+                            if(item instanceof Weapon && stat.length() > 0){
+                                flavor += "Scales from your " + stat;
                             }else if(stat.length() > 0){
-                                invSlot.setToolTipText("<html>" + s[1] + "<br><b><em style='color: #" 
-                                    + getColor(item.getRarity()) 
-                                    + "'>" +  item.getRarity() 
-                                    + "</em></b><br>" + "Increases your " + stat + "<html>");
-                            }else{
-                                invSlot.setToolTipText("<html>" + s[1] + "<br><b><em style='color: #" 
-                                    + getColor(item.getRarity()) 
-                                    + "'>" +  item.getRarity() 
-                                    + "</em></b><br>" + "<html>");
+                                flavor += "Increases your " + stat;
                             }
+                            
+                            invSlot.setToolTipText("<html>" + s[1] + "<br>§" + item.getPrice() + "<br><b><em style='color: #" 
+                                    + item.getColor() 
+                                    + "'>" +  item.getRarity() 
+                                    + "</em></b><br>" + flavor + "<html>");
                             
                         }
                     }
@@ -337,6 +311,8 @@ public class InventoryManager {
         dest.repaint();
     }
     
+    //Shows merge option for inventory
+    
     private ArrayList<JLabel> mergeScreen = new ArrayList<>();
     private void openMerge(int itemIdx, JPanel destination){
         //find match
@@ -350,7 +326,7 @@ public class InventoryManager {
             }
         }
         if(item2 == null){
-            pop.spawnEffect("You need at least 2 of this item!", false);
+            pop.spawnEffect("You need at least 2 of this item!", false, MouseInfo.getPointerInfo().getLocation(), 50);
             return;
         }
 
@@ -395,7 +371,7 @@ public class InventoryManager {
                 }
             }
         });
-        int price = getRarityValue(item1) * 5000;
+        int price = (item1.getRarityTier()+1) * 5000;
         if(game.getSouls() >= price){
             soul.setText(String.valueOf(price));
             bttn.setText("Merge");
@@ -419,18 +395,19 @@ public class InventoryManager {
         mBg.getParent().repaint();
     }
     
+    //This logic drives the item merging process
     public void attemptMerge(Item item1){
         Random rnd = new Random();
         int chance = 25 + game.getGenericStat("ItemsMerged");
         mergeScreen.get(2).setVisible(false);
         mergeScreen.get(1).setBounds(800, 350, 330, 320);
         if(rnd.nextInt(100) <= chance){
-            //success
+            //Success
             game.setGenericStat("ItemsMerged", game.getGenericStat("ItemsMerged")+1);
             item1.boostRarity();
             mergeScreen.get(4).setText("Success!");
         }else{
-            //failure
+            //Failure
             mergeScreen.get(4).setText("Failure.");
         }
         ArrayList<Item> inv = game.getInv();
@@ -438,34 +415,18 @@ public class InventoryManager {
         game.setInventory(inv);
     }
     
-    public int getRarityValue(Item i){
-        int out = 1;
-        switch(i.getRarity()){
-                case "common":
-                    out *= 1;
-                break;
-                case "uncommon":
-                    out *= 2;
-                break;
-                case "rare":
-                    out *= 3;
-                break;
-                case "epic":
-                    out *= 4;
-                break;
-                case "legendary":
-                   out *= 5;
-                break;
-            }
-        return out;
-    }
-    
-    public void destroyItem(int itemIdx, JPanel destination){
+    //Removes any item from the player inventory and adds souls for compensation
+    public Boolean destroyItem(int itemIdx, JPanel destination){
         ArrayList<Item> inv = game.getInv();
         game.calcBurn(inv.get(itemIdx));
+        int before = inv.size();
         inv.remove(itemIdx);
         hideInventory(destination);
         showInventory(destination, mode);
+        if(inv.size() < before){
+            return true;
+        }
+        return false;
     }
     
     public void hideInventory(JPanel origin){
@@ -483,6 +444,7 @@ public class InventoryManager {
         origin.repaint();
     }
     
+    //Returns the formal name of stats
     public String decodeStat(String st){
         String stat = "";
         switch(st){
@@ -505,8 +467,9 @@ public class InventoryManager {
         return stat;
     }
     
-    public void removeItem(Item gear, JPanel destination){
+    public Boolean removeItem(Item gear, JPanel destination){
         ArrayList<Item> inv = game.getInv();
+        int before = inv.size();
         inv.add(gear);
         Item[] gearSetup = game.getEquipped();
         for(int i = 0; i < gearSetup.length; i++){
@@ -517,6 +480,10 @@ public class InventoryManager {
         game.setEquipped(gearSetup);
         hideInventory(destination);
         showInventory(destination, mode);
+        if(before < inv.size()){
+            return true;
+        }
+        return false;
     }
     
     public void equipItem(int slot, JPanel destination){
@@ -524,27 +491,5 @@ public class InventoryManager {
         x.equip(slot);
         hideInventory(destination);
         showInventory(destination, mode);
-    }
-    
-    public String getColor(String input){
-        String out = "";
-        switch(input){
-            case "common":
-                out = "ffffff";
-            break;
-            case "uncommon":
-                out = "00ff00";
-            break;
-            case "rare":
-                out = "0000ff";
-            break;
-            case "epic":
-                out = "ff00ff";
-            break;
-            case "legendary":
-                out = "ffff00";
-            break;
-        }
-        return out;
     }
 }

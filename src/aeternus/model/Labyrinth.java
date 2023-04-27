@@ -34,6 +34,7 @@ public class Labyrinth {
     private ArrayList<int[]> fronts = new ArrayList<int[]>();
     private int[][] floor = new int[ACROSS][DOWN];
     
+    //Labyrinth generation logic
     public void genLevel(){
         cells = new ArrayList<>();
         outer = new ArrayList<>();
@@ -132,6 +133,7 @@ public class Labyrinth {
         }
     }
     
+    //Shifts tiles accorting to given direction
     public void shiftField(int x, int y){
         for(Cell c : floorTiles){
             c.setX(c.getX() + x);
@@ -149,6 +151,7 @@ public class Labyrinth {
         }
     }
 
+    //Picks neightbor when generating labyrinth
     public int[] randomValidNeighbor(int x, int y){
         int[] res = new int[2];
         boolean run = true;
@@ -211,6 +214,7 @@ public class Labyrinth {
         return false;
     }
     
+    //Marks the frontiers for generation
     public void markFrontiers(int x, int y){
         if(x+2 < ACROSS-1){
             if(maze[x+2][y] == 1){
@@ -270,6 +274,7 @@ public class Labyrinth {
         }
     }
     
+    //Collision logic for monsters
     public boolean collides(Monster m) {
         Cell collidedWith = null;
         for (Cell cell : cells) {
@@ -285,6 +290,7 @@ public class Labyrinth {
         }
     }
     
+    //Collision logic for player
     public boolean playerCollides(Player player) {
         Cell collidedWith = null;
         for (Cell cell : cells) {

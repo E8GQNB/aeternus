@@ -33,6 +33,7 @@ public class GameEngine {
     public enum characters {
     PLAYER, SERVANT, WEAPONMERCHANT, MAGICMERCHANT
 }
+    //This acts as a stub for anyone wanting to add more maps
     public enum locations{
         SQUARE("/images/menuBackground.png", readIn("locations/Square"));
         
@@ -53,6 +54,7 @@ public class GameEngine {
         }
     }
     
+    //Responsible for locations
     public enum interactables{
         MAGICSHOP(readIn("MagicShop")),
         WEAPONSHOP(readIn("WeaponShop")),
@@ -80,6 +82,7 @@ public class GameEngine {
             
         }
         
+        //Reads location info from txt
         static private ArrayList<String[]> readIn(String name){
             File file = new File("src/locations/" + name + ".txt");
             ArrayList<String[]> data = new ArrayList<>();
@@ -148,6 +151,12 @@ public class GameEngine {
         this.worldSeed = seed;
     }
     
+    private void loadGeneral(){
+        souls = Double.parseDouble(general.get(0)[0]);
+        worldSeed = Integer.parseInt(general.get(1)[0]);
+        refreshSoulPower();
+    }
+    
     public String getFlag(interactables i){
         for(String[] s : flags){
             if(s[0].equals(i.name()) && s.length > 1){
@@ -155,11 +164,6 @@ public class GameEngine {
             }
         }
         return null;
-    }
-    
-    private void loadGeneral(){
-        souls = Double.parseDouble(general.get(0)[0]);
-        worldSeed = Integer.parseInt(general.get(1)[0]);
     }
     
     public String getFlag(String i){
@@ -175,24 +179,24 @@ public class GameEngine {
         return worldSeed;
     }
     
+    //Sets given value to flag
     public Boolean setFlag(String f, String value){
-        for(String[] s : flags){
-            if(s[0].equals(f)){
-                if(s.length > 1){
-                   s[1] = value; 
-                }else{
-                    s = new String[]{s[0], value};
-                }
+        for (int i = 0; i < flags.size(); i++) {
+            if(flags.get(i)[0].equals(f)){
+                String[] x = {f, value};
+                flags.set(i, x);
                 return true;
             }
         }
         return false;
     }
     
+    //Returns free inventory slots
     public int getInvSpaces(){
         return 32-inventory.size();
     }
     
+    //Calculates the value an item gives when burnt
     public double calcBurn(Item x){
         double price = 1000 * ((double)getGenericStat("ItemsBurned")/10+1) * Integer.parseInt(getStat("lvl"));
         alterSouls(price);
@@ -200,6 +204,7 @@ public class GameEngine {
         return price;
     }
     
+    //Takes a list of items and returns a list of strings carrying the same data
     public ArrayList<String[]> itemToList(ArrayList<Item> items){
         ArrayList<String[]> out = new ArrayList<>();
         for(Item i : items){
@@ -208,6 +213,7 @@ public class GameEngine {
         return out;
     }
     
+    //Writes the save when called
     public void WriteSave(){
         try {
             FileWriter fw = new FileWriter("src/saves/general.txt");
@@ -247,6 +253,7 @@ public class GameEngine {
           }
     }
     
+    //Returns armor protective points for calculation in combat
     public int getArmor(){
         int out = 0;
         if(equipped[0] != null){
@@ -262,6 +269,7 @@ public class GameEngine {
         equipped = items;
     }
     
+    //Calculates the multiplier based on item rarity
     public void calculateStats(){
         stats.forEach(s ->{
             s[1] = s[2];
@@ -293,6 +301,7 @@ public class GameEngine {
         });
     }
     
+    //Starts thread that counts souls
     public void soulCountThread(){
         Runnable newThread = () -> {
             addSouls();
@@ -310,7 +319,8 @@ public class GameEngine {
         return soulPower;
     }
     
-    public void refreshSoulPower(){
+    //Changes the power with which the player clicks in the engine menu
+    private void refreshSoulPower(){
         double newsp = 1;
         for(int i = 0; i < Integer.parseInt(getStat("lvl"))-1;i++){
             newsp *= 5;
@@ -322,6 +332,7 @@ public class GameEngine {
         return souls;
     }
     
+    //Tests if the endind requirements are met when triggering final conversation
     public Boolean endReq(){
         for(Item i : equipped){
             if(i == null || !i.getRarity().equals("legendary")){
@@ -331,6 +342,7 @@ public class GameEngine {
         return true;
     }
     
+    //Retursn statistic by it's name
     public String getStat(String name){
         for(String[] s : stats){
             if(s[0].equals(name)){
@@ -340,6 +352,7 @@ public class GameEngine {
         return "10";
     }
     
+    //Increases given statistic
     public void addStat(int idx){
         int x = Integer.parseInt(stats.get(idx)[2]);
         x += 1;
@@ -353,6 +366,7 @@ public class GameEngine {
         }
     }
     
+    //Refreshes shop stock
     public void refreshShops(){
         Random rnd = new Random();
         shopStocks.entrySet().forEach(shop -> {
@@ -365,6 +379,7 @@ public class GameEngine {
         });
     }
     
+    //Generates item from given shop
     public Item genRandomItem(String shop, Random rnd){
         Item x = null;
         while(x == null){
@@ -428,6 +443,7 @@ public class GameEngine {
         return points;
     }
     
+    //Returns multiplier for weapons based on rarity
     public double getDamage(){
         double div = 1;
         if(equipped[2] != null){
@@ -503,6 +519,7 @@ public class GameEngine {
         }
     }
     
+    //Returns wheter a location should be shown to the player as visitable or not
     public boolean getLockState(String tst){
         for(String[] s : unlocks){
             if(s[0].equals(tst)){
@@ -512,6 +529,7 @@ public class GameEngine {
         return false;
     }
     
+    //Handles story based logic for dialouges and progression for unlocks
     public void checkConnections(String event){
         for(String[] line : lookupTable){
             if(line[0].equals(event)){
@@ -535,6 +553,7 @@ public class GameEngine {
         }
     }
     
+    //Creates an item based on an ID and rarity
     public Item createItem(String[] in){
         Item x = null;
         for(String[] s : idList){
@@ -563,14 +582,15 @@ public class GameEngine {
         return x;
     }
     
+    //Logic for entering the gate
     public void enterPortal() throws IOException{
         la = new LabyrinthEngine(this, aeg);
         la.setBounds(0, 0, 1920, 1080);
         aeg.getFrame().getContentPane().add(la, 0);
         la.requestFocus();
-        //aeg.findPanel("subMenu").getParent().add(la, 0);
     }
     
+    //Logic for exiting the gate
     public void exitPortal(Boolean win){
         la.setVisible(false);
         aeg.getFrame().getContentPane().remove(la);
@@ -582,6 +602,7 @@ public class GameEngine {
         refreshSoulPower();
     }
     
+    //An item reader that stores values in a list of items
     public ArrayList<Item> readInv(String name){
         File file = new File("src/" + name + ".txt");
         ArrayList<Item> inv = new ArrayList<>();
@@ -599,6 +620,7 @@ public class GameEngine {
         return inv;
     }
     
+    //Specific reader for player gear
     private Item[] readGear(String name){
         File file = new File("src/" + name + ".txt");
         Item[] inv = new Item[5];
@@ -606,11 +628,11 @@ public class GameEngine {
             try {
                 br = new BufferedReader(new FileReader(file));
                 String st;
+                Boolean chrm = false;
                 while ((st = br.readLine()) != null){
                     String[] line = st.split(";");
                     for(String[] s : idList){
                         int idx = -1;
-                        Boolean chrm = false;
                         if(line[0].equals(s[0])){
                             switch(s[2]){
                                 case "helmet":
@@ -642,6 +664,7 @@ public class GameEngine {
         return inv;
     }
     
+    //String based reader for everything else
     static private ArrayList<String[]> readIn(String name){
         File file = new File("src/" + name + ".txt");
         ArrayList<String[]> data = new ArrayList<String[]>();

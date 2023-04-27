@@ -1,4 +1,5 @@
 009;legendary
-014;epic
-003;common
-021;epic
+014;legendary
+003;legendary
+021;legendary
+021;legendary

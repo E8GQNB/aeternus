@@ -18,12 +18,10 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -160,57 +158,72 @@ public class LabyrinthEngine extends JPanel{
     
     public void restart() {
         level = new Labyrinth();
-        Image playerImage = new ImageIcon("src/images/playerIcon.png").getImage();
         Image vignetteImage = new ImageIcon("src/images/vignetteTP.png").getImage();
-        int playerSpawnX = 152*4+10;
-        int playerSpawnY = 152*4+5;
-        int[] stats = new int[]{Integer.parseInt(game.getStat("str")), Integer.parseInt(game.getStat("con")), Integer.parseInt(game.getStat("dex")), Integer.parseInt(game.getStat("int")), Integer.parseInt(game.getStat("lck")), Integer.parseInt(game.getStat("lvl"))};
-        player = new Player(playerSpawnX, playerSpawnY, PLAYER_WIDTH, PLAYER_HEIGHT, playerImage, Integer.parseInt(game.getStat("con")), game.getDamage(), stats);
-        Player Up = new Player(playerSpawnX, playerSpawnY-5, PLAYER_WIDTH, PLAYER_HEIGHT, playerImage);
-        Player Right = new Player(playerSpawnX+5, playerSpawnY, PLAYER_WIDTH, PLAYER_HEIGHT, playerImage);
-        Player Down = new Player(playerSpawnX, playerSpawnY+5, PLAYER_WIDTH, PLAYER_HEIGHT, playerImage);
-        Player Left = new Player(playerSpawnX-5, playerSpawnY, PLAYER_WIDTH, PLAYER_HEIGHT, playerImage);
+        player = spawnPlayer("playerIcon", 0, 0);
+        Player Up = spawnPlayer("playerIcon", 0, -5);
+        Player Right = spawnPlayer("playerIcon", 5, 0);
+        Player Down = spawnPlayer("playerIcon", 0, 5);
+        Player Left = spawnPlayer("playerIcon", -5, 0);
         List<Player> newHB = Arrays.asList(Up, Right, Down, Left);
         playerHitbox.addAll(newHB);
         vignette = new Player(-1600, -440, 4537, 2190, vignetteImage);
-        spawnMonster(3 + Integer.parseInt(game.getStat("lvl")));
+        for(int i = 0; i < 3 + (Integer.parseInt(game.getStat("lvl"))/2); i++){
+            spawnMonster();
+        }
     }
     
-    public void spawnMonster(int amount){
-        for(int i = 0; i < amount; i++){
-            int random = (int) (Math.random() * 3);
-            int monsterX = (int) ((Math.random() * 15) + 1);
-            int monsterY = (int) ((Math.random() * 15) + 1);
-            Image monsterImage = new ImageIcon("src/images/Foes/Castle/" + enemy.values()[random].name() + ".png").getImage();
-            Image monsterToken = new ImageIcon("src/images/Foes/Castle/Tokens/" + enemy.values()[random].name() + ".png").getImage();
-            int hitbox = 10;
-            int ms = 120;
+    //Spawns player in the northwest of the map
+    public Player spawnPlayer(String image, int shiftX, int shiftY){
+        Image playerImage = new ImageIcon("src/images/" + image + ".png").getImage();
+        int playerSpawnX = 152*4+10;
+        int playerSpawnY = 152*4+5;
+        int[] stats = new int[]{Integer.parseInt(game.getStat("str")), Integer.parseInt(game.getStat("con")), 
+            Integer.parseInt(game.getStat("dex")), Integer.parseInt(game.getStat("int")), 
+            Integer.parseInt(game.getStat("lck")), Integer.parseInt(game.getStat("lvl"))};
+        Player p = new Player(playerSpawnX+shiftX, playerSpawnY+shiftY, PLAYER_WIDTH, PLAYER_HEIGHT, playerImage, Integer.parseInt(game.getStat("con")), game.getDamage(), stats);
+        return p;
+    }
+    
+    //Spawns monster in a random location
+    public Boolean spawnMonster(){
+        int random = (int) (Math.random() * 3);
+        int monsterX = (int) ((Math.random() * 15) + 1);
+        int monsterY = (int) ((Math.random() * 15) + 1);
+        Image monsterImage = new ImageIcon("src/images/Foes/Castle/" + enemy.values()[random].name() + ".png").getImage();
+        Image monsterToken = new ImageIcon("src/images/Foes/Castle/Tokens/" + enemy.values()[random].name() + ".png").getImage();
+        int hitbox = 10;
+        int ms = 120;
+        monsterX *= ms;
+        monsterY *= ms;
+
+        Monster m = new Monster(monsterX, monsterY, MONSTER_SIZE, MONSTER_SIZE, monsterImage, enemy.values()[random], monsterToken);
+        while(level.collides(m) || player.collides(m)){
+            monsterX = (int) ((Math.random() * 10) + 1);
+            monsterY = (int) ((Math.random() * 5) + 1);
             monsterX *= ms;
             monsterY *= ms;
-            
-            Monster m = new Monster(monsterX, monsterY, MONSTER_SIZE, MONSTER_SIZE, monsterImage, enemy.values()[random], monsterToken);
-            while(level.collides(m) || player.collides(m)){
-                monsterX = (int) ((Math.random() * 10) + 1);
-                monsterY = (int) ((Math.random() * 5) + 1);
-                monsterX *= ms;
-                monsterY *= ms;
-                m = new Monster(monsterX, monsterY, MONSTER_SIZE, MONSTER_SIZE, monsterImage, enemy.values()[random], monsterToken);
-            }
-            Monster up = new Monster(monsterX, monsterY-hitbox, MONSTER_SIZE, MONSTER_SIZE, monsterImage, enemy.values()[random]);
-            Monster right = new Monster(monsterX+hitbox, monsterY, MONSTER_SIZE, MONSTER_SIZE, monsterImage, enemy.values()[random]);
-            Monster down = new Monster(monsterX, monsterY+hitbox, MONSTER_SIZE, MONSTER_SIZE, monsterImage, enemy.values()[random]);
-            Monster left = new Monster(monsterX-hitbox, monsterY, MONSTER_SIZE, MONSTER_SIZE, monsterImage, enemy.values()[random]);
-            List<Monster> newMHB = Arrays.asList(up, right, down, left);
-            monsterHitboxes.addAll(newMHB);
-            monsters.add(m);
+            m = new Monster(monsterX, monsterY, MONSTER_SIZE, MONSTER_SIZE, monsterImage, enemy.values()[random], monsterToken);
         }
+        Monster up = new Monster(monsterX, monsterY-hitbox, MONSTER_SIZE, MONSTER_SIZE, monsterImage, enemy.values()[random]);
+        Monster right = new Monster(monsterX+hitbox, monsterY, MONSTER_SIZE, MONSTER_SIZE, monsterImage, enemy.values()[random]);
+        Monster down = new Monster(monsterX, monsterY+hitbox, MONSTER_SIZE, MONSTER_SIZE, monsterImage, enemy.values()[random]);
+        Monster left = new Monster(monsterX-hitbox, monsterY, MONSTER_SIZE, MONSTER_SIZE, monsterImage, enemy.values()[random]);
+        List<Monster> newMHB = Arrays.asList(up, right, down, left);
+        monsterHitboxes.addAll(newMHB);
+        int before = monsters.size();
+        monsters.add(m);
+        if(before < monsters.size()){
+            return true;
+        }
+        return false;
     }
 
     public static int getPoints(){
         return levelNum;
     }
     
-    private boolean moveViewport(){
+    //Shift viewPort to follow player
+    public boolean moveViewport(){
         int xmin = 480;
         int xmax = 1440;
         int ymin = 370;
@@ -295,6 +308,7 @@ public class LabyrinthEngine extends JPanel{
         c = null;
     }
     
+    //Rolls possibility of a level up after a monster has been slain
     public void rollLvl(){
         Random rnd = new Random();
         double lvlupchance = Math.pow(0.5, Double.parseDouble(game.getStat("lvl")));
@@ -321,6 +335,7 @@ public class LabyrinthEngine extends JPanel{
         return lower <= x && x <= upper;
     }
     
+    //Returns weighed chance
     private int getChance(int boost, int max){
         Random rnd = new Random();
         int chance = rnd.nextInt(max);
@@ -339,6 +354,7 @@ public class LabyrinthEngine extends JPanel{
         return 0;
     }
     
+    //Builds ending screen with loot
     public void endScreen(){
         Random rnd = new Random();
         ArrayList<Item> loot = new ArrayList<>();
@@ -346,7 +362,7 @@ public class LabyrinthEngine extends JPanel{
         
         //generate loot
         int amount = (int)(5 * Math.pow(rnd.nextDouble(), 1.5))+1;
-        if(game.getInvSpaces() > amount){
+        if(game.getInvSpaces() < amount){
             amount = game.getInvSpaces();
         }
         for(int i = 0; i < amount; i++){
@@ -413,7 +429,7 @@ public class LabyrinthEngine extends JPanel{
                     cl.setBounds(150 + ((max - loot.size())*340), 380, 240, 240);
                     cl.setIcon(new javax.swing.ImageIcon(loot.get(0).getImg().getScaledInstance(240, 240, Image.SCALE_DEFAULT)));
                     cl.setToolTipText("<html>" + loot.get(0).getName() + "<br><b><em style='color: #" 
-                                    + getColor(loot.get(0).getRarity()) + "'>" 
+                                    + loot.get(0).getColor() + "'>" 
                                     +  loot.get(0).getRarity()
                                     + "</em></b><br>" + "<html>");
                     this.add(cl, 0);
@@ -428,28 +444,6 @@ public class LabyrinthEngine extends JPanel{
                 exit(true);
             }
         });
-    }
-    
-    private String getColor(String input){
-        String out = "";
-        switch(input){
-            case "common":
-                out = "ffffff";
-            break;
-            case "uncommon":
-                out = "00ff00";
-            break;
-            case "rare":
-                out = "0000ff";
-            break;
-            case "epic":
-                out = "ff00ff";
-            break;
-            case "legendary":
-                out = "ffff00";
-            break;
-        }
-        return out;
     }
     
     private int monsterIndx = -1;
@@ -491,55 +485,43 @@ public class LabyrinthEngine extends JPanel{
             }
             
         }
-
+        //Drives monster pathfinding
         private void monsterController(int rnd){
             for(int i = 0; i < monsters.size(); i++){
                 int j = i*4;
                 if(rnd == 1){
+                    int dir = 0;
                     if(!level.collides(monsterHitboxes.get(j)) && monsters.get(i).gety() == 0){
-                        monsters.get(i).changeDirection(1);
-                        monsterHitboxes.get(j).changeDirection(1);
-                        monsterHitboxes.get(j+1).changeDirection(1);
-                        monsterHitboxes.get(j+2).changeDirection(1);
-                        monsterHitboxes.get(j+3).changeDirection(1);
+                        dir = 1;
                     }else if(!level.collides(monsterHitboxes.get(j+1)) && monsters.get(i).getx() == 0){
-                        monsters.get(i).changeDirection(2);
-                        monsterHitboxes.get(j).changeDirection(2);
-                        monsterHitboxes.get(j+1).changeDirection(2);
-                        monsterHitboxes.get(j+2).changeDirection(2);
-                        monsterHitboxes.get(j+3).changeDirection(2);
+                        dir = 2;
                     }else if(!level.collides(monsterHitboxes.get(j+2)) && monsters.get(i).gety() == 0){
-                        monsters.get(i).changeDirection(3);
-                        monsterHitboxes.get(j).changeDirection(3);
-                        monsterHitboxes.get(j+1).changeDirection(3);
-                        monsterHitboxes.get(j+2).changeDirection(3);
-                        monsterHitboxes.get(j+3).changeDirection(3);
+                        dir = 3;
                     }else if(!level.collides(monsterHitboxes.get(j+3)) && monsters.get(i).getx() == 0){
-                        monsters.get(i).changeDirection(4);
-                        monsterHitboxes.get(j).changeDirection(4);
-                        monsterHitboxes.get(j+1).changeDirection(4);
-                        monsterHitboxes.get(j+2).changeDirection(4);
-                        monsterHitboxes.get(j+3).changeDirection(4);
+                        dir = 4;
+                    }
+                    if(dir > 0){
+                        monsters.get(i).changeDirection(dir);
+                        for(int k = 0; k < 4; k++){
+                            monsterHitboxes.get(j+k).changeDirection(dir);
+                        }
                     }
                 }
-                
                 monsters.get(i).move();
-                monsterHitboxes.get(j).move();
-                monsterHitboxes.get(j+1).move();
-                monsterHitboxes.get(j+2).move();
-                monsterHitboxes.get(j+3).move();
-                if (level.collides(monsters.get(i))) {
+                for(int k = 0; k < 4; k++){
+                    monsterHitboxes.get(j+k).move();
+                }
+                
+                if(level.collides(monsters.get(i))) {
                     monsters.get(i).stepBack();
-                    monsterHitboxes.get(j).stepBack();
-                    monsterHitboxes.get(j+1).stepBack();
-                    monsterHitboxes.get(j+2).stepBack();
-                    monsterHitboxes.get(j+3).stepBack();
+                    for(int k = 0; k < 4; k++){
+                        monsterHitboxes.get(j+k).stepBack();
+                    }
                     rnd = (int) ((Math.random() * 4) + 1);
                     monsters.get(i).changeDirection(rnd);
-                    monsterHitboxes.get(j).changeDirection(rnd);
-                    monsterHitboxes.get(j+1).changeDirection(rnd);
-                    monsterHitboxes.get(j+2).changeDirection(rnd);
-                    monsterHitboxes.get(j+3).changeDirection(rnd);
+                    for(int k = 0; k < 4; k++){
+                        monsterHitboxes.get(j+k).changeDirection(rnd);
+                    }
                 }
             }
         }

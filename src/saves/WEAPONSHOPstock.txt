@@ -1,5 +1,4 @@
 008;uncommon
-005;common
 011;rare
 016;uncommon
 014;rare

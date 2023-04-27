@@ -55,6 +55,8 @@ public class AeternusGUI {
     private GameEngine.locations currentLocale;
     private LocalTime portalEntry = LocalTime.now().minusMinutes(10);
     private MouseListener ml;
+    private Boolean endTrigger = false;
+    private Boolean fade = false;
     private ShopManager shop;
     private EscapeMenu esc;
     private EngineMenu engine;
@@ -73,25 +75,26 @@ public class AeternusGUI {
         );
     }
 
+    //Initializes the GUI
     public void initiateGame(Boolean newGame){
         this.game = new GameEngine(this, 73915, newGame);
         inventory = new InventoryManager(this, game);
         ((JPanel) s.getRootPane().getContentPane().getComponent(1)).getComponent(0).setVisible(true);
         new java.util.Timer().schedule( 
-        new java.util.TimerTask() {
-            @Override
-            public void run() {
-                findPanel("MainMenu").setVisible(false);
-                findPanel("Main").setVisible(true);
-                if(newGame){
-                    newGame();
-                }else{
-                    loadGame();
+            new java.util.TimerTask() {
+                @Override
+                public void run() {
+                    findPanel("MainMenu").setVisible(false);
+                    findPanel("Main").setVisible(true);
+                    if(newGame){
+                        newGame();
+                    }else{
+                        loadGame();
+                    }
                 }
-            }
-        }, 
+            }, 
         570
-);
+        );
         
     }
     
@@ -111,6 +114,7 @@ public class AeternusGUI {
         return locationOptions;
     }
     
+    //Returns a panel based on it's name
     public JPanel findPanel(String name){
         for(Component c : clist){
             if(c.getName().equals(name)){
@@ -120,6 +124,7 @@ public class AeternusGUI {
         return null;
     }
     
+    //Creates and plays an info card
     private void playInfo(InfoText inf, String text, int length, String path, int speed) throws InterruptedException{
         fadeIn(transitionCover, 5);
         inf.createText(text, length);
@@ -131,6 +136,7 @@ public class AeternusGUI {
         dialougeState = b;
     }
     
+    //Transitions from background-to-background on the main panel
     private void setBackground(String path, int speed, boolean transition){
         if(transition){
             fadeIn(transitionCover, speed);
@@ -142,6 +148,7 @@ public class AeternusGUI {
         }
     }
     
+    //Transitions from background-to-background from the main to the sub panel
     private void setBackground(String path, int speed, boolean transition, JLabel bg, JPanel to){
         if(transition){
             fadeIn(transitionCover, speed);
@@ -158,6 +165,7 @@ public class AeternusGUI {
         }
     }
     
+    //Fading for transitions
     public void fadeIn(JLabel l, int length){
         l.setFocusable(false);
         l.getParent().setComponentZOrder(l, 0);
@@ -190,6 +198,7 @@ public class AeternusGUI {
             }
     }
     
+    //Transition creator
     public JLabel createTransition(JPanel dest){
         JLabel tr = new JLabel();
         tr.setForeground(new java.awt.Color(0, 0, 0, 0));
@@ -202,6 +211,7 @@ public class AeternusGUI {
         return tr;
     }
     
+    //Background image creator
     public JLabel createBackground(JPanel dest, int z){
         JLabel bg = new JLabel();
         bg.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
@@ -214,6 +224,7 @@ public class AeternusGUI {
         return bg;
     }
     
+    //Loads in the general area (Ex.: Square)
     private void loadLocale(GameEngine.locations x, boolean transition){
         currentLocale = x;
         setBackground(x.getPath(), 5, transition);
@@ -223,6 +234,7 @@ public class AeternusGUI {
         findPanel("Main").getParent().repaint();
     }
     
+    //Searches if portal label is visible and refreshes it's text according to the cooldown
     public void refreshPortal(){
         for(JLabel j : locationOptions){
             if(j.getName().equals("Enter Portal")){
@@ -250,6 +262,7 @@ public class AeternusGUI {
         }
     }
     
+    //Triggers after you exit a labyrinth
     public void afterPortalExit(Boolean win){
         LocalTime l2 = portalEntry.plusMinutes(5);
         long difference = LocalTime.now().until(l2, ChronoUnit.MINUTES);
@@ -262,6 +275,7 @@ public class AeternusGUI {
         portalThread(difference);
     }
     
+    //Loads all clickable locations on a map (Ex.: Base, Magic Shop)
     private void loadPointsOfInterest(GameEngine.locations x){
         ArrayList<String[]> POI = x.getPOI();
         currentLocale = x;
@@ -296,6 +310,7 @@ public class AeternusGUI {
         transitionCover.getParent().setComponentZOrder(transitionCover, 0);
     }
     
+    //Deletes the clickable locations
     private void removePointsOfInterest(){
         for(JLabel l : mapLocations){
             l.getParent().remove(l);
@@ -311,6 +326,7 @@ public class AeternusGUI {
         }
     }
     
+    //Creates a submenu panel used in every location.
     private void createNewPanel(String name, int z){
         JPanel newP = new JPanel();
         newP.setBackground(new java.awt.Color(0, 0, 0));
@@ -329,6 +345,7 @@ public class AeternusGUI {
         newP.getParent().repaint();
     }
     
+    //Loads specific location with it's available options (Ex.:Shop, Talk)
     private void loadLocation(java.awt.event.MouseEvent evt){
         createNewPanel("subMenu", 0);
         setSoulCount(findPanel("subMenu"));
@@ -337,25 +354,26 @@ public class AeternusGUI {
         Thread one = new Thread() {
             @Override
             public void run() {
-                setPOI(false);
                 setBackground("/images/" + evt.getComponent().getName() + ".png", 2, true, subBackground, findPanel("subMenu"));
-                if(flag != null && !flag.equals("")){
-                    startDialouge(flag);
-                }
-                int cnt = 0;
-                for(String[] row : options){
-                    if(row[0].equals("option")){
-                        addOption(row[1], GameEngine.interactables.valueOf(evt.getComponent().getName()).toString(), cnt);
-                        cnt++;
-                    }
-                }
-                invLabel.setEnabled(true);
-                esc = new EscapeMenu(findPanel("subMenu"), AeternusGUI.this, game);
             }
         };
         one.start();
+        setPOI(false);
+        if(flag != null && !flag.equals("")){
+            startDialouge(flag);
+        }
+        int cnt = 0;
+        for(String[] row : options){
+            if(row[0].equals("option")){
+                addOption(row[1], GameEngine.interactables.valueOf(evt.getComponent().getName()).toString(), cnt);
+                cnt++;
+            }
+        }
+        invLabel.setEnabled(true);
+        esc = new EscapeMenu(findPanel("subMenu"), AeternusGUI.this, game);
     }
     
+    //Launches the thread that refreshes the portal label
     private void portalThread(long difference){
         Thread two = new Thread() {
             @Override
@@ -373,6 +391,7 @@ public class AeternusGUI {
         two.start();
     }
     
+    //Adds it's given option to the submenu panel (Ex.: Shop)
     private void addOption(String name, String id, int place){
         JLabel newL = new JLabel();
         labelFactory(newL, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
@@ -394,6 +413,7 @@ public class AeternusGUI {
         });
     }
     
+    //Decides what to do when an option is clicked
     private void option(java.awt.event.MouseEvent evt, String id, String name){
         if(!dialougeState){
             setOptions(false);
@@ -416,6 +436,7 @@ public class AeternusGUI {
                 case "Talk":
                     if(id.equals("MAGICSHOP") && game.getSouls() > 100000000){
                         if(game.endReq()){
+                            fade = true;
                             startDialouge("EndReady");
                         }else{
                             startDialouge("EndNotReady");
@@ -460,6 +481,17 @@ public class AeternusGUI {
         }
     }
     
+    public void endFade(){
+        Thread x = new Thread(){
+            @Override
+            public void run(){
+                fadeIn(subTransition, 15);
+                System.exit(0);
+            }
+        };
+        x.start();
+    }
+    
     public void showMerger(){
         inventory.showInventory(findPanel("subMenu"), "merge");
     }
@@ -476,6 +508,7 @@ public class AeternusGUI {
         }
     }
     
+    //Sets up the given label to simplify code view
     public void labelFactory(JLabel j, boolean opacity, boolean vis, int[] alignment, Color fG, Color bG, String text, Font f){
         j.setOpaque(opacity);
         j.setVisible(vis);
@@ -488,6 +521,7 @@ public class AeternusGUI {
         j.setName(text);
     }
     
+    //Creates label taht displays current souls
     private void setSoulCount(JPanel destination){
         labelFactory(soulCount, true, true, new int[]{SwingConstants.LEFT, SwingConstants.TOP}, 
                 new Color(204, 204, 204), 
@@ -503,6 +537,7 @@ public class AeternusGUI {
         return invLabel;
     }
     
+    //Creates the label taht activates/deactivates the inventory
     private void createInvButton(JPanel destination){
         invLabel.removeMouseListener(ml);
         invLabel.setEnabled(false);
@@ -540,13 +575,18 @@ public class AeternusGUI {
         engine = null;
     }
     
+    //Refreshes the label displaying souls and the upgrade options availability
     public void refreshSouls(){
         if(!activeLabyrinth){
-            if(game.getSouls() > 10000000){
+            if(game.getSouls() > 100000000){
                 soulCount.setForeground(Color.cyan);
-                game.setFlag("MAGICSHOP", "Ending");
-            }else if(game.getSouls() > 1000000){
-                soulCount.setText(String.format("%.0f", game.getSouls()/1000000) + "." + String.format("%.0f", game.getSouls()%1000000/100000) + "M");
+                if(!endTrigger){
+                    game.setFlag("MAGICSHOP", "Ending");
+                    endTrigger = true;
+                }
+            }
+            if(game.getSouls() > 1000000){
+                soulCount.setText(String.format("%.1f", game.getSouls()/1000000)+ "M");
             }else if(game.getSouls() > 1000){
                 soulCount.setText(String.format("%.0f", game.getSouls()));
             }else{
@@ -561,6 +601,7 @@ public class AeternusGUI {
         }
     }
     
+    //"Leaves" the submenu panel by destroying it
     public void leaveSubMenu(){
         findPanel("subMenu").getParent().remove(findPanel("subMenu"));
         removePointsOfInterest();
@@ -569,6 +610,7 @@ public class AeternusGUI {
         s.getRootPane().getContentPane().repaint();
     }
     
+    //Creates and runs a dialougesystem
     private void startDialouge(String name){
         dialougeState = true;
         setOptions(false);
@@ -585,11 +627,15 @@ public class AeternusGUI {
                 }
                 game.checkConnections(name);
                 game.removeFlag(name);
+                if(fade){
+                    endFade();
+                }
             }
         };
         one.start();
     }
     
+    //Decids whether to open the shop based on flags
     private void loadShop(String id){
         if(id.equals("MAGICSHOP")){
             if(game.getSouls() == 0){
@@ -620,6 +666,7 @@ public class AeternusGUI {
         activeLabyrinth = b;
     }
     
+    //Loads previous save
     public void loadGame(){
         new java.util.Timer().schedule( 
         new java.util.TimerTask() {
@@ -645,6 +692,7 @@ public class AeternusGUI {
 );
     }
     
+    //Creates a new game
     public void newGame(){
         new java.util.Timer().schedule( 
         new java.util.TimerTask() {

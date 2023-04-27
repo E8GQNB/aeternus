@@ -97,6 +97,7 @@ public class MainFrame extends javax.swing.JFrame {
         setExtendedState(6);
         setForeground(new java.awt.Color(0, 0, 0));
         setLocation(new java.awt.Point(0, 0));
+        setMinimumSize(new java.awt.Dimension(1920, 1080));
         setUndecorated(true);
         setResizable(false);
         getContentPane().setLayout(null);
@@ -122,7 +123,7 @@ public class MainFrame extends javax.swing.JFrame {
         MainMenu.setPreferredSize(new java.awt.Dimension(1920, 1080));
         MainMenu.setLayout(null);
 
-        transitionOut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/transitionToGame.gif"))); // NOI18N
+        transitionOut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/transitionNewest.gif"))); // NOI18N
         MainMenu.add(transitionOut);
         transitionOut.setBounds(0, 0, 1920, 1080);
         transitionOut.setVisible(false);

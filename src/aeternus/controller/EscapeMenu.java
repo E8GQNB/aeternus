@@ -20,14 +20,12 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
-/**
- *
- * @author User
- */
 public class EscapeMenu {
     private AeternusGUI gui;
     private GameEngine game;
     private JPanel j;
+    private ArrayList<JLabel> escScreen = new ArrayList<>();
+    
     public EscapeMenu(JPanel j, AeternusGUI gui, GameEngine game){
         this.gui = gui;
         this.game = game;
@@ -35,7 +33,8 @@ public class EscapeMenu {
         addEsc();
     }
     
-    public void addEsc(){
+    //Adds escape button functionality
+    private void addEsc(){
         j.requestFocus();
         j.getInputMap().put(KeyStroke.getKeyStroke("ESCAPE"), "escape");
         j.getActionMap().put("escape", new AbstractAction() {
@@ -62,9 +61,9 @@ public class EscapeMenu {
             }
         });
     }
-    
-    ArrayList<JLabel> escScreen = new ArrayList<>();
-    public void buildEscScreen(JPanel dest){
+
+    //Buidlds menu when button is clicked
+    private void buildEscScreen(JPanel dest){
         JLabel bg = new JLabel();
         JLabel icon = new JLabel();
         JLabel savebttn = new JLabel();

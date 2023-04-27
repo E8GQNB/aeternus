@@ -10,6 +10,7 @@ import aeternus.view.AeternusGUI;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.MouseInfo;
 import java.util.ArrayList;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
@@ -31,9 +32,9 @@ public class EngineMenu {
         showEngineMenu();
     }
     
-    
+    //Renders menu for engine
     private void showEngineMenu(){
-        pop = new PopupFloatingText(gui, game, gui.findPanel("subMenu"), 15);
+        pop = new PopupFloatingText(gui.findPanel("subMenu"), 15);
         gui.labelFactory(engine, false, true, new int[]{SwingConstants.LEFT, SwingConstants.TOP}, 
                 new Color(204, 204, 204), 
                 new Color(0, 0, 0, 150), 
@@ -48,7 +49,7 @@ public class EngineMenu {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 game.alterSouls(game.getSoulPower());
                 gui.refreshSouls();
-                pop.spawnEffect(String.valueOf(game.getSoulPower()), true);
+                pop.spawnEffect(String.valueOf(game.getSoulPower()), true, MouseInfo.getPointerInfo().getLocation(), 50);
             }
         });
         ArrayList<String[]> upgrades = game.getEngineUpgrades();
@@ -59,6 +60,7 @@ public class EngineMenu {
         }
     }
     
+    //Adds the upgrade options
     private void addUpgradeOption(String name, int place, double price, String desc, double power){
         CustomLabel newL = new CustomLabel();
         gui.labelFactory(newL, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
@@ -96,6 +98,7 @@ public class EngineMenu {
         });
     }
     
+    //Logic for buying upgrades
     private void buyUpgrade(String name){
         int indx = 0;
         for(String[] row : game.getEngineUpgrades()){
@@ -114,6 +117,7 @@ public class EngineMenu {
         }
     }
     
+    //Refreshes upgrade options based on availability
     public void refreshUpgrades(){
         for(JLabel j : upgradeOptions){
             j.setEnabled((game.getSouls() - Double.parseDouble(j.getName())) >= 0);
