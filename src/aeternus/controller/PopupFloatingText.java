@@ -5,10 +5,8 @@
  */
 package aeternus.controller;
 
-import aeternus.view.AeternusGUI;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.MouseInfo;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Random;
@@ -24,53 +22,38 @@ import javax.swing.SwingConstants;
  * @author User
  */
 public class PopupFloatingText {
-    private AeternusGUI gui;
-    private GameEngine game;
     private JPanel jp;
     private ArrayList<JLabel> effects = new ArrayList<JLabel>();
     private ArrayList<Integer> effectLifespan = new ArrayList<Integer>();
     
-    public PopupFloatingText(AeternusGUI gui, GameEngine game, JPanel jp, int speed){
-        this.gui = gui;
-        this.game = game;
+    public PopupFloatingText(JPanel jp, int speed){
         this.jp = jp;
         effectThread(speed);
     }
     
-    
-    public void spawnEffect(String s, Boolean positive){
-        JLabel j = new JLabel();
-        Color c = ((positive) ? new Color(200,200,200) : new Color(200,0,0));
-        gui.labelFactory(j, false, true, new int[]{SwingConstants.LEFT, SwingConstants.CENTER}, 
-                c, 
-                null, 
-                s, 
-                new Font("Agency FB", 1, 30));
-        Point p = MouseInfo.getPointerInfo().getLocation();
-        Random rnd = new Random();
-        j.setBounds(p.x + rnd.nextInt(50)-30, p.y - rnd.nextInt(50), 300, 50);
-        jp.add(j);
-        jp.setComponentZOrder(j, 0);
-        effects.add(j);
-        effectLifespan.add(40);
-    }
-    
-    public void spawnEffect(String s, Boolean miss, Point p, int zone){
+    //Renders floating effect
+    public Boolean spawnEffect(String s, Boolean miss, Point p, int zone){
         JLabel j = new JLabel();
         Color c = ((miss) ? new Color(200,200,200) : new Color(200,0,0));
-        gui.labelFactory(j, false, true, new int[]{SwingConstants.LEFT, SwingConstants.CENTER}, 
-                c, 
-                null, 
-                s, 
-                new Font("Agency FB", 1, 30));
+        j.setVisible(true);
+        j.setHorizontalAlignment(SwingConstants.LEFT);
+        j.setVerticalAlignment(SwingConstants.CENTER);
+        j.setForeground(c);
+        j.setText(s);
+        j.setFont(new Font("Agency FB", 1, 30));
         Random rnd = new Random();
         j.setBounds(p.x + rnd.nextInt(zone)-(zone/2), p.y - rnd.nextInt(zone), 300, 50);
         jp.add(j);
         jp.setComponentZOrder(j, 0);
         effects.add(j);
         effectLifespan.add(40);
+        if(jp.isAncestorOf(j)){
+            return true;
+        }
+        return false;
     }
     
+    //Starts thread in charge of handling effects
     private void effectThread(int speed){
         Runnable newThread = () -> {
             for(int i = 0; i < effects.size(); i++){

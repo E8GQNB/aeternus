@@ -6,11 +6,8 @@
 package aeternus.model;
 
 import aeternus.controller.CombatEngine.enemy;
-import static junit.framework.Assert.assertEquals;
-import aeternus.model.Monster;
 import java.util.Random;
 import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 import org.junit.Test;
 

@@ -34,9 +34,10 @@ public class DialougeSystem {
         createSpeakerName();
         createSpeakerImage();
         createTextBox();
-        createBackground();
+        destination.add(createBackground(dialougeBackground), 4);
     }
 
+    //Self describing
     public void removeAllStuff(){
         destination.remove(dialougeTextBox);
         destination.remove(speakerName);
@@ -51,6 +52,7 @@ public class DialougeSystem {
         dialougeTextBox.setForeground(new java.awt.Color(204, 204, 204));
         dialougeTextBox.setColumns(20);
         dialougeTextBox.setLineWrap(true);
+        dialougeTextBox.setWrapStyleWord(true);
         dialougeTextBox.setRows(5);
         dialougeTextBox.setDisabledTextColor(new java.awt.Color(204, 204, 204));
         dialougeTextBox.setEnabled(false);
@@ -103,15 +105,16 @@ public class DialougeSystem {
         flag = false;
     }  
     
-    private void createBackground(){
-        dialougeBackground.setBackground(new Color(30, 30, 30, 0));
-        dialougeBackground.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        dialougeBackground.setOpaque(true);
-        dialougeBackground.setVisible(false);
-        destination.add(dialougeBackground, 4);
-        dialougeBackground.setBounds(0, 700, 1920, 380);
+    private JLabel createBackground(JLabel j){
+        j.setBackground(new Color(30, 30, 30, 0));
+        j.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        j.setOpaque(true);
+        j.setVisible(false);
+        j.setBounds(0, 700, 1920, 380);
+        return j;
     }
     
+    //Customized faders
     public void fadeIn(JLabel l, int length){
             try {
                 for(int i = 0; i < 200; i++){
@@ -139,6 +142,7 @@ public class DialougeSystem {
             }
     }
     
+    //Plays dialouge scene
     public void play(String id) throws Exception{
         dialougeBackground.setVisible(true);
         fadeIn(dialougeBackground, 5);
@@ -202,11 +206,11 @@ public class DialougeSystem {
     }
     
     private ArrayList<String[]> readIn(String name) throws Exception{
-        //File file = new File("src/dialouge/" + name + ".txt");
-        File file = new File("src/dialouge/devmode.txt");
+        File file = new File("src/dialouge/" + name + ".txt");
+        //File file = new File("src/dialouge/devmode.txt");
         BufferedReader br = new BufferedReader(new FileReader(file));
         String st;
-        ArrayList<String[]> dialouge = new ArrayList<String[]>();
+        ArrayList<String[]> dialouge = new ArrayList<>();
         while ((st = br.readLine()) != null){
             String[] line = st.split(";");
             dialouge.add(line);

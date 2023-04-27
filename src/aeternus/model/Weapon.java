@@ -18,7 +18,7 @@ public class Weapon extends Item{
     }
     
     @Override
-    public void equip(int slot){
+    public Boolean equip(int slot){
         Item[] newGear = gm.getEquipped();
         ArrayList<Item> inv = gm.getInv();
         Item current = null;
@@ -33,5 +33,9 @@ public class Weapon extends Item{
             inv.remove(slot);
         }
         gm.setInventory(inv);
+        if(inv.size()-1 < slot || inv.get(slot) == current){
+            return true;
+        }
+        return false;
     }
 }

@@ -1,4 +1,4 @@
-ItemsBurned;16
+ItemsBurned;19
 ItemsMerged;0
-PortalsEntered;9
+PortalsEntered;10
 LabyrinthsWon;0

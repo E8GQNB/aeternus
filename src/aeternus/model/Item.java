@@ -70,6 +70,28 @@ public class Item {
         return out;
     }
     
+    public String getColor(){
+        String out = "";
+        switch(rarity){
+            case "common":
+                out = "ffffff";
+            break;
+            case "uncommon":
+                out = "00ff00";
+            break;
+            case "rare":
+                out = "0000ff";
+            break;
+            case "epic":
+                out = "ff00ff";
+            break;
+            case "legendary":
+                out = "ffff00";
+            break;
+        }
+        return out;
+    }
+    
     public void boostRarity(){
         switch(rarity){
             case "common":
@@ -123,5 +145,6 @@ public class Item {
         return shopPrice;
     }
     
-    public void equip(int slot){}
+    public Boolean equip(int slot){
+    return true;}
 }

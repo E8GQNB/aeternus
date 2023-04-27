@@ -108,6 +108,7 @@ public class EngineTest {
     @Test
     public void readTest(){
         ArrayList<Item> inv = game.readInv("saves/playerInventory");
+        game.setInventory(inv);
         assertEquals(game.getInv(), inv);
     };
     

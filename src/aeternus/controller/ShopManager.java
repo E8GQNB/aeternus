@@ -12,6 +12,7 @@ import aeternus.view.AeternusGUI;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.MouseInfo;
 import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -34,8 +35,9 @@ public class ShopManager {
         this.shopID = shopID;
     }
     
+    //Renders shop screen
     public void openShop(){
-        pop = new PopupFloatingText(gui, game, gui.findPanel("subMenu"), 35);
+        pop = new PopupFloatingText(gui.findPanel("subMenu"), 35);
         JLabel shopBg = new JLabel();
         gui.labelFactory(shopBg, true, true, new int[]{SwingConstants.CENTER, SwingConstants.CENTER}, 
                 new Color(204, 204, 204), 
@@ -67,22 +69,17 @@ public class ShopManager {
                     for(String[] s : idList){
                         if(s[0].equals(id)){
                             String stat = decodeStat(stock.get(i*8 + j).getStat());
+                            String flavor = "";
                             if(stock.get(i*8 + j) instanceof Weapon && stat.length() > 0){
-                                shopSlot.setToolTipText("<html>" + s[1] + "<br>§" + stock.get(i*8 + j).getPrice() + "<br><b><em style='color: #" 
-                                    + getColor(stock.get(i*8 + j).getRarity()) 
-                                    + "'>" +  stock.get(i*8 + j).getRarity() 
-                                    + "</em></b><br>" + "Scales from " + stat + "<html>");
+                                flavor += "Scales from your " + stat;
                             }else if(stat.length() > 0){
-                                shopSlot.setToolTipText("<html>" + s[1] + "<br>§" + stock.get(i*8 + j).getPrice() + "<br><b><em style='color: #" 
-                                    + getColor(stock.get(i*8 + j).getRarity()) 
-                                    + "'>" +  stock.get(i*8 + j).getRarity() 
-                                    + "</em></b><br>" + "Increases your " + stat + "<html>");
-                            }else{
-                                shopSlot.setToolTipText("<html>" + s[1] + "<br>§" + stock.get(i*8 + j).getPrice() + "<br><b><em style='color: #" 
-                                    + getColor(stock.get(i*8 + j).getRarity()) 
-                                    + "'>" +  stock.get(i*8 + j).getRarity() 
-                                    + "</em></b><br>" + "<html>");
+                                flavor += "Increases your " + stat;
                             }
+                            
+                            shopSlot.setToolTipText("<html>" + s[1] + "<br>§" + stock.get(i*8 + j).getPrice() + "<br><b><em style='color: #" 
+                                    + stock.get(i*8 + j).getColor() 
+                                    + "'>" +  stock.get(i*8 + j).getRarity() 
+                                    + "</em></b><br>" + flavor + "<html>");
                         }
                     }
                     int slotnum = i*8 + j;
@@ -148,9 +145,9 @@ public class ShopManager {
                     gui.findPanel("subMenu").repaint();
                 openShop();
                 }else if(game.getSouls() < paidRefreshCost()){
-                    pop.spawnEffect("You cannot afford this.", false);
+                    pop.spawnEffect("You cannot afford this.", false, MouseInfo.getPointerInfo().getLocation(), 50);
                 }else{
-                    pop.spawnEffect("You do not have inventory space!", false);
+                    pop.spawnEffect("You do not have inventory space!", false, MouseInfo.getPointerInfo().getLocation(), 50);
                 }
             }
         });
@@ -159,6 +156,7 @@ public class ShopManager {
         gui.findPanel("subMenu").repaint();
     }
     
+    //Returns the price of a shop refresh when paid for.
     public double paidRefreshCost(){
         ArrayList<Item> stock = game.getStock(shopID);
         int out = 1;
@@ -179,7 +177,8 @@ public class ShopManager {
         gui.findPanel("subMenu").repaint();
     }
     
-    private void purchaseItem(int slot, String shop){
+    //Item purchase logic
+    private Boolean purchaseItem(int slot, String shop){
         ArrayList<Item> stock = game.getStock(shop);
         ArrayList<Item> inv = game.getInv();
         if(game.getSouls() >= stock.get(slot).getPrice()){
@@ -197,33 +196,14 @@ public class ShopManager {
                 gui.findPanel("subMenu").revalidate();
                 gui.findPanel("subMenu").repaint();
             openShop();
+            return true;
         }else{
-            pop.spawnEffect("You cannot afford this.", false);
+            pop.spawnEffect("You cannot afford this.", false, MouseInfo.getPointerInfo().getLocation(), 50);
+            return false;
         }
     }
     
-    public String getColor(String input){
-        String out = "";
-        switch(input){
-            case "common":
-                out = "ffffff";
-            break;
-            case "uncommon":
-                out = "00ff00";
-            break;
-            case "rare":
-                out = "0000ff";
-            break;
-            case "epic":
-                out = "ff00ff";
-            break;
-            case "legendary":
-                out = "ffff00";
-            break;
-        }
-        return out;
-    }
-    
+    //Returns formal name of stat
     private String decodeStat(String st){
         String stat = "";
         switch(st){
