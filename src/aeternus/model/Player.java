@@ -16,8 +16,8 @@ public class Player extends Sprite{
     private double velx;
     private double vely;
     private int maxHP;
-    private Double hp;
-    private Double damage;
+    private double hp;
+    private double damage;
     private int[] stats = new int[6];
     
     public Player(int x, int y, int width, int height, Image image, int maxHP, Double damage, int[] stats) {
@@ -83,12 +83,5 @@ public class Player extends Sprite{
     
     public void setVely(double vely) {
         this.vely = vely;
-    }
-    
-    public boolean isOut(){
-        if(y < -50){
-            return true;
-        }
-        return false;
     }
 }

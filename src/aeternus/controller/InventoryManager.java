@@ -132,7 +132,7 @@ public class InventoryManager {
                                     flavor += "Increases your " + stat;
                                 }
 
-                                custom.setToolTipText("<html>" + s[1] + "<br>§" + x.getPrice() + "<br><b><em style='color: #" 
+                                custom.setToolTipText("<html>" + s[1] + "<br><b><em style='color: #" 
                                         + x.getColor() 
                                         + "'>" +  x.getRarity() 
                                         + "</em></b><br>" + flavor + "<html>");
@@ -215,7 +215,7 @@ public class InventoryManager {
         intLabel.setText("Intelligence: " + game.getStat("int") + points);
         lckLabel.setText("Luck: " + game.getStat("lck") + points);
         
-        strLabel.setToolTipText("<html>" + "Your strength determines your chance at whitstanding an attack. The formula is as follows:<br> Strength / 5" + "<html>");
+        strLabel.setToolTipText("<html>" + "Your strength determines your chance at withstanding an attack. The formula is as follows:<br> Strength / 5" + "<html>");
         conLabel.setToolTipText("<html>" + "Your constitution directly correlates with your hp. It is a 1:1 ratio." +"<html>");
         dexLabel.setToolTipText("<html>" + "Your dexterity determines how well you can dodge attacks. The formula for evasion is as follows:<br> Dexterity / 5" +"<html>");
         intLabel.setToolTipText("<html>" + "Your intelligence determines how you pick your attack spots. The higher it is the bigger the critical damage you deal. <br>Each point correlates to a % above 100" +"<html>");
@@ -249,7 +249,7 @@ public class InventoryManager {
                                 flavor += "Increases your " + stat;
                             }
                             
-                            invSlot.setToolTipText("<html>" + s[1] + "<br>§" + item.getPrice() + "<br><b><em style='color: #" 
+                            invSlot.setToolTipText("<html>" + s[1] + "<br><b><em style='color: #" 
                                     + item.getColor() 
                                     + "'>" +  item.getRarity() 
                                     + "</em></b><br>" + flavor + "<html>");

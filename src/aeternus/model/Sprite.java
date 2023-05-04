@@ -9,11 +9,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Rectangle;
 
-/**
- *
- * @author User
- */
-public class Sprite {
+public abstract class Sprite {
     protected int x;
     protected int y;
     protected int width;
