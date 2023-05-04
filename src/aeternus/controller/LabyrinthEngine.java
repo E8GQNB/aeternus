@@ -36,15 +36,13 @@ import javax.swing.Timer;
  */
 public class LabyrinthEngine extends JPanel{
     private final int FPS = 240;
-    private final int PLAYER_WIDTH = 60;
-    private final int PLAYER_HEIGHT = 60;
+    private final int PLAYER_SIZE = 60;
     private final int PLAYER_MOVEMENT = 1;
     private final int MONSTER_SIZE = 120;
 
     private boolean paused = false;
     private static int levelNum = 0;
     private Labyrinth level;
-    private Monster monster;
     private Player vignette;
     private Player player;
     private Boolean activeCombat = false;
@@ -166,7 +164,7 @@ public class LabyrinthEngine extends JPanel{
         Player Left = spawnPlayer("playerIcon", -5, 0);
         List<Player> newHB = Arrays.asList(Up, Right, Down, Left);
         playerHitbox.addAll(newHB);
-        vignette = new Player(-1600, -440, 4537, 2190, vignetteImage);
+        vignette = new Player(-1580, -440, 4537, 2190, vignetteImage);
         for(int i = 0; i < 3 + (Integer.parseInt(game.getStat("lvl"))/2); i++){
             spawnMonster();
         }
@@ -180,7 +178,7 @@ public class LabyrinthEngine extends JPanel{
         int[] stats = new int[]{Integer.parseInt(game.getStat("str")), Integer.parseInt(game.getStat("con")), 
             Integer.parseInt(game.getStat("dex")), Integer.parseInt(game.getStat("int")), 
             Integer.parseInt(game.getStat("lck")), Integer.parseInt(game.getStat("lvl"))};
-        Player p = new Player(playerSpawnX+shiftX, playerSpawnY+shiftY, PLAYER_WIDTH, PLAYER_HEIGHT, playerImage, Integer.parseInt(game.getStat("con")), game.getDamage(), stats);
+        Player p = new Player(playerSpawnX+shiftX, playerSpawnY+shiftY, PLAYER_SIZE, PLAYER_SIZE, playerImage, Integer.parseInt(game.getStat("con")), game.getDamage(), stats);
         return p;
     }
     

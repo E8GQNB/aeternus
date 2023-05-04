@@ -17,7 +17,7 @@ public class Monster extends Sprite{
     private double velx;
     private double vely;
     private int maxHP;
-    private Double hp;
+    private double hp;
     private int damage;
     private Image token;
 

@@ -18,8 +18,7 @@ import javax.swing.ImageIcon;
  */
 public class Labyrinth {
     
-    private final int BLOCK_WIDTH = 120;
-    private final int BLOCK_HEIGHT = 120;
+    private final int BLOCK_SIZE = 120;
     private final int ACROSS = 29;
     private final int DOWN = 30;
     ArrayList<Cell> cells;
@@ -35,7 +34,7 @@ public class Labyrinth {
     private int[][] floor = new int[ACROSS][DOWN];
     
     //Labyrinth generation logic
-    public void genLevel(){
+    private void genLevel(){
         cells = new ArrayList<>();
         outer = new ArrayList<>();
         floorTiles = new ArrayList<>();
@@ -85,16 +84,16 @@ public class Labyrinth {
                 if(j < DOWN-1){
                     if(j == DOWN-2){
                         Image image = new ImageIcon("src/images/castlewall.png").getImage();
-                        cells.add(new Cell(i * BLOCK_WIDTH, j * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT, new Image[]{image, null, null, null, null}));
+                        cells.add(new Cell(i * BLOCK_SIZE, j * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, new Image[]{image, null, null, null, null}));
                     }else{
                         if(maze[i][j] == 1 && maze[i][j+1] != 1){
                             Random rnd = new Random();
                             Image image = new ImageIcon("src/images/Labyrinth/Castle/Walls/" + rnd.nextInt(5) + ".png").getImage();
                             Image shadow = new ImageIcon("src/images/Labyrinth/Shadows/2.png").getImage();
-                            cells.add(new Cell(i * BLOCK_WIDTH, j * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT, new Image[]{image, null, null, shadow, null}));
+                            cells.add(new Cell(i * BLOCK_SIZE, j * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, new Image[]{image, null, null, shadow, null}));
                         }else if(maze[i][j] == 1 && maze[i][j+1] == 1){
                             Image image = new ImageIcon("src/images/castledark.png").getImage();
-                            cells.add(new Cell(i * BLOCK_WIDTH, j * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT, new Image[]{image, null, null, null, null}));
+                            cells.add(new Cell(i * BLOCK_SIZE, j * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, new Image[]{image, null, null, null, null}));
                         }else{
                             Image image = new ImageIcon("src/images/floor1.png").getImage();
                             Image[] imgs = new Image[5];
@@ -116,7 +115,7 @@ public class Labyrinth {
                                 imgs[4] = null;
                             }
                             
-                            floorTiles.add(new Cell(i * BLOCK_WIDTH, j * BLOCK_HEIGHT, BLOCK_WIDTH, BLOCK_HEIGHT, imgs));
+                            floorTiles.add(new Cell(i * BLOCK_SIZE, j * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, imgs));
                         }
                     }
                 }
@@ -127,7 +126,7 @@ public class Labyrinth {
             for(int j = 0; j < DOWN*4; j++){
                 if((j < 10 || i < 10) || (j > 37 || i > 38)){
                     Image image = new ImageIcon("src/images/castledark.png").getImage();
-                    outer.add(new Cell((i * BLOCK_WIDTH)-(BLOCK_WIDTH * 10), (j * BLOCK_HEIGHT)-(BLOCK_WIDTH * 10), BLOCK_WIDTH, BLOCK_HEIGHT, image));
+                    outer.add(new Cell((i * BLOCK_SIZE)-(BLOCK_SIZE * 10), (j * BLOCK_SIZE)-(BLOCK_SIZE * 10), BLOCK_SIZE, BLOCK_SIZE, image));
                 }
             }
         }
@@ -152,7 +151,7 @@ public class Labyrinth {
     }
 
     //Picks neightbor when generating labyrinth
-    public int[] randomValidNeighbor(int x, int y){
+    private int[] randomValidNeighbor(int x, int y){
         int[] res = new int[2];
         boolean run = true;
         while(run){
@@ -195,27 +194,8 @@ public class Labyrinth {
         return res;
     }
     
-    public boolean neighbors(int x, int y){
-        int cnt = 0;
-        if(maze[x+1][y] == 0){
-            cnt++;
-        }if(maze[x-1][y] == 0){
-            cnt++;
-        }
-        if(maze[x][y+1] == 0){
-            cnt++;
-        }
-        if(maze[x][y-1] == 0){
-            cnt++;
-        }
-        if(cnt == 1){
-            return true;
-        }
-        return false;
-    }
-    
     //Marks the frontiers for generation
-    public void markFrontiers(int x, int y){
+    private void markFrontiers(int x, int y){
         if(x+2 < ACROSS-1){
             if(maze[x+2][y] == 1){
             int[] temp = {x+2, y};

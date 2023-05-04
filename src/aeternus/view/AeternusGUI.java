@@ -71,7 +71,7 @@ public class AeternusGUI {
                 findPanel("SplashScreen").setVisible(false);
             }
         }, 
-        100
+        10000
         );
     }
 
@@ -93,7 +93,7 @@ public class AeternusGUI {
                     }
                 }
             }, 
-        570
+        5700
         );
         
     }
@@ -407,14 +407,14 @@ public class AeternusGUI {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 if(newL.isEnabled()){
-                    option(evt, id, name);
+                    option(id, name);
                 }
             }
         });
     }
     
     //Decides what to do when an option is clicked
-    private void option(java.awt.event.MouseEvent evt, String id, String name){
+    private void option(String id, String name){
         if(!dialougeState){
             setOptions(false);
             String flag = game.getFlag(name);
