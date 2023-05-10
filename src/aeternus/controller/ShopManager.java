@@ -178,7 +178,11 @@ public class ShopManager {
     }
     
     //Item purchase logic
+<<<<<<< HEAD
     public Boolean purchaseItem(int slot, String shop){
+=======
+    private Boolean purchaseItem(int slot, String shop){
+>>>>>>> f6d5470dec48dbb5f341e6c47ae7f2649e9cf6a5
         ArrayList<Item> stock = game.getStock(shop);
         ArrayList<Item> inv = game.getInv();
         if(game.getSouls() >= stock.get(slot).getPrice()){

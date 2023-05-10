@@ -189,11 +189,7 @@
               <Color blue="0" green="0" red="0" type="rgb"/>
             </Property>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-<<<<<<< HEAD
-              <Image iconType="2" name="C:\Users\User\Documents\NetBeansProjects\aeternus\src\images\Locations\menuBackground.png"/>
-=======
               <Image iconType="3" name="/images/menuBackground.png"/>
->>>>>>> f6d5470dec48dbb5f341e6c47ae7f2649e9cf6a5
             </Property>
             <Property name="toolTipText" type="java.lang.String" value=""/>
           </Properties>

@@ -327,7 +327,11 @@ public class AeternusGUI {
     }
     
     //Creates a submenu panel used in every location.
+<<<<<<< HEAD
     public void createNewPanel(String name, int z){
+=======
+    private void createNewPanel(String name, int z){
+>>>>>>> f6d5470dec48dbb5f341e6c47ae7f2649e9cf6a5
         JPanel newP = new JPanel();
         newP.setBackground(new java.awt.Color(0, 0, 0));
         newP.setMinimumSize(new java.awt.Dimension(1920, 1080));
@@ -354,7 +358,11 @@ public class AeternusGUI {
         Thread one = new Thread() {
             @Override
             public void run() {
+<<<<<<< HEAD
                 setBackground("/images/Locations/" + evt.getComponent().getName() + ".png", 2, true, subBackground, findPanel("subMenu"));
+=======
+                setBackground("/images/" + evt.getComponent().getName() + ".png", 2, true, subBackground, findPanel("subMenu"));
+>>>>>>> f6d5470dec48dbb5f341e6c47ae7f2649e9cf6a5
             }
         };
         one.start();
@@ -473,6 +481,13 @@ public class AeternusGUI {
                         Logger.getLogger(AeternusGUI.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 break;
+<<<<<<< HEAD
+=======
+                case "Travel Home":
+                    
+                break;
+
+>>>>>>> f6d5470dec48dbb5f341e6c47ae7f2649e9cf6a5
             }
         }
     }
@@ -676,7 +691,11 @@ public class AeternusGUI {
                 try {
                     transitionCover = createTransition(findPanel("Main"));
                     backgroundImage = createBackground(findPanel("Main"), 1);
+<<<<<<< HEAD
                     setBackground("/images/Locations/menuBackground.png", 5, true);
+=======
+                    setBackground("/images/menuBackground.png", 5, true);
+>>>>>>> f6d5470dec48dbb5f341e6c47ae7f2649e9cf6a5
                     loadLocale(GameEngine.locations.SQUARE, false);
                     
                 } catch (Exception ex) {
@@ -706,16 +725,28 @@ public class AeternusGUI {
                     transitionCover = createTransition(findPanel("Main"));
                     transitionCover.setBackground(Color.cyan);
                     backgroundImage = createBackground(findPanel("Main"), 6);
+<<<<<<< HEAD
                     setBackground("/images/Locations/caveBackground.png", 5, true);
                     d.play("Open");
                     while(dialougeState){}
                     Thread.sleep(1000);
                     playInfo(inf, "An hour later...", 3000, "/images/Locations/caveBackground.png", 5);
+=======
+                    setBackground("/images/caveBackground.png", 5, true);
+                    d.play("Open");
+                    while(dialougeState){}
+                    Thread.sleep(1000);
+                    playInfo(inf, "An hour later...", 3000, "/images/caveBackground.png", 5);
+>>>>>>> f6d5470dec48dbb5f341e6c47ae7f2649e9cf6a5
                     dialougeState = true;
                     d.play("Open2");
                     while(dialougeState){}
                     Thread.sleep(1000);
+<<<<<<< HEAD
                     playInfo(inf, "At the surface", 2500, "/images/Locations/menuBackground.png", 5);
+=======
+                    playInfo(inf, "At the surface", 2500, "/images/menuBackground.png", 5);
+>>>>>>> f6d5470dec48dbb5f341e6c47ae7f2649e9cf6a5
                     dialougeState = true;
                     d.play("Open3");
                     while(dialougeState){}

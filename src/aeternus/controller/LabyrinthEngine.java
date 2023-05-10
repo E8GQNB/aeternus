@@ -133,7 +133,11 @@ public class LabyrinthEngine extends JPanel{
             }
         });
         levelNum = 0;
+<<<<<<< HEAD
         bootLabyrinth();
+=======
+        restart();
+>>>>>>> f6d5470dec48dbb5f341e6c47ae7f2649e9cf6a5
         newFrameTimer = new Timer(1000 / FPS, new NewFrameListener());
         newFrameTimer.start();
     }
@@ -154,7 +158,11 @@ public class LabyrinthEngine extends JPanel{
         vignette.setVely(y);
     }
     
+<<<<<<< HEAD
     public void bootLabyrinth() {
+=======
+    public void restart() {
+>>>>>>> f6d5470dec48dbb5f341e6c47ae7f2649e9cf6a5
         level = new Labyrinth();
         Image vignetteImage = new ImageIcon("src/images/vignetteTP.png").getImage();
         player = spawnPlayer("playerIcon", 0, 0);
@@ -184,7 +192,11 @@ public class LabyrinthEngine extends JPanel{
     
     //Spawns monster in a random location
     public Boolean spawnMonster(){
+<<<<<<< HEAD
         int random = (int) (Math.random() * enemy.values().length);
+=======
+        int random = (int) (Math.random() * 3);
+>>>>>>> f6d5470dec48dbb5f341e6c47ae7f2649e9cf6a5
         int monsterX = (int) ((Math.random() * 15) + 1);
         int monsterY = (int) ((Math.random() * 15) + 1);
         Image monsterImage = new ImageIcon("src/images/Foes/Castle/" + enemy.values()[random].name() + ".png").getImage();
