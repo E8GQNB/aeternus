@@ -327,7 +327,7 @@ public class AeternusGUI {
     }
     
     //Creates a submenu panel used in every location.
-    private void createNewPanel(String name, int z){
+    public void createNewPanel(String name, int z){
         JPanel newP = new JPanel();
         newP.setBackground(new java.awt.Color(0, 0, 0));
         newP.setMinimumSize(new java.awt.Dimension(1920, 1080));
@@ -354,7 +354,7 @@ public class AeternusGUI {
         Thread one = new Thread() {
             @Override
             public void run() {
-                setBackground("/images/" + evt.getComponent().getName() + ".png", 2, true, subBackground, findPanel("subMenu"));
+                setBackground("/images/Locations/" + evt.getComponent().getName() + ".png", 2, true, subBackground, findPanel("subMenu"));
             }
         };
         one.start();
@@ -473,10 +473,6 @@ public class AeternusGUI {
                         Logger.getLogger(AeternusGUI.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 break;
-                case "Travel Home":
-                    
-                break;
-
             }
         }
     }
@@ -680,7 +676,7 @@ public class AeternusGUI {
                 try {
                     transitionCover = createTransition(findPanel("Main"));
                     backgroundImage = createBackground(findPanel("Main"), 1);
-                    setBackground("/images/menuBackground.png", 5, true);
+                    setBackground("/images/Locations/menuBackground.png", 5, true);
                     loadLocale(GameEngine.locations.SQUARE, false);
                     
                 } catch (Exception ex) {
@@ -710,16 +706,16 @@ public class AeternusGUI {
                     transitionCover = createTransition(findPanel("Main"));
                     transitionCover.setBackground(Color.cyan);
                     backgroundImage = createBackground(findPanel("Main"), 6);
-                    setBackground("/images/caveBackground.png", 5, true);
+                    setBackground("/images/Locations/caveBackground.png", 5, true);
                     d.play("Open");
                     while(dialougeState){}
                     Thread.sleep(1000);
-                    playInfo(inf, "An hour later...", 3000, "/images/caveBackground.png", 5);
+                    playInfo(inf, "An hour later...", 3000, "/images/Locations/caveBackground.png", 5);
                     dialougeState = true;
                     d.play("Open2");
                     while(dialougeState){}
                     Thread.sleep(1000);
-                    playInfo(inf, "At the surface", 2500, "/images/menuBackground.png", 5);
+                    playInfo(inf, "At the surface", 2500, "/images/Locations/menuBackground.png", 5);
                     dialougeState = true;
                     d.play("Open3");
                     while(dialougeState){}

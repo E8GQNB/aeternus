@@ -174,7 +174,7 @@ public class MainFrame extends javax.swing.JFrame {
         logo.setBounds(0, 330, 1920, 380);
 
         background.setBackground(new java.awt.Color(0, 0, 0));
-        background.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/menuBackground.png"))); // NOI18N
+        background.setIcon(new javax.swing.ImageIcon("C:\\Users\\User\\Documents\\NetBeansProjects\\aeternus\\src\\images\\Locations\\menuBackground.png")); // NOI18N
         background.setToolTipText("");
         MainMenu.add(background);
         background.setBounds(0, 0, 1920, 1080);

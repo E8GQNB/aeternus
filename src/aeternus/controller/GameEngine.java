@@ -30,12 +30,12 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 
 public class GameEngine {
-    public enum characters {
+    private enum characters {
     PLAYER, SERVANT, WEAPONMERCHANT, MAGICMERCHANT
 }
     //This acts as a stub for anyone wanting to add more maps
     public enum locations{
-        SQUARE("/images/menuBackground.png", readIn("locations/Square"));
+        SQUARE("/images/Locations/menuBackground.png", readIn("locations/Square"));
         
         private final String path;
         private ArrayList<String[]> POI = new ArrayList<String[]>();
@@ -54,12 +54,12 @@ public class GameEngine {
         }
     }
     
-    //Responsible for locations
+    //Responsible for ingame locations
     public enum interactables{
-        MAGICSHOP(readIn("MagicShop")),
-        WEAPONSHOP(readIn("WeaponShop")),
-        BASE(readIn("Base")),
-        PORTAL(readIn("Portal"));
+        MAGICSHOP(readIn("locations/MagicShop")),
+        WEAPONSHOP(readIn("locations/WeaponShop")),
+        BASE(readIn("locations/Base")),
+        PORTAL(readIn("locations/Portal"));
         
         private ArrayList<String[]> data = new ArrayList<String[]>();
         
@@ -75,30 +75,10 @@ public class GameEngine {
             if(idx == -1){
                 data.add(s);
                 return false;
-            }else{
-                data.add(idx, s);
-                return true;
             }
             
-        }
-        
-        //Reads location info from txt
-        static private ArrayList<String[]> readIn(String name){
-            File file = new File("src/locations/" + name + ".txt");
-            ArrayList<String[]> data = new ArrayList<>();
-            data.clear();
-            BufferedReader br;
-                try {
-                    br = new BufferedReader(new FileReader(file));
-                    String st;
-                    while ((st = br.readLine()) != null){
-                        String[] line = st.split(";");
-                        data.add(line);
-                    }
-                } catch (Exception ex) {
-                    Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            return data;
+            data.add(idx, s);
+            return true;
         }
     }
     
@@ -227,8 +207,12 @@ public class GameEngine {
                     gear.add(x);
                 }
             }
-            var files = Arrays.asList("Unlocks", "eventflags", "engine", "connections", "playerStats", "genericStats", "MAGICSHOPstock", "WEAPONSHOPstock", "playerGear", "playerInventory");
-            var data = Arrays.asList(unlocks, flags, engineUpgrades, lookupTable, stats, genericStats, itemToList(shopStocks.get("MAGICSHOP")), itemToList(shopStocks.get("WEAPONSHOP")), itemToList(gear), itemToList(inventory));
+            var files = Arrays.asList("Unlocks", "eventflags", "engine", 
+                    "connections", "playerStats", "genericStats", "MAGICSHOPstock", 
+                    "WEAPONSHOPstock", "playerGear", "playerInventory");
+            var data = Arrays.asList(unlocks, flags, engineUpgrades, 
+                    lookupTable, stats, genericStats, itemToList(shopStocks.get("MAGICSHOP")), 
+                    itemToList(shopStocks.get("WEAPONSHOP")), itemToList(gear), itemToList(inventory));
             for(int i = 0; i < files.size(); i++){
                 try {
                     FileWriter f = new FileWriter("src/saves/" + files.get(i) + ".txt");
@@ -665,7 +649,7 @@ public class GameEngine {
     }
     
     //String based reader for everything else
-    static private ArrayList<String[]> readIn(String name){
+    static public ArrayList<String[]> readIn(String name){
         File file = new File("src/" + name + ".txt");
         ArrayList<String[]> data = new ArrayList<String[]>();
         BufferedReader br;
