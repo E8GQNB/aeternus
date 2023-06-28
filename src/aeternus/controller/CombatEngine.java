@@ -28,15 +28,9 @@ import javax.swing.SwingConstants;
  * @author User
  */
 public class CombatEngine {
-<<<<<<< HEAD
     //Enemy types can be adjusted here.
     public enum enemy{
         KNIGHT(10, 2), MAGE(5, 5), VANGUARD(20, 2);
-=======
-    //Enemy types can be adjusted here. There is a special unused KING variety as well
-    public enum enemy{
-        KNIGHT(10, 2), MAGE(5, 5), VANGUARD(20, 2), KING(15, 5);
->>>>>>> f6d5470dec48dbb5f341e6c47ae7f2649e9cf6a5
         private int hp;
         private int dmg;
         

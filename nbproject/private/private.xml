@@ -3,18 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/controller/GameEngine.java</file>
-<<<<<<< HEAD
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/model/Labyrinth.java</file>
             <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/view/MainFrame.java</file>
             <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/view/AeternusGUI.java</file>
-=======
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/controller/EngineMenu.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/test/aeternus/view/EngineTest.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/controller/PopupFloatingText.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/test/aeternus/view/GUITest.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/view/MainFrame.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/aeternus/src/aeternus/controller/ShopManager.java</file>
->>>>>>> f6d5470dec48dbb5f341e6c47ae7f2649e9cf6a5
         </group>
     </open-files>
 </project-private>

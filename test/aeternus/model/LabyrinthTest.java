@@ -21,9 +21,9 @@ public class LabyrinthTest {
     @Test
     public void statTest(){
         Random rnd = new Random();
-        Monster m = new Monster(0, 0, 50, 50, null, enemy.values()[rnd.nextInt(4)], null);
+        Monster m = new Monster(0, 0, 50, 50, null, enemy.values()[rnd.nextInt(3)], null);
         assertTrue(lab.collides(m));
-        m = new Monster(-100, -100, 50, 50, null, enemy.values()[rnd.nextInt(4)], null);
+        m = new Monster(-100, -100, 50, 50, null, enemy.values()[rnd.nextInt(3)], null);
         assertFalse(lab.collides(m));
     };
 }

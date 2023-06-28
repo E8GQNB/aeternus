@@ -133,11 +133,7 @@ public class LabyrinthEngine extends JPanel{
             }
         });
         levelNum = 0;
-<<<<<<< HEAD
         bootLabyrinth();
-=======
-        restart();
->>>>>>> f6d5470dec48dbb5f341e6c47ae7f2649e9cf6a5
         newFrameTimer = new Timer(1000 / FPS, new NewFrameListener());
         newFrameTimer.start();
     }
@@ -158,11 +154,7 @@ public class LabyrinthEngine extends JPanel{
         vignette.setVely(y);
     }
     
-<<<<<<< HEAD
     public void bootLabyrinth() {
-=======
-    public void restart() {
->>>>>>> f6d5470dec48dbb5f341e6c47ae7f2649e9cf6a5
         level = new Labyrinth();
         Image vignetteImage = new ImageIcon("src/images/vignetteTP.png").getImage();
         player = spawnPlayer("playerIcon", 0, 0);
@@ -173,8 +165,9 @@ public class LabyrinthEngine extends JPanel{
         List<Player> newHB = Arrays.asList(Up, Right, Down, Left);
         playerHitbox.addAll(newHB);
         vignette = new Player(-1580, -440, 4537, 2190, vignetteImage);
+        spawnMonster();
         for(int i = 0; i < 3 + (Integer.parseInt(game.getStat("lvl"))/2); i++){
-            spawnMonster();
+            
         }
     }
     
@@ -192,11 +185,7 @@ public class LabyrinthEngine extends JPanel{
     
     //Spawns monster in a random location
     public Boolean spawnMonster(){
-<<<<<<< HEAD
         int random = (int) (Math.random() * enemy.values().length);
-=======
-        int random = (int) (Math.random() * 3);
->>>>>>> f6d5470dec48dbb5f341e6c47ae7f2649e9cf6a5
         int monsterX = (int) ((Math.random() * 15) + 1);
         int monsterY = (int) ((Math.random() * 15) + 1);
         Image monsterImage = new ImageIcon("src/images/Foes/Castle/" + enemy.values()[random].name() + ".png").getImage();
@@ -321,7 +310,7 @@ public class LabyrinthEngine extends JPanel{
     //Rolls possibility of a level up after a monster has been slain
     public void rollLvl(){
         Random rnd = new Random();
-        double lvlupchance = Math.pow(0.5, Double.parseDouble(game.getStat("lvl")));
+        double lvlupchance = Math.pow(0.5, (Double.parseDouble(game.getStat("lvl")) <= 5) ? Double.parseDouble(game.getStat("lvl")) : 5);
         if(rnd.nextInt(100)+1 < lvlupchance*100){
             game.addStat(5);
         }

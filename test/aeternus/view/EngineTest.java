@@ -30,7 +30,7 @@ public class EngineTest {
     public void testLocation(){
         assertNotNull(locations.SQUARE);
         assertNotNull(locations.SQUARE.getPOI());
-        assertEquals("/images/menuBackground.png", locations.SQUARE.getPath());
+        assertEquals("/images/Locations/menuBackground.png", locations.SQUARE.getPath());
     };
     
     @Test
